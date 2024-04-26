@@ -27,7 +27,6 @@ from Products import views as product_views, endpoints as product_endpoints
 from Stores import views as store_views, endpoints as store_endpoints
 
 
-
 schema_view = get_schema_view(
     openapi.Info(
         title="NAME HERE API Documentation",
@@ -60,4 +59,7 @@ urlpatterns = [
     path('api/products/add', product_endpoints.add_product_endpoint),
     path('api/products/update', product_endpoints.update_product_endpoint),
     path('api/products/update_stock', product_endpoints.update_product_stock_endpoint),
+    path('api/products/remove_stock', product_endpoints.remove_product_stock_endpoint),
+    path('api/products/add_stock', product_endpoints.remove_product_stock_endpoint),
+    path('api/products/remove', product_endpoints.remove_product_endpoint),
 ]

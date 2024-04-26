@@ -9,6 +9,9 @@ class ProductSerializer(serializers.ModelSerializer):
     def run_validation(self, attrs):
         name = attrs.get('name')
         store_id = attrs.get('store_id')
+        quantity = attrs.get('quantity')
+        if quantity < 0:
+            raise serializers.ValidationError({"quantity": "Quantity cannot be negative"})
 
         if Product.objects.filter(name=name, store_id=store_id).exists():
             raise serializers.ValidationError({"name": "Product with this name already exists in this store"})

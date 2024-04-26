@@ -143,8 +143,8 @@ def update_product_endpoint(request):
                 serializer = ProductSerializer(product, data=data)
                 if serializer.is_valid():
                     serializer.save()
-                    if data.get("quantity") <= serializer.data.get("minimum_quantity"):
-                        send_notification(product.store.id, product.id, True, product.quantity)
+                    product = Product.objects.get(id=product_id)
+                    check_product_quantity(product.quantity, product.minimum_quantity, serializer.data.get('store_id'), product_id)
 
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -170,13 +170,16 @@ def update_product_stock_endpoint(request):
     product_id = data.get('id')
     try:
         product = Product.objects.get(id=product_id)
+        if data.get('quantity') < 0:
+            return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
         if request.user.is_authenticated:
             if request.user.is_superuser or request.user.store == product.store:
+                if data.get('quantity') < 0:
+                    return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST) 
                 product.quantity = data.get('quantity')
                 product.save()
-                if data.get("quantity") <= product.minimum_quantity:
-                    send_notification(product.store.id, product.id, True, product.quantity)
-
+                check_product_quantity(product.quantity, product.minimum_quantity, product.store.id, product.id)
+                    
                 return Response({"message": "Product stock updated successfully"}, status=status.HTTP_200_OK)
         return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
     except Product.DoesNotExist:
@@ -200,15 +203,17 @@ def remove_stock_endpoint(request):
     product_id = data.get('id')
     try:
         product = Product.objects.get(id=product_id)
+        if data.get('quantity') < 0:
+            return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
         if request.user.is_authenticated:
             if request.user.is_superuser or request.user.store == product.store:
-                if product.quantity < data.get('quantity'):
+                if data.get('quantity') > product.quantity:
                     return Response({"message": "You cannot remove more stock than is available"}, status=status.HTTP_400_BAD_REQUEST)
                 product.quantity -= data.get('quantity')
                 product.save()
-                if product.quantity <= product.minimum_quantity:
-                    send_notification(product.store.id, product.id, True, product.quantity)
+                check_product_quantity(product.quantity, product.minimum_quantity, product.store.id, product.id)
                 return Response({"message": "Product stock updated successfully"}, status=status.HTTP_200_OK)
+                
         return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
     except Product.DoesNotExist:
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
@@ -231,6 +236,8 @@ def add_stock_endpoint(request):
     product_id = data.get('id')
     try:
         product = Product.objects.get(id=product_id)
+        if data.get('quantity') < 0:
+            return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
         if request.user.is_authenticated:
             if request.user.is_superuser or request.user.store == product.store:
                 product.quantity += data.get('quantity')
@@ -266,6 +273,12 @@ def remove_product_endpoint(request):
     except Product.DoesNotExist:
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
 
+def check_product_quantity(current_stock, minimum_stock, store_id, product_id):
+    out_of_stock = current_stock == 0
+    if current_stock <= minimum_stock:
+        send_notification(store_id, product_id, out_of_stock, current_stock)
+
 def send_notification(store_id, product_id, out_of_stock, current_stock):
     #TODO Implement notification system
     pass
+
