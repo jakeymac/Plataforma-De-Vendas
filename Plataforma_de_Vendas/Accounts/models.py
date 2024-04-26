@@ -10,6 +10,8 @@ class CustomUser(AbstractUser):
     ]
 
     account_type = models.CharField(choices=ACCOUNT_TYPES, max_length=10, default='customer')
+    stock_notifications = models.BooleanField(default=True, null=True, blank=True) # For sellers to receive notifcations of their stock levels. 
+    store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE, null=True, blank=True) # For sellers to have a store
 
     def __str__(self):
         return self.username

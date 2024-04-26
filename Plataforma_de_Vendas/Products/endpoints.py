@@ -17,6 +17,7 @@ from .serializers import ProductSerializer
 from Stores.models import Store
 
 import json
+from django.core.mail import send_mail
 
 @swagger_auto_schema(
     method='get',
@@ -276,11 +277,19 @@ def remove_product_endpoint(request):
 def check_product_quantity(current_stock, minimum_stock, store_id, product_id):
     out_of_stock = current_stock == 0
     if current_stock <= minimum_stock:
-        send_notification(store_id, product_id, out_of_stock, current_stock)
+        send_low_stock_notification(store_id, product_id, out_of_stock, current_stock)
 
-def send_notification(store_id, product_id, out_of_stock, current_stock):
-    #TODO Implement notification system
-    pass
+def send_low_stock_notification(store_id, product_id, out_of_stock, current_stock):
+    product = Product.objects.get(id=product_id)
+    product_name = product.name
+    subject = 'Product Notification'
+    message = f'The product with ID {product_id} and name {product.name} is out of stock.' if out_of_stock else f'The product with ID {product_id} and name {product.name} is running low on stock. Current stock: {current_stock}'
+    from_email = '	plataformadevendassistema@gmail.com'
+    store = Store.objects.get(id=store_id)
+    accounts_to_notify = store.customuser_set.filter(stock_notifications=True)
+    recipient_list = [account.email for account in accounts_to_notify]
+    
+    send_mail(subject, message, from_email, recipient_list)
 
 @swagger_auto_schema(
     method='get',
