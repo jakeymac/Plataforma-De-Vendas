@@ -1,8 +1,5 @@
 #API endpoints for stores
-from django.http import JsonResponse
 from django.contrib.auth import authenticate
-
-from django.db import transaction
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -11,7 +8,6 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from Accounts.models import CustomUser
 from .models import Store
 from .serializers import StoreSerializer
 
@@ -73,7 +69,7 @@ def update_store_endpoint(request):
     try:
         store = Store.objects.get(id=store_id)
         if request.user.is_authenticated:
-            
+
             if request.user.is_superuser or request.user.id == store.owner.id:
                 serializer = StoreSerializer(store, data=data)
                 if serializer.is_valid():
