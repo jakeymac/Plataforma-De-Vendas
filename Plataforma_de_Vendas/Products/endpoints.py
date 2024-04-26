@@ -12,7 +12,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .models import Product
+from .models import Product, ProductImage, ProductInOrder
 from .serializers import ProductSerializer
 from Stores.models import Store
 
@@ -282,3 +282,74 @@ def send_notification(store_id, product_id, out_of_stock, current_stock):
     #TODO Implement notification system
     pass
 
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all images for a product by product id'
+)
+@api_view(['GET'])
+def product_images_endpoint(request, product_id):
+    try:
+        product = Product.objects.get(id=product_id)
+        images = ProductImage.objects.filter(product=product)
+        urls = [image.image.url for image in images]
+        images = product.productimage_set.all()
+        images_data = []
+        for image in images:
+            images_data.append(image.image.url)
+        return JsonResponse({"product_id": product_id, "image_urls": images_data}, status=status.HTTP_200_OK)
+    except Product.DoesNotExist:
+        return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['product_id', 'image'],
+        properties={
+            'product_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
+            'image': openapi.Schema(type=openapi.TYPE_FILE, description='Image file'),
+        }
+    ),
+    responses={201: 'Created'}
+)
+@api_view(['POST'])
+def add_product_image_endpoint(request):
+    data = request.data
+    product_id = data.get('product_id')
+    try:
+        product = Product.objects.get(id=product_id)
+        image = ProductImage(product=product, image=data.get('image'))
+        image.save()
+        return Response({"message": "Image added successfully"}, status=status.HTTP_201_CREATED)
+    except Product.DoesNotExist:
+        return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+@swagger_auto_schema(
+    method='delete',
+    responses={200: 'OK'},
+    description='Remove an image for a product by image id'
+)
+@api_view(['DELETE'])
+def remove_product_image_endpoint(request, image_id):
+    try:
+        image = ProductImage.objects.get(id=image_id)
+        image.delete()
+        return Response({"message": "Image removed successfully"}, status=status.HTTP_200_OK)
+    except ProductImage.DoesNotExist:
+        return Response({"message": f"Image not found with the id {image_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all products in an order by order id'
+)
+@api_view(['GET'])
+def products_in_order_endpoint(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+        products = ProductInOrder.objects.filter(order=order)
+        serializer = ProductInOrderSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Order.DoesNotExist:
+        return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)

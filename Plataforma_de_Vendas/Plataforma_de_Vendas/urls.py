@@ -62,4 +62,8 @@ urlpatterns = [
     path('api/products/remove_stock', product_endpoints.remove_product_stock_endpoint),
     path('api/products/add_stock', product_endpoints.remove_product_stock_endpoint),
     path('api/products/remove', product_endpoints.remove_product_endpoint),
+    path('api/products/add_image', product_endpoints.add_product_image_endpoint),
+    path('api/products/images/<int:product_id>', product_endpoints.get_product_images_endpoint),
+    path('api/products/order/<int:order_id>', product_endpoints.get_products_in_order_endpoint),
+    path('api/products/remove_image/<int:image_id>', product_endpoints.remove_product_image_endpoint),
 ]
