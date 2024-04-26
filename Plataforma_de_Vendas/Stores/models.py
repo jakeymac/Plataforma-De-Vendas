@@ -4,7 +4,7 @@ from django.db import models
 class Store(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    url = models.URLField()
+    url = models.CharField(max_length=75)
 
     def __str__(self):
         return self.name
