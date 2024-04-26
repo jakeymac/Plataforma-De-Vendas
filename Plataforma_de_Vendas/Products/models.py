@@ -8,6 +8,8 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField()
     details = models.TextField(default='{}')
+    minimum_quantity = models.IntegerField(default=10)
+    is_active = models.BooleanField(default=True)
     
 
     def __str__(self):

@@ -6,6 +6,15 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+    def run_validation(self, attrs):
+        name = attrs.get('name')
+        store_id = attrs.get('store_id')
+
+        if Product.objects.filter(name=name, store_id=store_id).exists():
+            raise serializers.ValidationError({"name": "Product with this name already exists in this store"})
+
+        return attrs
+
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage

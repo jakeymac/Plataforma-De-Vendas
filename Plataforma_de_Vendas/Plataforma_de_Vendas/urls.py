@@ -21,9 +21,9 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-from Accounts import views, endpoints
-from Orders import views, endpoints
-from Products import views, endpoints
+from Accounts import views as account_views, endpoints as account_endpoints
+from Orders import views as order_views, endpoints as order_endpoints
+from Products import views as product_views, endpoints as product_endpoints
 from Stores import views as store_views, endpoints as store_endpoints
 
 
@@ -51,4 +51,13 @@ urlpatterns = [
     path('api/stores/<int:store_id>/',store_endpoints.get_stores_endpoint),
     path('api/stores/add/',store_endpoints.add_store_endpoint),
     path('api/stores/update/',store_endpoints.update_store_endpoint),
+
+    path('api/products/', product_endpoints.get_products_endpoint),
+    path('api/products/<int:product_id>/', product_endpoints.get_products_endpoint),
+    path('api/products/store/<int:store_id>/', product_endpoints.get_products_endpoint),
+    path('api/products/search/', product_endpoints.search_for_product_endpoint),
+    path('api/products/search/<int:store_id>', product_endpoints.search_for_product_endpoint),
+    path('api/products/add', product_endpoints.add_product_endpoint),
+    path('api/products/update', product_endpoints.update_product_endpoint),
+    path('api/products/update_stock', product_endpoints.update_product_stock_endpoint),
 ]

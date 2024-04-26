@@ -1,6 +1,7 @@
 #API endpoints for stores
 from django.contrib.auth import authenticate
 
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,6 +14,12 @@ from .serializers import StoreSerializer
 
 import json
 
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all stores or a specific store by id'
+)
 @api_view(['GET'])
 def get_stores_endpoint(request,store_id=None):
     if store_id is not None:
@@ -90,4 +97,4 @@ def update_store_endpoint(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+ 
