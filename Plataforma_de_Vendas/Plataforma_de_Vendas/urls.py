@@ -33,7 +33,7 @@ schema_view = get_schema_view(
         default_version='v1',
         description="""This API provides seamless access to the NAME HERE system's 
         functionalites for managing products, inventory, orders,
-        user accounts of both store owners and customers""",
+        and user accounts of both store owners and customers""",
         contact=openapi.Contact(email="jmjohnson1578@gmail.com"),
     ),
     public=True,
