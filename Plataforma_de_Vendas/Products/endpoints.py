@@ -97,7 +97,7 @@ def search_for_product_endpoint(request, store_id=None):
             'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Product status'),
         }
     ),
-    responses={200: 'Created'}
+    responses={201: 'Created'}
 )
 @api_view(['POST'])
 def add_product_endpoint(request):
@@ -112,7 +112,7 @@ def add_product_endpoint(request):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({"message": "You do not have permission to add a product to this store"}, status=status.HTTP_403_FORBIDDEN)
+    return Response({"message": "You do not have permission to add a product to this store"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @swagger_auto_schema(
     method='put',
@@ -328,6 +328,7 @@ def add_product_image_endpoint(request):
     product_id = data.get('product_id')
     try:
         product = Product.objects.get(id=product_id)
+        #TODO add a checker to see if this image already exists (or with this name)
         image = ProductImage(product=product, image=data.get('image'))
         image.save()
         return Response({"message": "Image added successfully"}, status=status.HTTP_201_CREATED)
