@@ -363,3 +363,37 @@ def products_in_order_endpoint(request, order_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Order.DoesNotExist:
         return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all categories or a specific category by category id'
+)
+@api_view(['GET'])
+def get_categories_endpoint(request, category_id=None):
+    if category_id is not None:
+        try:
+            category = ProductCategory.objects.get(id=category_id)
+            serializer = ProductCategorySerializer(category)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ProductCategory.DoesNotExist:
+            return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+    categories = ProductCategory.objects.all()
+    serializer = ProductCategorySerializer(categories, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all products in a category by category id'
+)
+@api_view(['GET'])
+def find_products_in_category_endpoint(request, category_id):
+    try:
+        category = ProductCategory.objects.get(id=category_id)
+        products = Product.objects.filter(category=category)
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ProductCategory.DoesNotExist:
+        return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)

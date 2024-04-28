@@ -34,5 +34,5 @@ class ProductInOrder(models.Model):
 
 
 class ProductCategory(models.Model):
-    category_name = models.CharField(max_length=45)
-    
+    name = models.CharField(max_length=45)
+    description = models.TextField(null=True, blank=True)
