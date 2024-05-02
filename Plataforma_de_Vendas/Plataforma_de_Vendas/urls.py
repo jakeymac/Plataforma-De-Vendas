@@ -75,5 +75,12 @@ urlpatterns = [
     path('api/accounts/sellers/', account_endpoints.get_sellers_endpoint),
     path('api/accounts/sellers/<int:store_id>/', account_endpoints.get_sellers_by_store_endpoint),
     path('api/accounts/customers/', account_endpoints.get_customers_endpoint),
-    
+
+    path('api/orders/', order_endpoints.get_orders_endpoint),
+    path('api/orders/<int:order_id>/', order_endpoints.get_order_endpoint),
+    path('api/orders/user/<int:user_id>/', order_endpoints.get_orders_by_user_endpoint),
+    path('api/orders/store/<int:store_id>/', order_endpoints.get_orders_by_store_endpoint),
+    path('api/orders/add/', order_endpoints.create_order_endpoint),
+    path('api/orders/update/', order_endpoints.update_order_endpoint),
 ]
+
