@@ -1,0 +1,21 @@
+header {
+    background-color: #436a91;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    margin-left: 5%;
+    margin-right:5%;
+    margin-top:4%;
+    display: flex;
+    align-items: center;
+}
+
+header h1 {
+    width: 50%;
+    margin-left: 40%;
+}
+
+
+
+
+

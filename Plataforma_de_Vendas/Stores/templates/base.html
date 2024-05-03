@@ -1,0 +1,51 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    {% block scripts %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="{% static 'js/base.js' %}"></script>
+    {% endblock %}
+
+    {% block styles %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+    {% endblock %}
+    
+    
+</head>
+<body>
+    <header>
+        <h1>Plataforma de Vendas</h1>
+        <!-- Add your navigation menu here -->
+        <div id="nav-buttons-div">
+            <button type="button" id="home-nav-button" href="">Home</button>
+
+            {% if request.user.is_authenticated %}
+                {% if request.user.account_type == "customer" %}
+                    <button type="button" id="customer-account-info-nav-button">My account</button>
+                {% elif request.user.account_type == "seller" %}
+                    <button type="button" id="my-store-nav-button">My store</button>
+                {% else %}
+                    <button type="button" id="admin-settings-nav-button">Admin Settings</button>
+                {% endif %}
+            {% else %}
+                <div id="account-info-div">
+                    <button id="login-button">Login</button>
+                    <button id="register-button">Register</button>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+        <!-- Add your main content here -->
+    </main>
+
+    <footer>
+        <!-- Add your footer content here -->
+    </footer>
+</body>
+</html>

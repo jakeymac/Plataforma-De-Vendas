@@ -144,3 +144,16 @@ def edit_user_endpoint(request):
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
     return Response({"messages": "You are not authorized to make changes to this account"}, status.HTTP_401_UNAUTHORIZED)
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all users",
+    responses={200: CustomUserSerializer(many=True)}
+)
+@api_view(['GET'])
+def get_current_user_info_endpoint(request):
+    # TODO make this more secure (remove password, etc from response body)
+    if request.user.is_authenticated:
+        serializer = CustomUserSerializer(request.user)
+        return Response(serializer.data, status.HTTP_200_OK)
+    return Response({"message": "You are not logged in"}, status.HTTP_404_NOT_FOUND)
+

@@ -42,6 +42,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', store_views.home, name='index'),
     path('home/', store_views.home, name='home'),
     path('swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -71,10 +72,12 @@ urlpatterns = [
     path('api/products/search_category/<int:category_id>', product_endpoints.find_products_in_category_endpoint),
 
     path('api/accounts/', account_endpoints.get_users_endpoint),
+    path('api/accounts/current_user/', account_endpoints.get_current_user_info_endpoint),
     path('api/accounts/<int:user_id>/', account_endpoints.get_user_endpoint),
     path('api/accounts/sellers/', account_endpoints.get_sellers_endpoint),
     path('api/accounts/sellers/<int:store_id>/', account_endpoints.get_sellers_by_store_endpoint),
     path('api/accounts/customers/', account_endpoints.get_customers_endpoint),
+  
 
     path('api/orders/', order_endpoints.get_orders_endpoint),
     path('api/orders/<int:order_id>/', order_endpoints.get_order_endpoint),
