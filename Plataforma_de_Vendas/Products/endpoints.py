@@ -44,7 +44,7 @@ def get_products_endpoint(request, store_id=None, product_id=None):
     else:
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"products": serializer.data}, status=status.HTTP_200_OK)
 
 @swagger_auto_schema(
     method='get',

@@ -1,6 +1,6 @@
 #API endpoints for accounts
 from django.http import JsonResponse
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 
 from django.db.models import Q
 from django.db import transaction
@@ -156,4 +156,29 @@ def get_current_user_info_endpoint(request):
         serializer = CustomUserSerializer(request.user)
         return Response(serializer.data, status.HTTP_200_OK)
     return Response({"message": "You are not logged in"}, status.HTTP_404_NOT_FOUND)
+
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'username': openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, description="User's password")
+        }
+    )
+)
+@api_view(['POST'])
+def login_endpoint(request):
+    data = request.data
+    user = authenticate(username=data.get('username'), password=data.get('password'))
+    if user is not None:
+        login(request, user)
+        return Response({"message": "Logged in"}, status.HTTP_200_OK)
+    return Response({"message": "Invalid credentials"}, status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def logout_endpoint(request):
+    logout(request)
+    return Response({"message": "Logged out"}, status.HTTP_200_OK)
 

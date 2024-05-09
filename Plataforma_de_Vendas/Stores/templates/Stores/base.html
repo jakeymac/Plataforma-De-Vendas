@@ -24,17 +24,17 @@
 
             {% if request.user.is_authenticated %}
                 {% if request.user.account_type == "customer" %}
-                    <button type="button" id="customer-account-info-nav-button">My account</button>
+                    <button type="button" class="nav-button" id="customer-account-info-nav-button">My account</button>
                 {% elif request.user.account_type == "seller" %}
-                    <button type="button" id="my-store-nav-button">My store</button>
+                    <button type="button" class="nav-button" id="my-store-nav-button">My store</button>
                 {% else %}
-                    <button type="button" id="admin-settings-nav-button">Admin Settings</button>
+                    <button type="button" class="nav-button" id="admin-account-nav-button">My account</button>
                 {% endif %}
+                <button type="button" class="nav-button" id="logout-nav-button">Logout</button>
             {% else %}
-                <div id="account-info-div">
-                    <button id="login-button">Login</button>
-                    <button id="register-button">Register</button>
-                </div>
+                <button class="nav-button" id="login-nav-button">Login</button>
+                <button class="nav-button" id="register-account-nav-button">Register</button>
+                <button class="nav-button" id="register-store-nav-button">Register Store</button>
             {% endif %}
         </div>
     </header>

@@ -7,13 +7,25 @@ header {
     margin-right:5%;
     margin-top:4%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
 header h1 {
-    width: 50%;
-    margin-left: 40%;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
 }
+
+#nav-buttons-div {
+    margin-right: 5%;
+}
+
+.nav-button {
+    margin-left: 10px;
+}
+
+
 
 
 

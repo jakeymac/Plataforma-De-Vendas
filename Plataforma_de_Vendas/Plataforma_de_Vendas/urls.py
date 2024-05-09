@@ -43,9 +43,15 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', store_views.home, name='index'),
+    path('login/', account_views.login_page, name='login'),
+    path('register_account/', account_views.register_account_page, name='register_account'),
+    path('register_store/', account_views.register_store_page, name='register_store'),
+    path('logout/', account_views.logout_view, name='logout'),
     path('home/', store_views.home, name='home'),
     path('swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    path('admin_account', account_views.view_admin_account, name='admin_account'),
 
     path('api/stores/',store_endpoints.get_stores_endpoint),
     path('api/stores/<int:store_id>/',store_endpoints.get_stores_endpoint),
@@ -72,11 +78,14 @@ urlpatterns = [
     path('api/products/search_category/<int:category_id>', product_endpoints.find_products_in_category_endpoint),
 
     path('api/accounts/', account_endpoints.get_users_endpoint),
+    path('api/accounts/login', account_endpoints.login_endpoint),
+    path('api/accounts/logout/', account_endpoints.logout_endpoint),
     path('api/accounts/current_user/', account_endpoints.get_current_user_info_endpoint),
     path('api/accounts/<int:user_id>/', account_endpoints.get_user_endpoint),
     path('api/accounts/sellers/', account_endpoints.get_sellers_endpoint),
     path('api/accounts/sellers/<int:store_id>/', account_endpoints.get_sellers_by_store_endpoint),
     path('api/accounts/customers/', account_endpoints.get_customers_endpoint),
+   
   
 
     path('api/orders/', order_endpoints.get_orders_endpoint),

@@ -1,18 +1,40 @@
 
+
+function load_event_listeners() {
+    $("#home-nav-button").on("click", function() {
+        window.location.href = "/";
+    });
+
+    $("#admin-account-nav-button").on("click", function() {
+        window.location.href = "/admin_account";
+    });
+
+    $("#customer-account-nav-button").on("click", function() {
+        window.location.href = "/customer_account";
+    });
+
+    $("#my-store-nav-button").on("click", function() {
+        window.location.href = "/my_store";
+    });
+
+    $("#login-nav-button").on("click", function() {
+        window.location.href = "/login";
+    });
+
+    $("#register-account-nav-button").on("click", function() {
+        window.location.href = "/register_account";
+    });
+
+    $("#register-store-nav-button").on("click", function() {
+        window.location.href = "/register_store";
+    });
+
+    $("#logout-nav-button").on("click", function() {
+        window.location.href = "/logout";
+    });
+}
+
+
 $(document).ready(function() {
-    fetch('api/accounts/current_user/', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Error in request');
-        }
-    })
-    .then(data =>
-    console.log(data));
+    load_event_listeners();
 });
