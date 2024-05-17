@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     fetch('/api/products/', {
         method: 'GET',
