@@ -24,6 +24,17 @@
     border-radius:5px;
 }
 
+.product-card a {
+    text-decoration: none;
+    color: black;
+}
+
+.product-card a:hover {
+    text-decoration: underline;
+    color:#436a91;
+}
+
+
 @media only screen and (min-width: 768px) {
     #products-container {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

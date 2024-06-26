@@ -1,4 +1,4 @@
-$(document).ready(function() {
+function load_data() {
     fetch('/api/products/', {
         method: 'GET',
         headers: {
@@ -20,8 +20,11 @@ $(document).ready(function() {
         products.forEach(product => {
             productArea.append(`<div class="product-card">
                                 <img src="${product.image}" alt="product-image">    
-                                <h2>${product.name}</h2>
-                                <p>${product.product_price}</p>`);
+                                <a href="view_product/${product.id}"><h2 class="product-name-link">${product.name}</h2></a>
+                                <p>$${product.price}</p>`);
         });
     })
+}
+$(document).ready(function() {
+    load_data();    
 });

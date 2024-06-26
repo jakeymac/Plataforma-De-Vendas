@@ -1,6 +1,9 @@
 from django.shortcuts import render
-from django.contrib.auth import logout
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
+
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import AccountRegistrationForm, SellerRegistrationForm, StoreRegistrationForm
 
 
 
@@ -12,13 +15,32 @@ def logout_view(request):
     return redirect('/')
     
 def login_page(request):
-    return render(request, 'Accounts/login.html')
+     #TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
+    if request.method =='POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username,password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+    else:
+        form = AuthenticationForm()
+        
+    return render(request, 'Accounts/login.html', {'form': form})
 
 def register_account_page(request):
-    return render(request, 'Accounts/register_account.html')
+    form = AccountRegistrationForm()
+    if request.method == 'POST':
+        form = AccountRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    return render(request, 'Accounts/register_account.html', context={'form': form})
 
-def register_store_page(request):
-    return render(request, 'Accounts/register_store.html')
+def register_seller_page(request):
+    return render(request, 'Accounts/register_seller.html')
 
 def view_user_account(request):
     return render(request, 'Accounts/user_account.html')

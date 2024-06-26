@@ -1,8 +1,10 @@
 
 
 function load_event_listeners() {
+    console.log("hi there")
     $("#home-nav-button").on("click", function() {
         window.location.href = "/";
+        console.log("Clicked home button");
     });
 
     $("#admin-account-nav-button").on("click", function() {
@@ -25,8 +27,8 @@ function load_event_listeners() {
         window.location.href = "/register_account";
     });
 
-    $("#register-store-nav-button").on("click", function() {
-        window.location.href = "/register_store";
+    $("#register-seller-nav-button").on("click", function() {
+        window.location.href = "/register_seller";
     });
 
     $("#logout-nav-button").on("click", function() {

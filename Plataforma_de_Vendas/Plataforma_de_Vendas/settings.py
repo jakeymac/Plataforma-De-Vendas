@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-7x00smj5q!!f-6+viux&@yhug#&joo9lg%**d0c+&3xc==xnsa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'plataformadevendas.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1','localhost', 'plataformadevendas.pythonanywhere.com']
 
 
 # Application definition
@@ -90,6 +90,8 @@ DATABASES = {
 
 
 AUTH_USER_MODEL = 'Accounts.CustomUser'
+
+LOGIN_URL = 'login'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -1,7 +1,31 @@
 {% extends "Stores/base.html" %}
 {% load static %}
 
+{% block title %} My Account {% endblock %}
+
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/admin_account.css' %}">
+{% endblock %}
+
 {% block content%}
-    <h1>Admin account here...</h1>
+    <div id="admin-account-info-container">
+        <h1>Account Info</h1>
+        <p id="username-label"></p>
+        <p id="first-name-label"></p>
+        <p id="last-name-label"></p>
+        <p id="email-label"></p>
+        <p id="phone-label"></p>
+        <div id="buttons-div">
+            <button id="edit-button">Edit</button>
+            <button id="add-product-button">Add Product</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'js/admin_account.js' %}"></script>
 {% endblock %}
 

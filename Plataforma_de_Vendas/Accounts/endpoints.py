@@ -168,13 +168,18 @@ def get_current_user_info_endpoint(request):
         }
     )
 )
-@api_view(['POST'])
+@api_view(['POST','GET'])
 def login_endpoint(request):
-    data = request.data
-    user = authenticate(username=data.get('username'), password=data.get('password'))
-    if user is not None:
-        login(request, user)
-        return Response({"message": "Logged in"}, status.HTTP_200_OK)
+    import pdb
+    pdb.set_trace()
+    try:
+        data = request.data
+        user = authenticate(username=data.get('username'), password=data.get('password'))
+        if user is not None:
+            login(request, user)
+            return Response({"message": "Logged in"}, status.HTTP_200_OK)
+    except:
+        pass
     return Response({"message": "Invalid credentials"}, status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])

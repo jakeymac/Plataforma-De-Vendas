@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'js/register_account.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/register_account.css' %}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    <div id="registration-container">
+        <h1>Register</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-column">
+                <label for="{{ form.username.id_for_label }}">Username:</label>
+                {{ form.username }}
+                <label for="{{ form.password.id_for_label }}">Password:</label>
+                {{ form.password }}
+                <label for="{{ form.email.id_for_label }}">Email:</label>
+                {{ form.email }}
+                <label for="{{ form.first_name.id_for_label }}">First Name:</label>
+                {{ form.first_name }}
+                <label for="{{ form.last_name.id_for_label }}">Last Name:</label>
+                {{ form.last_name }}
+                <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth:</label>
+                {{ form.date_of_birth }}
+                <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
+                {{ form.phone_number }}
+            </div>
+            <div class="form-column">
+                <label for="{{ form.account_type.id_for_label }}">Account Type:</label>
+                {{ form.account_type }}
+                <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
+                {{ form.phone_number }}
+                <label for="{{ form.address.id_for_label }}">Address:</label>
+                {{ form.address }}
+                <label for="{{ form.city.id_for_label }}">City:</label>
+                {{ form.city }}
+                <label for="{{ form.state.id_for_label }}">State:</label>
+                {{ form.state }}
+                <label for="{{ form.zip_code.id_for_label }}">Zip Code:</label>
+                {{ form.zip_code }}
+                <label for="{{ form.country.id_for_label }}">Country:</label>
+                {{ form.country }}
+            </div>
+            <div class="form-column">
+                <label for="{{ form.profile_picture.id_for_label }}">Profile Picture:</label>
+                {{ form.profile_picture }}
+                <label for="{{ form.notes.id_for_label }}">Notes:</label>
+                {{ form.notes }}
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>

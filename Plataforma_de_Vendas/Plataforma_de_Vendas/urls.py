@@ -45,7 +45,7 @@ urlpatterns = [
     path('', store_views.home, name='index'),
     path('login/', account_views.login_page, name='login'),
     path('register_account/', account_views.register_account_page, name='register_account'),
-    path('register_store/', account_views.register_store_page, name='register_store'),
+    path('register_seller/', account_views.register_seller_page, name='register_seller'),
     path('logout/', account_views.logout_view, name='logout'),
     path('home/', store_views.home, name='home'),
     path('swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -86,7 +86,6 @@ urlpatterns = [
     path('api/accounts/sellers/<int:store_id>/', account_endpoints.get_sellers_by_store_endpoint),
     path('api/accounts/customers/', account_endpoints.get_customers_endpoint),
    
-  
 
     path('api/orders/', order_endpoints.get_orders_endpoint),
     path('api/orders/<int:order_id>/', order_endpoints.get_order_endpoint),
