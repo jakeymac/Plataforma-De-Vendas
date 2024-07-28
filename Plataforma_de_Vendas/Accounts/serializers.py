@@ -6,21 +6,21 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = '__all__'
 
-    def run_validation(self, attrs):
-        username = attrs.get('username')
-        email = attrs.get('email')
-        password = attrs.get('password')
-        account_type = attrs.get('account_type')
-        if len(password) < 8:
-            raise serializers.ValidationError({"password": "Password must be at least 8 characters long"})
-        if CustomUser.objects.filter(username=username, email=email).exists():
-            raise serializers.ValidationError({"username": "Username already exists", "email": "Email already exists"})
-        elif CustomUser.objects.filter(username=username).exists():
-            raise serializers.ValidationError({"username": "Username already exists"})
-        elif CustomUser.objects.filter(email=email).exists():
-            raise serializers.ValidationError({"email": "Email already exists"})
+    def validate(self, data):
+        errors = {}
+        if data['account_type'] == 'admin' and not self.instance.is_superuser:
+            raise serializers.ValidationError('Only superusers can create admin accounts')
+        return data
+
+        if data['username'] in CustomUser.objects.all().values_list('username', flat=True):
+            errors["username"] = "Username already exists"
+
+        if data['email'] in CustomUser.objects.all().values_list('email', flat=True):
+            errors["email"] = "Email already exists"
+
+        if errors:
+            raise serializers.ValidationError(errors)
         
-        if account_type not in ['customer', 'seller', 'admin']:
-            raise serializers.ValidationError({"account_type": "Invalid account type"})
+        return data
+
         
-        return attrs

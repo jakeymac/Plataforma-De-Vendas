@@ -82,11 +82,11 @@ urlpatterns = [
     path('api/accounts/logout/', account_endpoints.logout_endpoint),
     path('api/accounts/current_user/', account_endpoints.get_current_user_info_endpoint),
     path('api/accounts/<int:user_id>/', account_endpoints.get_user_endpoint),
-    path('api/accounts/sellers/', account_endpoints.get_sellers_endpoint),
-    path('api/accounts/sellers/<int:store_id>/', account_endpoints.get_sellers_by_store_endpoint),
-    path('api/accounts/customers/', account_endpoints.get_customers_endpoint),
+    path('api/accounts/customers/', account_endpoints.get_customers_endpoint),  
+    path('api/accounts/admins/', account_endpoints.get_admins_endpoint),
+    path('api/accounts/edit_user/', account_endpoints.edit_user_endpoint),
+    path('api/accounts/register', account_endpoints.register_account_endpoint),
    
-
     path('api/orders/', order_endpoints.get_orders_endpoint),
     path('api/orders/<int:order_id>/', order_endpoints.get_order_endpoint),
     path('api/orders/user/<int:user_id>/', order_endpoints.get_orders_by_user_endpoint),

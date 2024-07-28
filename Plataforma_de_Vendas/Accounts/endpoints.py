@@ -46,30 +46,6 @@ def get_user_endpoint(request, user_id):
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
 @swagger_auto_schema(method='GET',
-    operation_description="Get sellers by store ID",
-    responses={200: CustomUserSerializer(many=True)})
-@api_view(['GET'])
-def get_sellers_by_store_endpoint(request, store_id):
-    if request.user.is_authenticated and request.user.is_superuser:
-        sellers = CustomUser.objects.filter(store_id=store_id, account_type='seller')
-        serializer = CustomUserSerializer(sellers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-
-@swagger_auto_schema(method='GET',
-    operation_description="Get all sellers",
-    responses={200: CustomUserSerializer(many=True)})
-@api_view(['GET'])
-def get_sellers_endpoint(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-        sellers = CustomUser.objects.filter(account_type='seller')
-        serializer = CustomUserSerializer(sellers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-
-@swagger_auto_schema(method='GET',
     operation_description="Get all customers",
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
@@ -92,36 +68,6 @@ def get_admins_endpoint(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-@swagger_auto_schema(
-    method='post',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'first_name':openapi.Schema(type=openapi.TYPE_STRING, description="User first name"),
-            'last_name':openapi.Schema(type=openapi.TYPE_STRING, description="User last name"),
-            'account_type':openapi.Schema(type=openapi.TYPE_STRING, description="User account type"),
-        }
-    ),
-    responses={201:'Created'}
-)
-@api_view(['POST'])
-def add_user_endpoint(request):
-    data = request.data
-    if data.get("account_type") != "admin":
-        serializer = CustomUserSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        if request.user.is_authenticated and request.user.is_superuser:
-            serializer = CustomUserSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"message": "You do not have permission to create admin accounts."}, status.HTTP_401_UNAUTHORIZED)
 
 #TODO add schema info here.
 @swagger_auto_schema(
@@ -170,8 +116,6 @@ def get_current_user_info_endpoint(request):
 )
 @api_view(['POST','GET'])
 def login_endpoint(request):
-    import pdb
-    pdb.set_trace()
     try:
         data = request.data
         user = authenticate(username=data.get('username'), password=data.get('password'))
@@ -186,4 +130,39 @@ def login_endpoint(request):
 def logout_endpoint(request):
     logout(request)
     return Response({"message": "Logged out"}, status.HTTP_200_OK)
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties = {
+            'username': openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, description="User's password"),
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
+            'first_name': openapi.Schema(type=openapi.TYPE_STRING, description="User's first name"),
+            'last_name': openapi.Schema(type=openapi.TYPE_STRING, description="User's last name"),
+            'date_of_birth': openapi.Schema(type=openapi.TYPE_STRING, description="User's date of birth"),
+            'phone_number': openapi.Schema(type=openapi.TYPE_STRING, description="User's phone number"),
+            'address': openapi.Schema(type=openapi.TYPE_STRING, description="User's address"),
+            'address_line_two': openapi.Schema(type=openapi.TYPE_STRING, description="User's address line two"),
+            'city': openapi.Schema(type=openapi.TYPE_STRING, description="User's city"),
+            'state': openapi.Schema(type=openapi.TYPE_STRING, description="User's state"),
+            'zip_code': openapi.Schema(type=openapi.TYPE_STRING, description="User's zip code"),
+            'country': openapi.Schema(type=openapi.TYPE_STRING, description="User's country"),
+            'profile_picture': openapi.Schema(type=openapi.TYPE_FILE, description="User's profile picture"),
+            'account_type': openapi.Schema(type=openapi.TYPE_STRING, description="User's account type")
+        }
+    )
+)
+@api_view(['POST'])
+def register_account_endpoint(request):
+    data = request.data
+    if data.get("account_type") == "customer":
+        serializer = CustomUserSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"message": "Incorrect endpoint for registering admin accounts and sellers"}, status=status.HTTP_400_BAD_REQUEST)
 
