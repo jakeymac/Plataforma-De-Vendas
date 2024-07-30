@@ -22,8 +22,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         if len(data['password']) < 8:
             errors["password"] = "Password must have at least 8 characters"
-
-        breakpoint()
+            
         pattern = r'^\d{5}(-\d{4})?$'
         if not re.match(pattern, data['zip_code']):
             errors["zip_code"] = "Invalid zip code"
