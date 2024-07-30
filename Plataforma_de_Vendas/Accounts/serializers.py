@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import CustomUser
 
+import re
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -17,6 +19,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         if data['email'] in CustomUser.objects.all().values_list('email', flat=True):
             errors["email"] = "Email already exists"
+
+        if len(data['password']) < 8:
+            errors["password"] = "Password must have at least 8 characters"
+
+        breakpoint()
+        pattern = r'^\d{5}(-\d{4})?$'
+        if not re.match(pattern, data['zip_code']):
+            errors["zip_code"] = "Invalid zip code"
 
         if errors:
             raise serializers.ValidationError(errors)

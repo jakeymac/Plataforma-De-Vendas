@@ -37,7 +37,6 @@ function load_event_listeners() {
                     })
                 });
                 console.log(response);
-                // throw new Error('Error in request');
             }
         })
         .then(data => {

@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -93,5 +95,7 @@ urlpatterns = [
     path('api/orders/store/<int:store_id>/', order_endpoints.get_orders_by_store_endpoint),
     path('api/orders/add/', order_endpoints.create_order_endpoint),
     path('api/orders/update/', order_endpoints.update_order_endpoint),
+
+    path('retrieve_profile_picture/<str:usernamee>', account_views.retrieve_profile_picture),
 ]
 
