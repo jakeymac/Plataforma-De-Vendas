@@ -1,30 +1,24 @@
 function load_event_listeners() {
-    $("#login-button").on("click", function() {
+    $("#login-form").submit(function(event) {
+        event.preventDefault();
+        var form_data = new FormData(this);
         fetch('/api/accounts/login', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
-            },
-            body: JSON.stringify({
-                username: $("#username-input").val(),
-                password: $("#password-input").val(),
-            })
+            body: form_data
         })
         .then(response => {
             if (response.ok) {
                 return response.json();
             } else {
-                throw new Error('Error in request');
+                response.json().then(data => {
+                    $("#login-error-div").text(data.message).show();
+                });
             }
         })
         .then(data => {
             if (data.message == "Logged in") {
                 window.location.href = "/home";
-            } else {
-                
             }
-            
         });
     });
 }

@@ -5,11 +5,6 @@ from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import AccountRegistrationForm, SellerRegistrationForm, StoreRegistrationForm
 
-
-
-# Create your views here.
-
-
 def logout_view(request):
     logout(request) #TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
     return redirect('/')
@@ -31,13 +26,7 @@ def login_page(request):
     return render(request, 'Accounts/login.html', {'form': form})
 
 def register_account_page(request):
-    form = AccountRegistrationForm()
-    if request.method == 'POST':
-        form = AccountRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    return render(request, 'Accounts/register_account.html', context={'form': form})
+    return render(request, 'Accounts/register_account.html')
 
 def register_seller_page(request):
     return render(request, 'Accounts/register_seller.html')

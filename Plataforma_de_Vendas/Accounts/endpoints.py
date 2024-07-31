@@ -124,7 +124,7 @@ def login_endpoint(request):
             return Response({"message": "Logged in"}, status.HTTP_200_OK)
     except:
         pass
-    return Response({"message": "Invalid credentials"}, status.HTTP_401_UNAUTHORIZED)
+    return Response({"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 def logout_endpoint(request):

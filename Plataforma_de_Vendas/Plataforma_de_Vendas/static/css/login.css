@@ -2,14 +2,14 @@ body {
     background-color: #d5d5d5;
 }
 #login-container {
-    width: 400px;
-    height: 250px;
-    background-color: #f8f8f8;
-    margin: 0 auto;
+    width: 30%;
+    height: 25%;
+    margin-left: 28%;
     margin-top: 10%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    border: 1px solid black;
+    padding-top: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out; 
 }
