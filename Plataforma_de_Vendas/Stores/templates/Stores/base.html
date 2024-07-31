@@ -6,47 +6,65 @@
     <title>{% block title %}{% endblock %}</title>
     {% block scripts %}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="{% static 'js/base.js' %}"></script>
     {% endblock %}
 
     {% block styles %}
-        <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
     {% endblock %}
-    
-    
 </head>
 <body>
-    <header>
-        <h1>Plataforma de Vendas</h1>
-        <!-- Add your navigation menu here -->
-        <div id="nav-buttons-div">
-            <button type="button" id="home-nav-button" href="">Home</button>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
+        <a class="navbar-brand" href="/">Plataforma de Vendas</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+            </li>
 
             {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="">My Account</a>
+                </li>
                 {% if request.user.account_type == "customer" %}
-                    <button type="button" class="nav-button" id="customer-account-info-nav-button">My account</button>
-                {% elif request.user.account_type == "seller" %}
-                    <button type="button" class="nav-button" id="my-store-nav-button">My store</button>
-                {% else %}
-                    <button type="button" class="nav-button" id="admin-account-nav-button">My account</button>
+                    <li class="nav-item">
+                        <a class="nav-link" href="">Cart</a>
+                    </li>
                 {% endif %}
-                <button type="button" class="nav-button" id="logout-nav-button">Logout</button>
+                {% if request.user.account_type == "seller" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="">My Store</a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="">Logout</a>
+                </li>
             {% else %}
-                <button class="nav-button" id="login-nav-button">Login</button>
-                <button class="nav-button" id="register-account-nav-button">Register</button>
-                <button class="nav-button" id="register-seller-nav-button">Register to Sell</button>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Register to Sell</a>
+                </li>
             {% endif %}
+          </ul>
         </div>
-    </header>
-    
+      </nav>
+
     <main>
         {% block content %}{% endblock %}
         <!-- Add your main content here -->
     </main>
 
     <footer>
-        <!-- Add your footer content here -->
     </footer>
 </body>
 </html>
