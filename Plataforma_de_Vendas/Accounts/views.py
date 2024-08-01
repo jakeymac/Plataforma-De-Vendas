@@ -10,7 +10,10 @@ def logout_view(request):
     return redirect('/')
     
 def login_page(request):
-    return render(request, 'Accounts/login.html')
+    breakpoint()
+    next_link = request.GET.get("next", "/")
+    context = {"next_link": next_link}
+    return render(request, 'Accounts/login.html', context=context)
 
 def register_account_page(request):
     return render(request, 'Accounts/register_account.html')
@@ -18,14 +21,21 @@ def register_account_page(request):
 def register_seller_page(request):
     return render(request, 'Accounts/register_seller.html')
 
-def view_user_account(request):
-    return render(request, 'Accounts/user_account.html')
-
-def view_store_account(request):
-    return render(request, 'Accounts/store_account.html')
-
-def view_admin_account(request):
-    return render(request, 'Accounts/admin_account.html')
+def view_account(request):
+    if request.user.is_authenticated:
+        if request.user.account_type == "customer":
+            return render(request, 'Accounts/view_customer_account.html')
+        elif request.user.account_type == "seller": 
+            return render(request, 'Accounts/view_seller_account.html')
+        elif request.user.account_type == "admin":
+            return render(request, 'Accounts/view_admin_account.html')
+    
+    else:
+        breakpoint()
+        login_url = "/login"
+        next_url = request.get_full_path()
+        return redirect(f'{login_url}?next={next_url}')
+        
 
 def retrieve_profile_picture(request, username):
     if request.user.is_authenticated:

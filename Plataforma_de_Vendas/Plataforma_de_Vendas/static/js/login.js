@@ -17,7 +17,15 @@ function load_event_listeners() {
         })
         .then(data => {
             if (data.message == "Logged in") {
-                window.location.href = "/home";
+                var next_link = $("#next-link").val();
+                if (next_link) {
+                    if (next_link[0] != "/") {
+                        next_link = "/" + next_link;
+                    }
+                    window.location.href = next_link;
+                } else {
+                    window.location.href = "/home";
+                }
             }
         });
     });

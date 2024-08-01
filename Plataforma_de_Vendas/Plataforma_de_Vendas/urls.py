@@ -53,7 +53,7 @@ urlpatterns = [
     path('swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
-    path('admin_account', account_views.view_admin_account, name='admin_account'),
+    path('account/', account_views.view_account, name='view_account'),
 
     path('api/stores/',store_endpoints.get_stores_endpoint),
     path('api/stores/<int:store_id>/',store_endpoints.get_stores_endpoint),
