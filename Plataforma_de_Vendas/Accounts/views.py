@@ -3,14 +3,12 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import AccountRegistrationForm, SellerRegistrationForm, StoreRegistrationForm
 
 def logout_view(request):
     logout(request) #TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
     return redirect('/')
     
 def login_page(request):
-    breakpoint()
     next_link = request.GET.get("next", "/")
     context = {"next_link": next_link}
     return render(request, 'Accounts/login.html', context=context)
@@ -31,10 +29,8 @@ def view_account(request):
             return render(request, 'Accounts/view_admin_account.html')
     
     else:
-        breakpoint()
-        login_url = "/login"
         next_url = request.get_full_path()
-        return redirect(f'{login_url}?next={next_url}')
+        return redirect(f'/login?next={next_url}')
         
 
 def retrieve_profile_picture(request, username):
