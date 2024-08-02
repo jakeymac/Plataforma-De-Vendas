@@ -31,5 +31,3 @@ class CustomUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
         
         return data
-
-        

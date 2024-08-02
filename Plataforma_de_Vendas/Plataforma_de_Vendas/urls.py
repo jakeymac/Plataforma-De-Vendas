@@ -46,14 +46,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', store_views.home, name='index'),
     path('login/', account_views.login_page, name='login'),
-    path('register_account/', account_views.register_account_page, name='register_account'),
-    path('register_seller/', account_views.register_seller_page, name='register_seller'),
+    path('register/', account_views.register_account_page, name='register_account'),
+    path('register_seller/', store_views.register_store_page, name='register_seller'),
     path('logout/', account_views.logout_view, name='logout'),
     path('home/', store_views.home, name='home'),
-    path('swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
     path('account/', account_views.view_account, name='view_account'),
+    path('my_store', store_views.view_my_store, name='view_my_store'),
+
+    path('swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/swagger/',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
     path('api/stores/',store_endpoints.get_stores_endpoint),
     path('api/stores/<int:store_id>/',store_endpoints.get_stores_endpoint),
@@ -88,6 +90,8 @@ urlpatterns = [
     path('api/accounts/admins/', account_endpoints.get_admins_endpoint),
     path('api/accounts/edit_user/', account_endpoints.edit_user_endpoint),
     path('api/accounts/register', account_endpoints.register_account_endpoint),
+    path('api/accounts/username_available', account_endpoints.check_username_availability_endpoint),
+    path('api/accounts_email_available', account_endpoints.check_email_availability_endpoint),
    
     path('api/orders/', order_endpoints.get_orders_endpoint),
     path('api/orders/<int:order_id>/', order_endpoints.get_order_endpoint),

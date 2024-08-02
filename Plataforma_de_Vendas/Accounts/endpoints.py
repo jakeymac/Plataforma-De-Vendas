@@ -166,3 +166,35 @@ def register_account_endpoint(request):
     else:
         return Response({"message": "Incorrect endpoint for registering admin accounts and sellers"}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties = {
+            'username': openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+        }
+    )
+)
+@api_view(['POST'])
+def check_username_availability_endpoint(request):
+    data = request.data
+    if data.get("username") in CustomUser.objects.all().values_list('username', flat=True):
+        return Response({"is_available": False}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"is_available": True}, status=status.HTTP_200_OK)
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties = {
+            'email': openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
+        }
+    )
+)
+@api_view(['POST'])
+def check_email_availability_endpoint(request):
+    data = request.data
+    if data.get("email") in CustomUser.objects.all().values_list('email', flat=True):
+        return Response({"is_available": False}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"is_available": True}, status=status.HTTP_200_OK)
+

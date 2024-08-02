@@ -1,0 +1,137 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Register to Sell</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="{% static 'js/register_store.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/register_store.css' %}">    
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <meta name="csrf-token" content="{{ csrf_token }}">
+    </head>
+    <body>
+        <div id="outer-registration-container" class="container">
+            <form method="post" id="store-registration-form">
+                {% csrf_token %}
+                <div id="account-registration-container" class="container">
+                    <h2 class="text-center">Register Store Manager</h2>
+                    <div class="row">
+                        <div class="form-column col-md-6">
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" name="username" class="form-control" placeholder="Username">
+                                <div class="invalid-feedback" id="username-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+                                <div class="invalid-feedback" id="password-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="Email">
+                                <div class="invalid-feedback" id="email-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="first_name">First Name:</label>
+                                <input type="text" id="first_name" name="first_name" class="form-control" placeholder="First Name">
+                                <div class="invalid-feedback" id="first_name-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name">Last Name:</label>
+                                <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Last Name">
+                                <div class="invalid-feedback" id="last_name-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="date_of_birth">Date of Birth:</label>
+                                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone_number">Phone Number:</label>
+                                <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="Phone Number">
+                                <div class="invalid-feedback" id="phone_number-error-div"></div>
+                            </div>
+                        </div>
+                        <div class="form-column col-md-6">
+                            <div class="form-group">
+                                <label for="address">Address:</label>
+                                <input type="text" id="address" name="address" class="form-control" placeholder="Address">
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line_two">Address 2:</label>
+                                <input type="text" id="address_line_two" name="address_line_two" class="form-control" placeholder="Address 2">
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City:</label>
+                                <input type="text" id="city" name="city" class="form-control" placeholder="City">
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State:</label>
+                                <input type="text" id="state" name="state" class="form-control" placeholder="State">
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country:</label>
+                                <input type="text" id="country" name="country" class="form-control" placeholder="Country">
+                                <div class="invalid-feedback" id="country-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip_code">Zip Code:</label>
+                                <input type="number" pattern="\d*" id="zip_code" name="zip_code" class="form-control" placeholder="Zip Code">
+                                <div class="invalid-feedback" id="zip_code-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile_picture">Profile Picture</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="profile_picture" name="profile_picture" aria-describedby="fileHelp">
+                                    <label class="custom-file-label" for="profile_picture"><span>Choose file...</span></label>
+                                    <div class="invalid-feedback" id="profile_picture-error-div"></div>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                    <div id="account-registration-buttons-container" class="row justify-content-center mb-3">
+                        <button type="button" class="btn btn-secondary mr-2" id="back-home-button">Back</button>
+                        <button type="button" class="btn btn-info" id="next-button">Next</button>
+                    </div>
+                </div>
+                <div id="store-registration-container" class="container" style="display: none;">
+                    <h2 class="text-center">Register Store</h2>
+                    <div class="row">
+                        <div class="form-column col-md-6">
+                            <div class="form-group">
+                                <label for="store_name">Store Name:</label>
+                                <input type="text" id="store_name" name="store_name" class="form-control" placeholder="Store Name">
+                                <div class="invalid-feedback" id="store_name-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="store_description">Store Description:</label>
+                                <textarea id="store_description" name="store_description" class="form-control" placeholder="Store Description"></textarea>
+                                <div class="invalid-feedback" id="store_description-error-div"></div>
+                            </div>
+                        </div>
+                        <div class="form-column col-md-6">
+                            <div class="form-group">
+                                <label for="contact_email">Contact Email:</label>
+                                <input type="email" id="contact_email" name="contact_email" class="form-control" placeholder="Contact Email">
+                                <div class="invalid-feedback" id="contact_email-error-div"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="profile_picture">Store Logo</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="store_logo" name="store_logo" aria-describedby="fileHelp">
+                                    <label class="custom-file-label" for="store_logo"><span>Choose file...</span></label>
+                                    <div class="invalid-feedback" id="store_logo-error-div"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="store-registration-buttons-container" class="row justify-content-center mb-3">
+                        <button type="button" class="btn btn-secondary mr-2" id="back-user-registration-button">Back</button>
+                        <button type="submit" class="btn btn-primary" id="register-button">Register</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
