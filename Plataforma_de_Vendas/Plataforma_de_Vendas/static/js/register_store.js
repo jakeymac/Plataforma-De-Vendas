@@ -15,39 +15,104 @@ function load_event_listeners() {
    })
 
    $("#back-user-registration-button").on("click", function() {
+        $("store-registration-container").hide();
+        $("#account-registration-container").show();
+    });
+
+    $("#next-button").on("click", function() {
         var found_errors = false;
-        fetch('/api/accounts/username_available', {
-            method: 'POST',
-            body: JSON.stringify({ username: $("#username").val() }),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                response.json().then(data => {
+        if ($("#username").val().trim() === "") {
+            var inputField = $("#username");
+            var errorDiv = $("#username-error-div");
+            errorDiv.text("Username is required");
+            inputField.addClass('is-invalid');
+            errorDiv.show();
+            found_errors = true;
+        } else {
+            fetch('/api/accounts/username_available', {
+                method: 'POST',
+                body: JSON.stringify({ username: $("#username").val() }),
+                headers: {
+                    'Content-Type': 'application/json', 
+                }
+            })
+            .then(response => {
+                if (!response.is_available) {
                     var inputField = $("#username");
                     var errorDiv = $("#username-error-div");
-                    errorDiv.text("That username is taken");
+                    errorDiv.text("Username is already taken");
                     inputField.addClass('is-invalid');
                     errorDiv.show();
                     found_errors = true;
-                });
-            }
-        })
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+        
+        if ($("#email").val().trim() === "") {
+            var inputField = $("#email");
+            var errorDiv = $("#email-error-div");
+            errorDiv.text("Email is required");
+            inputField.addClass('is-invalid');
+            errorDiv.show();
+            found_errors = true;
+        } else {
+            fetch('/api/accounts/email_available', {
+                method: 'POST',
+                body: JSON.stringify({ email: $("#email").val() }),
+                headers: {
+                    'Content-Type': 'application/json', 
+                }
+            })
+            .then(response => {
+                if (!response.is_available) {
+                    var inputField = $("#email");
+                    var errorDiv = $("#email-error-div");
+                    errorDiv.text("Email is already taken");
+                    inputField.addClass('is-invalid');
+                    errorDiv.show();
+                    found_errors = true;
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+        }
+        
+        if ($("#password").val().length < 8) {
+            passwordField = $("#password");
+            passwordErrorDiv = $("#password-error-div");
+            passwordErrorDiv.text("Password must be at least 8 characters long");
+            passwordField.addClass('is-invalid');
+            passwordErrorDiv.show();
+            found_errors = true;
+        }
+        if ($("#first_name").val().trim() === "") {
+            var inputField = $("#first_name");
+            var errorDiv = $("#first_name-error-div");
+            errorDiv.text("First name is required");
+            inputField.addClass('is-invalid');
+            errorDiv.show();
+            found_errors = true;
+        }
+
+        if ($("#last_name").val().trim() === "") {
+            var inputField = $("#last_name");
+            var errorDiv = $("#last_name-error-div");
+            errorDiv.text("Last name is required");
+            inputField.addClass('is-invalid');
+            errorDiv.show();
+            found_errors = true;
+        }
 
         if (!found_errors) {
-            $("#store-registration-container").hide();
-            $("#account-registration-container").show();    
+            $("#account-registration-container").hide();   
+            $("#store-registration-container").show(); 
         }
    });
 
-   $("#next-button").on("click", function() {
-        $("#account-registration-container").hide();
-        $("#store-registration-container").show();
-   });
 
     $('input').on('input', function() {
         var inputField = $(this);
@@ -57,34 +122,23 @@ function load_event_listeners() {
 
     $("#store-registration-form").submit(function(event) {
         event.preventDefault();
-        var form_data = new FormData(this);
-        fetch('/api/stores/register', { 
-            method: 'POST',
-            body: form_data
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                response.json().then(data => {
-                    Object.keys(data).forEach(key => {
-                        var inputField = $(`#${key}`);
-                        var errorDiv = $(`#${key}-error-div`);
-                        errorDiv.text(data[key]);
-                        inputField.addClass('is-invalid');
-                        errorDiv.show();
-                    })
-                });
-                console.log(response);
-            }
-        })
-        .then(data => {
-            if (data) {
-                alert('Store created');
-                window.location.href = "/login";
-            }
-            
+        var accountData= {};
+        var storeData = {};
+        
+        $("#account-registration-container input").each(function() {
+            var name=$(this).attr('name');
+            var value = $(this).val();
+            accountData[name] = value;
         });
+
+        $("#store-registration-container input").each(function() {
+            var name=$(this).attr('name');
+            var value = $(this).val();
+            storeData[name] = value;
+        });
+
+        console.log("Account info: ", accountData);
+        console.log("Store Info: ", storeData);
     });
 }
 

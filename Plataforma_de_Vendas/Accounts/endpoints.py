@@ -179,7 +179,7 @@ def register_account_endpoint(request):
 def check_username_availability_endpoint(request):
     data = request.data
     if data.get("username") in CustomUser.objects.all().values_list('username', flat=True):
-        return Response({"is_available": False}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"is_available": False}, status=status.HTTP_200_OK)
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 
 @swagger_auto_schema(
@@ -195,6 +195,6 @@ def check_username_availability_endpoint(request):
 def check_email_availability_endpoint(request):
     data = request.data
     if data.get("email") in CustomUser.objects.all().values_list('email', flat=True):
-        return Response({"is_available": False}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"is_available": False}, status=status.HTTP_200_OK)
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 

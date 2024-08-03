@@ -98,3 +98,10 @@ def update_store_endpoint(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
  
+
+def register_store_endpoint(request):
+    data = request.data
+    
+    
+    store.save()
+    return Response({"message": "Store created successfully"}, status=status.HTTP_201_CREATED)
