@@ -118,7 +118,10 @@ def get_current_user_info_endpoint(request):
 def login_endpoint(request):
     try:
         data = request.data
-        user = authenticate(username=data.get('username'), password=data.get('password'))
+        username = data.get("username")
+        password = data.get("password")
+        
+        user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
             return Response({"message": "Logged in"}, status.HTTP_200_OK)
@@ -160,7 +163,9 @@ def register_account_endpoint(request):
     if data.get("account_type") == "customer":
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            user.set_password(data.get("password"))
+            user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:

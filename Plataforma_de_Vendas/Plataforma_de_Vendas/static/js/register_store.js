@@ -196,29 +196,32 @@ function load_store_registration_listeners() {
                     if (data.message == "Store created successfully") {
                         window.location.href = "/login";
                     } else {
-                        alert('Store not created');
-                        if (data.errors.account_errors) {
-                            Object.keys(data.errors.account_errors).forEach(key => {
-                                var inputField = $(`#${key}`);
-                                var errorDiv = $(`#${key}-error-div`);
-                                errorDiv.text(data.errors.account_errors[key]);
-                                inputField.addClass('is-invalid');
-                                errorDiv.show();
-                            });
-                            $("#store-registration-container").hide();
-                            $("#account-registration-container").show();
-                        }
-                        if (data.errors.store_errors) {
-                            Object.keys(data.errors.store_errors).forEach(key => {
-                                var inputField = $(`#${key}`);
-                                var errorDiv = $(`#${key}-error-div`);
-                                errorDiv.text(data.errors.store_errors[key]);
-                                inputField.addClass('is-invalid');
-                                errorDiv.show();
-                            });
+                        if (data.message == "Server Error") {
+                            alert("There was an error, try again in a moment");
+                        } else {
+                            alert('Store not created');
+                            if (data.errors.account_errors) {
+                                Object.keys(data.errors.account_errors).forEach(key => {
+                                    var inputField = $(`#${key}`);
+                                    var errorDiv = $(`#${key}-error-div`);
+                                    errorDiv.text(data.errors.account_errors[key]);
+                                    inputField.addClass('is-invalid');
+                                    errorDiv.show();
+                                });
+                                $("#store-registration-container").hide();
+                                $("#account-registration-container").show();
+                            }
+                            if (data.errors.store_errors) {
+                                Object.keys(data.errors.store_errors).forEach(key => {
+                                    var inputField = $(`#${key}`);
+                                    var errorDiv = $(`#${key}-error-div`);
+                                    errorDiv.text(data.errors.store_errors[key]);
+                                    inputField.addClass('is-invalid');
+                                    errorDiv.show();
+                                });
+                            }
                         }
                     }
-
                 }
             })
             .catch(error => {

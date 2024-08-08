@@ -1,6 +1,6 @@
 #API endpoints for stores
 from django.contrib.auth import authenticate
-
+from django.db import transaction
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -134,8 +134,6 @@ def parse_store_registration_data(request_data, request_files):
 
 @api_view(['POST'])
 def register_store_endpoint(request):
-    breakpoint()
-    
     account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
 
     account_data["account_type"] = "seller"
@@ -144,12 +142,21 @@ def register_store_endpoint(request):
     account_data_is_valid = account_serializer.is_valid()
     store_data_is_valid = store_serializer.is_valid()
     if store_data_is_valid and account_data_is_valid:
-        account = account_serializer.save()
-        store = store_serializer.save()
+        try:
+            with transaction.atomic():
+                account = account_serializer.save()
+                account.set_password(account_data["password"])
+                account.save()
 
-        account.store = store
-        account.save()
-        return Response({"message": "Store created successfully"}, status=status.HTTP_201_CREATED)
+                store = store_serializer.save()
+                account.store = store
+                account.save()
+
+            return Response({"message": "Store created successfully"}, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({"message": "An error occurred", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     else:
         errors = {}
         if account_serializer.errors:

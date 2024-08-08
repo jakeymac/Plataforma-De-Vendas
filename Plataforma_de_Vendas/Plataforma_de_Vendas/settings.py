@@ -91,6 +91,10 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'Accounts.CustomUser'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 LOGIN_URL = 'login'
 
 # Password validation
