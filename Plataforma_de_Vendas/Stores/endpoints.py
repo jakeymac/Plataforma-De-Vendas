@@ -10,6 +10,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import Store
+from Accounts.serializers import CustomUserSerializer
 from .serializers import StoreSerializer
 
 import json
@@ -98,10 +99,62 @@ def update_store_endpoint(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
  
+#Helper function for register store endpoint
+def parse_store_registration_data(request_data, request_files):
+    account_data = {
+        "username": request_data.get("username"),
+        "password": request_data.get("password"),
+        "email": request_data.get("email"),
+        "first_name": request_data.get("first_name"),
+        "last_name": request_data.get("last_name"),
+        "date_of_birth": request_data.get("date_of_birth"),
+        "phone_number": request_data.get("phone_number"),
+        "address": request_data.get("address"),
+        "address_line_two": request_data.get("address_line_two"),
+        "city": request_data.get("city"),
+        "state": request_data.get("state"),
+        "country": request_data.get("country"),
+        "zip_code": request_data.get("zip_code"),
+        "profile_picture": request_files.get("profile_picture")
+    }
 
+    # Format the date_of_birth to 'YYYY-MM-DD' for saving to database
+    if account_data["date_of_birth"]:
+        account_data["date_of_birth"] = account_data["date_of_birth"].strftime('%Y-%m-%d')
+    else:
+        account_data["date_of_birth"] = None
+
+    store_data = {
+        "store_name": request_data.get("store_name"),
+        "store_description": request_data.get("store_description"),
+        "store_url": request_data.get("store_url"),
+        "store_logo": request_files.get("store_logo")
+    }
+    return account_data, store_data
+
+@api_view(['POST'])
 def register_store_endpoint(request):
-    data = request.data
+    breakpoint()
     
-    
-    store.save()
-    return Response({"message": "Store created successfully"}, status=status.HTTP_201_CREATED)
+    account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
+
+    account_data["account_type"] = "seller"
+    account_serializer = CustomUserSerializer(data=account_data)
+    store_serializer = StoreSerializer(data=store_data)
+    account_data_is_valid = account_serializer.is_valid()
+    store_data_is_valid = store_serializer.is_valid()
+    if store_data_is_valid and account_data_is_valid:
+        account = account_serializer.save()
+        store = store_serializer.save()
+
+        account.store = store
+        account.save()
+        return Response({"message": "Store created successfully"}, status=status.HTTP_201_CREATED)
+    else:
+        errors = {}
+        if account_serializer.errors:
+            errors["account_errors"] = account_serializer.errors
+        if store_serializer.errors:
+            errors["store_errors"] = store_serializer.errors
+        return Response({"message": "Store not created", "errors": errors}, status=status.HTTP_200_OK)
+        

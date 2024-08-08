@@ -7,20 +7,17 @@ class StoreSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def run_validation(self, attrs):
-        store_name = attrs.get('name')
-        url = attrs.get('url')
+        store_name = attrs.get('store_name')
+        store_url = attrs.get('store_url')
 
-        errors = []
-        if Store.objects.filter(name=store_name).exists():
-            errors.append({"name": "Store with this name already exists"})
-        if Store.objects.filter(url=url).exists():
-            errors.append({"store": "Store with this url already exists"})
+        errors = {}
+        if Store.objects.filter(store_name=store_name).exists():
+            errors["store_name"] = "Store with this name already exists"
+        if Store.objects.filter(store_url=store_url).exists():
+            errors["store_url"] = "Store with this url already exists"
 
         if errors:
-            if len(errors) == 1:
-                raise serializers.ValidationError(errors[0])
-            else:
-                raise serializers.ValidationError({"various": "A store already exists with that name and url"})
+            raise serializers.ValidationError(errors)
 
         return attrs
         

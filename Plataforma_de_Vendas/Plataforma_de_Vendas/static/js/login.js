@@ -1,4 +1,8 @@
 function load_event_listeners() {
+    $('input').on('input', function() {
+        $("#login-error-div").empty().hide();
+    });
+
     $("#login-form").submit(function(event) {
         event.preventDefault();
         var form_data = new FormData(this);

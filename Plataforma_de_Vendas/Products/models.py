@@ -11,6 +11,8 @@ class Product(models.Model):
     details = models.TextField(default='{}')
     minimum_quantity = models.IntegerField(default=10)
     is_active = models.BooleanField(default=True)
+
+    created_on = models.DateTimeField(auto_now_add=True)
     
 
     def __str__(self):
@@ -26,7 +28,7 @@ class ProductImage(models.Model):
 class ProductInOrder(models.Model):
     order = models.ForeignKey('Orders.Order', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField()   
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
