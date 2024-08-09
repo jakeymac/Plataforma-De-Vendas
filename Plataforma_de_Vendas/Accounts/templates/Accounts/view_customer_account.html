@@ -1,1 +1,77 @@
-View Customer Account
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block title %} View My Account {% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/view_customer_account.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div id="profile-header" class=" text-center">
+                    
+                    <div id="profile-img">
+                        {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
+                        {% else %}
+                        <div id="add-profile-pic" onclick="document.getElementById('profile-picture-input').click();">
+                            Add Profile Picture
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h3 class="mt-3">{{ user.first_name }} {{ user.last_name }}</h3>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div id="profile-info">
+                    <h4>Account Details</h4>
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th scope="row">First Name</th>
+                                <td>{{ user.first_name }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Last Name</th>
+                                <td>{{ user.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Date of Birth</th>
+                                <td>{{ user.date_of_birth }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Phone Number</th>
+                                <td>{{ user.phone_number }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Address</th>
+                                <td>{{ user.address }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">City</th>
+                                <td>{{ user.city }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">State</th>
+                                <td>{{ user.state }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Zip Code</th>
+                                <td>{{ user.zip_code }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Country</th>
+                                <td>{{ user.country }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
