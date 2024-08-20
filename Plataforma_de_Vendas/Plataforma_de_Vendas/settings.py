@@ -14,7 +14,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+#BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = '/home/ec2-user/project_files/Plataforma_de_Vendas/static'
 
 
 # Quick-start development settings - unsuitable for production
