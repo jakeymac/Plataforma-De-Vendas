@@ -90,9 +90,9 @@ urlpatterns = [
     path('api/accounts/customers/', account_endpoints.get_customers_endpoint),  
     path('api/accounts/admins/', account_endpoints.get_admins_endpoint),
     path('api/accounts/edit_user/', account_endpoints.edit_user_endpoint),
-    path('api/accounts/register', account_endpoints.register_account_endpoint),
-    path('api/accounts/username_available', account_endpoints.check_username_availability_endpoint),
-    path('api/accounts/email_available', account_endpoints.check_email_availability_endpoint),
+    path('api/accounts/register/', account_endpoints.register_account_endpoint),
+    path('api/accounts/username_available/', account_endpoints.check_username_availability_endpoint),
+    path('api/accounts/email_available/', account_endpoints.check_email_availability_endpoint),
    
     path('api/orders/', order_endpoints.get_orders_endpoint),
     path('api/orders/<int:order_id>/', order_endpoints.get_order_endpoint),

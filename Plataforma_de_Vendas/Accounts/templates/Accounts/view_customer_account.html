@@ -3,6 +3,14 @@
 
 {% block title %} View My Account {% endblock %}
 
+{% block scripts %}
+    {{ block.super }}
+    <script> var user_id = "{{ user_id }}"; </script>
+    <script src="{% static 'js/view_customer_account.js' %}"></script>
+    
+{% endblock %}
+
+
 {% block styles %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'css/view_customer_account.css' %}">

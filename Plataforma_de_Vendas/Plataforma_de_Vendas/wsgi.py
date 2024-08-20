@@ -11,6 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+path = '/home/'
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Plataforma_de_Vendas.settings')
 
 application = get_wsgi_application()
