@@ -19,7 +19,7 @@ function load_event_listeners() {
         event.preventDefault();
         var form_data = new FormData(this);
         form_data.append("account_type", "customer");
-        fetch('/api/accounts/register', { 
+        fetch('/api/accounts/register/', { 
             method: 'POST',
             body: form_data
         })
@@ -41,7 +41,6 @@ function load_event_listeners() {
         })
         .then(data => {
             if (data) {
-                alert('Account created');
                 window.location.href = "/login";
             }
             

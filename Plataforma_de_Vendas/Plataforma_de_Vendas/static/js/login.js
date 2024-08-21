@@ -6,7 +6,7 @@ function load_event_listeners() {
     $("#login-form").submit(function(event) {
         event.preventDefault();
         var form_data = new FormData(this);
-        fetch('/api/accounts/login', {
+        fetch('/api/accounts/login/', {
             method: 'POST',
             body: form_data
         })
@@ -20,17 +20,24 @@ function load_event_listeners() {
             }
         })
         .then(data => {
-            if (data.message == "Logged in") {
-                var next_link = $("#next-link").val();
-                if (next_link) {
-                    if (next_link[0] != "/") {
-                        next_link = "/" + next_link;
+            if (data.message) {
+                if (data.message == "Logged in") {
+                    var next_link = $("#next-link").val();
+                    if (next_link) {
+                        if (next_link[0] != "/") {
+                            next_link = "/" + next_link;
+                        }
+                        window.location.href = next_link;
+                    } else {
+                        window.location.href = "/home";
                     }
-                    window.location.href = next_link;
                 } else {
-                    window.location.href = "/home";
+                    $("#login-error-div").text(data.message).show();
                 }
+            } else {
+                $("#login-error-div").text("An error occurred").show();
             }
+            
         });
     });
 }

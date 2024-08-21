@@ -83,7 +83,7 @@ urlpatterns = [
     path('api/products/search_category/<int:category_id>', product_endpoints.find_products_in_category_endpoint),
 
     path('api/accounts/', account_endpoints.get_users_endpoint),
-    path('api/accounts/login', account_endpoints.login_endpoint),
+    path('api/accounts/login/', account_endpoints.login_endpoint),
     path('api/accounts/logout/', account_endpoints.logout_endpoint),
     path('api/accounts/current_user/', account_endpoints.get_current_user_info_endpoint),
     path('api/accounts/<int:user_id>/', account_endpoints.get_user_endpoint),
