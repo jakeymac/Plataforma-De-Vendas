@@ -101,6 +101,6 @@ urlpatterns = [
     path('api/orders/add/', order_endpoints.create_order_endpoint),
     path('api/orders/update/', order_endpoints.update_order_endpoint),
 
-    path('retrieve_profile_picture/<str:usernamee>', account_views.retrieve_profile_picture),
+    path('retrieve_profile_picture/<str:username>', account_views.retrieve_profile_picture),
 ]
 
