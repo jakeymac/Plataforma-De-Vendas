@@ -45,7 +45,7 @@
                             </tr>
                             <tr>
                                 <th scope="row">Phone Number</th>
-                                <td>{{ user.phone_number | default:"Not phone number provided"}}</td>
+                                <td>+{{user.country_phone_number_code}} {{ user.phone_number | default:"Not phone number provided"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Address</th>

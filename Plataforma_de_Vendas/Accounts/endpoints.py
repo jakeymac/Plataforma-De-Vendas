@@ -159,6 +159,7 @@ def logout_endpoint(request):
 )
 @api_view(['POST'])
 def register_account_endpoint(request):
+    breakpoint()
     data = request.data
     if data.get("account_type") == "customer":
         serializer = CustomUserSerializer(data=data)
