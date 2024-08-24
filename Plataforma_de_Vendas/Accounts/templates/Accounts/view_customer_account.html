@@ -41,31 +41,37 @@
                         <tbody>
                             <tr>
                                 <th scope="row">Date of Birth</th>
-                                <td>{{ user.date_of_birth }}</td>
+                                <td>{{ user.date_of_birth | default:"Not provided" }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Phone Number</th>
-                                <td>{{ user.phone_number }}</td>
+                                <td>{{ user.phone_number | default:"Not phone number provided"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Address</th>
-                                <td>{{ user.address }}</td>
+                                <td>{{ user.address | default:"Address not set"}}</td>
                             </tr>
+                            {% if user.address_2 %}
+                                <tr>
+                                    <th scope="row">Address 2</th>
+                                    <td>{{ user.address_2 }}</td>
+                                </tr>
+                            {% endif %}
                             <tr>
                                 <th scope="row">City</th>
-                                <td>{{ user.city }}</td>
+                                <td>{{ user.city | default:"No city provided"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">State</th>
-                                <td>{{ user.state }}</td>
+                                <td>{{ user.state | default:"No state provided"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Zip Code</th>
-                                <td>{{ user.zip_code }}</td>
+                                <td>{{ user.zip_code | default:"No zip code provided"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Country</th>
-                                <td>{{ user.country }}</td>
+                                <td>{{ user.country | default:"No country provided"}}</td>
                             </tr>
                         </tbody>
                     </table>

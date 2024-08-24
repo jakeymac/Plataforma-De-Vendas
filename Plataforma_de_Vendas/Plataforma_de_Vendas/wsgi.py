@@ -16,3 +16,4 @@ path = '/home/'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Plataforma_de_Vendas.settings')
 
 application = get_wsgi_application()
+
