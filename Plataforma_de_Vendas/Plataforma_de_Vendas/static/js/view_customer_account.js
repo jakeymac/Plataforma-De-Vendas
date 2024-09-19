@@ -36,17 +36,16 @@ function loadEventListeners() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.message === "Account information updated") {
-                location.reload();  // Reload the page to show the updated information
+            if (data.message === "User updated") {
+                location.reload();  // Reload the page
             } else {
                 console.log(data);
                 if (data.errors) {
                     for (var key in data.errors) {
                         $(`#edit_${key}`).addClass('is-invalid');
-                        // $(`#${key}_error_div`).text(data.errors[key]).show();
+                        $(`#${key}_error_div`).text(data.errors[key]).show();
                     }
                 }
-                alert(data.message);  // Handle any errors
             }
         })
         .catch(error => {

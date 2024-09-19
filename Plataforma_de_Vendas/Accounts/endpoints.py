@@ -13,7 +13,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, ExistingUserSerializer
 from Stores.models import Store
 
 import json
@@ -81,12 +81,10 @@ def get_admins_endpoint(request):
 )
 @api_view(['PUT'])
 def edit_user_endpoint(request):
-    #TODO add validation for user editing their own account, same username, email, etc. 
     data = request.data
     user = request.user
-    # TODO add a serializer simply for editing customers, as validation will be different (password for example)
     if request.user.is_authenticated and request.user.id == int(data.get("id")):
-        serializer = CustomUserSerializer(instance=user, data=data)
+        serializer = ExistingUserSerializer(instance=user, data=data)
         if serializer.is_valid():
             serializer.save()
             response = {"message": "User updated"}
