@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
+
+    def user_profile_picture_path(instance, filename):
+        return f'profile_pictures/{instance.username}/{filename}'
+
     ACCOUNT_TYPES = [
         ('customer', 'Customer'),
         ('seller', 'Seller'),
@@ -23,7 +27,7 @@ class CustomUser(AbstractUser):
     country = models.CharField(max_length=50, null=True, blank=True)
     country_phone_number_code = models.IntegerField(null=True, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to=user_profile_picture_path, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
 
     created_on = models.DateTimeField(auto_now_add=True)

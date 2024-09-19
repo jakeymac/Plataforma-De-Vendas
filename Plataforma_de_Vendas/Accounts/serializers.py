@@ -9,23 +9,28 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        breakpoint()
         errors = {}
         if data['account_type'] == 'admin' and not self.instance.is_superuser:
             raise serializers.ValidationError('Only superusers can create admin accounts')
-        return data
+            return data
 
-        if data['username'] in CustomUser.objects.all().values_list('username', flat=True):
-            errors["username"] = "Username already exists"
+        if self.instance:
+            if self.instance.username != data['username'] and CustomUser.objects.filter(username=data['username']).exists():
+                errors['username'] = 'Username already exists'
+            if self.instance.email != data['email'] and CustomUser.objectsfilter(email=data['email']).exists():
+                errors["email"] = "Email already exists"
+        else:
+            if CustomUser.objects.filter(username=data['username']).exists():
+                errors['username'] = 'Username already exists'
 
-        if data['email'] in CustomUser.objects.all().values_list('email', flat=True):
-            errors["email"] = "Email already exists"
+            if CustomUser.objects.filter(email=data['email']).exists():
+                errors["email"] = "Email already exists"
 
         if len(data['password']) < 8:
             errors["password"] = "Password must have at least 8 characters"
             
         pattern = r'^\d{5}(-\d{4})?$'
-        if not re.match(pattern, data['zip_code']):
+        if data['zip_code'] and not re.match(pattern, data['zip_code']):
             errors["zip_code"] = "Invalid zip code"
 
         if not self.is_phone_number_valid(data['phone_number'], data['country_phone_number_code']):
@@ -60,12 +65,20 @@ class CustomUserSerializer(serializers.ModelSerializer):
             return f"+{country} ({numbers[:3]}) {numbers[3:6]}-{numbers[6:]}"
 
     def create(self, validated_data):
-        breakpoint()
         validated_data['phone_number'] = self.format_phone_number(validated_data['country_phone_number_code'], validated_data['phone_number'])
-        return super().create(validated_data)
+        password = validated_data.pop('password', None)
+        user = super().create(validated_data)
+        if password:
+            user.set_password(password)
+        
+        user.save()
+
+        return user
 
     def update(self, instance, validated_data):
         validated_data['phone_number'] = self.format_phone_number(validated_data['country_phone_number_code'], validated_data['phone_number'])
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+        
         return super().update(instance, validated_data)
-
-    

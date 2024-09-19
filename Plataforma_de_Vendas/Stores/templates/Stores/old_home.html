@@ -1,0 +1,21 @@
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block title %} Home {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div id="home-content">
+        <h2 id="products-top-header">Products</h2>
+        <div id="products-container"></div>
+    </div>
+{% endblock %}

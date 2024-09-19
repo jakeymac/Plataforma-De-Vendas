@@ -1,32 +1,106 @@
-.navbar-custom {
-    background-color: #007BFF;
-    color: #FFFFFF;
-    border-radius:15px;
-    margin-left:20px;
-    margin-right:20px;
-    margin-top:10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+.navbar{
+    background-color: #ffffff; 
+    border-bottom: 1px solid #e5e5e5; 
+}
+.navbar-nav .nav-link {
+    color: #000000; /* Black text color for links */
+}
+.navbar-nav .nav-link:hover {
+    color: #007bff; /* Blue color on hover */
+}
+.btn-signin, .btn-signup {
+    margin-left: 10px;
+}
+.navbar-brand {
+    font-size: 1.25rem;
 }
 
-.navbar-custom .navbar-nav .nav-link
-{
-    color: #FFFFFF;
+.btn-signup {
+    margin-top: 5px;
+    border-radius: 20px;
 }
 
-.navbar-custom .navbar-nav .nav-link:hover {
-    color: #0056b3;
+.sign-in-icon {
+    margin-right:5px;
 }
 
-
-main {
-    margin-left: 20%;
-    margin-right: 20%;
-    width:60%;
+.dropdown-menu {
+    width: 350px;
 }
 
+.dropdown-item {
+    white-space: normal; 
+    overflow-wrap: break-word; 
+    word-wrap: break-word; 
+    word-break: break-word; 
+    max-width: 100%; 
+}
 
+.navbar-nav .dropdown:hover .dropdown-menu {
+    display: block;
+}
 
+.change-location-button {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 20px;
+}
 
+.or-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1rem 0;
+}
 
+.or-divider .line {
+    flex-grow: 1;
+    border: none;
+    border-top: 1px solid #ccc; 
+    margin: 0 10px; 
+}
 
+.or-divider span {
+    padding: 0 10px;
+    color: #555; 
+}
 
+#country-select-dropdown {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 10px;
+    border-color: #000000;
+}
+
+#zip-code-input {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 10px;
+    border-color: #000000;
+}
+
+#save-location-button {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 20px;
+}
+
+#language-select-dropdown {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 10px;
+    border-color: #000000;
+}
+
+#currency-select-dropdown {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 10px;
+    border-color: #000000;
+}
+
+#save-language-currency-button {
+    margin: 0% 2%;
+    width: 96%;
+    border-radius: 20px;
+}

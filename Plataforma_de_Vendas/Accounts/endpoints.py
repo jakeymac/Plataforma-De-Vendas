@@ -81,14 +81,21 @@ def get_admins_endpoint(request):
 )
 @api_view(['PUT'])
 def edit_user_endpoint(request):
+    #TODO add validation for user editing their own account, same username, email, etc. 
     data = request.data
-    if request.user.is_authenticated and request.user.id == data.id:
-        serializer = CustomUserSerializer(data=data)
+    user = request.user
+    # TODO add a serializer simply for editing customers, as validation will be different (password for example)
+    if request.user.is_authenticated and request.user.id == int(data.get("id")):
+        serializer = CustomUserSerializer(instance=user, data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status.HTTP_200_OK)
-        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-    return Response({"messages": "You are not authorized to make changes to this account"}, status.HTTP_401_UNAUTHORIZED)
+            response = {"message": "User updated"}
+            response["user_info"] = serializer.data
+            return Response(response, status.HTTP_200_OK)
+        response = {"message": "User not updated"}
+        response["errors"] = serializer.errors
+        return Response(response, status.HTTP_400_BAD_REQUEST)
+    return Response({"message": "You are not authorized to make changes to this account"}, status.HTTP_401_UNAUTHORIZED)
 
 @swagger_auto_schema(
     method='get',
@@ -159,7 +166,6 @@ def logout_endpoint(request):
 )
 @api_view(['POST'])
 def register_account_endpoint(request):
-    breakpoint()
     data = request.data
     if data.get("account_type") == "customer":
         serializer = CustomUserSerializer(data=data)
@@ -204,3 +210,26 @@ def check_email_availability_endpoint(request):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 
+
+@swagger_auto_schema(
+    method='put',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties = {
+            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="User's ID"),
+            'profile_picture': openapi.Schema(type=openapi.TYPE_FILE, description="User's profile picture"),
+        }
+    )
+)
+@api_view(['PUT'])
+def update_profile_picture_endpoint(request):
+    data = request.data
+    if request.user.is_authenticated and request.user.id == int(data.get("id")):
+        if request.user.profile_picture:
+            request.user.profile_picture.delete()
+        
+        request.user.profile_picture = data.get("profile_picture")
+        request.user.save()
+        return Response({"message": "Profile picture updated"}, status=status.HTTP_200_OK)
+    return Response({"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+    l

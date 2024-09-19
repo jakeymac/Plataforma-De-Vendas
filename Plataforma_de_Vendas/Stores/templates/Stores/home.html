@@ -14,8 +14,22 @@
 {% endblock %}
 
 {% block content %}
+    <div class="home-nav-container py-2 ml-1">
+        <div class="container">
+        <div class="home-nav">
+            <a href="#" class="home-nav-item"><i class="bi bi-list"></i> All categories</a>
+            <a href="#" class="home-nav-item">Featured selections</a>
+            <a href="#" class="home-nav-item">Trade Assurance</a>
+            <a href="#" class="home-nav-item">Buyer Central</a>
+            <a href="#" class="home-nav-item">Help Center</a>
+            <a href="#" class="home-nav-item">Get the app</a>
+            <a href="#" class="home-nav-item">Become a supplier</a>
+        </div>
+        </div>
+    </div>
     <div id="home-content">
-        <h2 id="products-top-header">Products</h2>
-        <div id="products-container"></div>
+        <div id="top-image-div" class="container">
+            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Top Image" id="top-image">
+        </div>
     </div>
 {% endblock %}

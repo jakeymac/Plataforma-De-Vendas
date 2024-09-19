@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'Orders',
     'Products',
     'Stores',
-
+    'Plataforma_de_Vendas',
 ]
 
 MIDDLEWARE = [
@@ -151,7 +151,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'Plataforma_de_Vendas', 'static')]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, "Plataforma_de_Vendas",'media')
 MEDIA_URL = '/media/'
 
 

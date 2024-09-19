@@ -1,11 +1,14 @@
 {% extends "Stores/base.html" %}
 {% load static %}
 
+{% load custom_filters %}
+
 {% block title %} View My Account {% endblock %}
 
 {% block scripts %}
     {{ block.super }}
-    <script> var user_id = "{{ user_id }}"; </script>
+    <script> var userId = "{{ user.id }}"; </script>
+    <script> var csrfToken = "{{ csrf_token }}"; </script>
     <script src="{% static 'js/view_customer_account.js' %}"></script>
 {% endblock %}
 
@@ -15,7 +18,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
+    <div class="container mt-5" id="account-information-display-container">
         <div class="row">
             <div class="col-md-4 d-flex flex-column align-items-center">
                 <div id="primary-info-container" class="text-center position-relative">
@@ -36,42 +39,53 @@
             </div>
             <div class="col-md-8">
                 <div id="profile-info">
-                    <h4>Account Details</h4>
+                    <h4 class="d-flex justify-content-between align-items-center">
+                        Account Details
+                        <button class="btn btn-primary btn-sm" id="edit-account-information-button">Edit</button>
+                        <button class="btn btn-primary btn-sm" id="save-account-information-button" style="display: none;">Save</button>
+                    </h4>
                     <table class="table">
                         <tbody>
                             <tr>
+                                <th scope="row">Username</th>
+                                <td class="account-info-field">{{ user.username }}</td>
+                            <tr>
                                 <th scope="row">Date of Birth</th>
-                                <td>{{ user.date_of_birth | default:"Not provided" }}</td>
+                                <td class="account-info-field">{{ user.date_of_birth|default:"Not provided" }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Phone Number</th>
-                                <td>+{{user.country_phone_number_code}} {{ user.phone_number | default:"Not phone number provided"}}</td>
+                                {% if user.phone_number|valid_value %}
+                                    <td class="account-info-field">+{{user.country_phone_number_code}} {{ user.phone_number }}</td>
+                                {% else %}
+                                    <td class="account-info-field">No phone number provided</td>
+                                {% endif %}
                             </tr>
                             <tr>
                                 <th scope="row">Address</th>
-                                <td>{{ user.address | default:"Address not set"}}</td>
+                                <td class="account-info-field">{{ user.address|no_data_provided:"address"}}</td>
                             </tr>
-                            {% if user.address_2 %}
+                            {% if user.address_2|valid_value %}
                                 <tr>
                                     <th scope="row">Address 2</th>
-                                    <td>{{ user.address_2 }}</td>
+                                    <td class="account-info-field">{{ user.address_2 }}</td>
                                 </tr>
                             {% endif %}
                             <tr>
                                 <th scope="row">City</th>
-                                <td>{{ user.city | default:"No city provided"}}</td>
+                                <td class="account-info-field">{{ user.city|no_data_provided:"city"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">State</th>
-                                <td>{{ user.state | default:"No state provided"}}</td>
+                                <td class="account-info-field">{{ user.state|no_data_provided:"state"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Zip Code</th>
-                                <td>{{ user.zip_code | default:"No zip code provided"}}</td>
+                                <td class="account-info-field">{{ user.zip_code|no_data_provided:"zip code"}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Country</th>
-                                <td>{{ user.country | default:"No country provided"}}</td>
+                                <td >{{ user.country|no_data_provided:"country"}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -79,4 +93,122 @@
             </div>
         </div>
     </div>
+    <div class="container mt-5" id="account-information-edit-container" style="display: none;">
+        <div class="col-md-12">
+            <form id="edit-account-information-form">
+                {% csrf_token %}
+                <h4 class="d-flex justify-content-between align-items-center">
+                    Edit Account Details
+                    <div>
+                        <button class="btn btn-primary btn-sm mr-2" id="cancel-edit-account-information-button" type="button">Cancel</button>
+                        <button class="btn btn-primary btn-sm" id="save-edited-account-information-button" type="submit">Save</button>
+                    </div>
+                </h4>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Username</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_username" name="username" value="{{ user.username }}">
+                                <div class="invalid-feedback" id="username-error-div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Password</th>
+                            <td>
+                                <input type="password" class="form-control edit-field" id="edit_password" name="password">
+                                <div class="invalid-feedback" id="password_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>
+                                <input type="email" class="form-control edit-field" id="edit_email" name="email" value="{{ user.email|none_to_empty }}">
+                                <div class="invalid-feedback" id="email_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First Name</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_first_name" name="first_name" value="{{ user.first_name|none_to_empty }}">
+                                <div class="invalid-feedback" id="first_name_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last Name</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_last_name" name="last_name" value="{{ user.last_name|none_to_empty }}">
+                                <div class="invalid-feedback" id="last_name_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date of Birth</th>
+                            <td>
+                                <input type="date" class="form-control edit-field" id="edit_date_of_birth" name="date_of_birth" value="{% if user.date_of_birth|none_to_empty %}{{user.date_of_birth|date:'Y-m-d'}}{% endif %}">
+                                <div class="invalid-feedback" id="date_of_birth_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone Number</th>
+                            <td>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <select class="form-select edit-field" id="edit_country_phone_number_code" name="country_phone_number_code">
+                                            <option value="55" {% if user.country_phone_number_code == '55' %}selected{% endif %}>+55</option>
+                                            <option value="1" {% if user.country_phone_number_code == '1' %}selected{% endif %}>+1</option>
+                                        </select>
+                                    </div>
+                                    <input type="text" class="form-control edit-field" id="edit_phone_number" name="phone_number" value="{{user.phone_number|none_to_empty}}">
+                                    <div class="invalid-feedback" id="phone_number_error_div"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Address</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_address" name="address" value="{{ user.address|none_to_empty }}">
+                                <div class="invalid-feedback" id="address_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Address 2</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_address_2" name="address_two" value="{{ user.address_2|none_to_empty }}">
+                                <div class="invalid-feedback" id="address_2_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">City</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_city" name="city" value="{{ user.city|none_to_empty }}"/>
+                                <div class="invalid-feedback" id="city_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">State</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_state" name="state" value="{{ user.state|none_to_empty}}">
+                                <div class="invalid-feedback" id="state_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Zip Code</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_zip_code" name="zip_code" value="{{ user.zip_code|none_to_empty }}">
+                                <div class="invalid-feedback" id="zip_code_error_div"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Country</th>
+                            <td>
+                                <input type="text" class="form-control edit-field" id="edit_country" name="country" value="{{ user.country|none_to_empty }}">
+                                <div class="invalid-feedback" id="country_error_div"></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>  
+    </div>
+            
 {% endblock %}
