@@ -37,6 +37,13 @@ function load_listeners() {
         var targetDivId = $(this).data('target');
         $("#" + targetDivId).show();
         
+        // Hide all product show case contaienrs
+        $('.product-showcase-container').hide();
+        
+        // TODO have the first sub category's products show up by default
+
+        // TODO fix so that hovering over the current main category doesn't hide the product show case container that's already open
+        
         // Update styling of all categories, then update the one being hovered over
         $('.categories-list-item').css('color', 'black');
         $(this).css('color', 'blue');
@@ -44,18 +51,22 @@ function load_listeners() {
 
     $('.sub-categories-list-item').hover(function() {
         // Hide all sub-categories' product containers, then show the one being hovered over
-        $('.products-container').hide();
+        $('.product-showcase-container').hide();
         var targetDivId = $(this).data('target');
         $("#" + targetDivId).show();
-
-        // TODO add a call to the API to get the products that are being highlighted for the sub-category being hovered over
 
         // Update styling of all sub-categories, then update the one being hovered over
         $('.sub-categories-list-item').css('color', 'black');
         $(this).css('color', 'blue');
 
+        // TODO add a call to the API to get the products that are being highlighted for the sub-category being hovered over
         
+        // Hide all product show case contaienrs
+        $('.product-showcase-container').hide();
+        var targetDiv = $(this).data('target');
+        $("#" + targetDiv).show();
     })
+    
 }
 
 $(document).ready(function() {

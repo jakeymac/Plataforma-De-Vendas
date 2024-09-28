@@ -40,7 +40,7 @@
                                 <!-- Containers for the lists of sub-categories for each main category -->
                                 <div id="top-categories-list-container" class="col-md-3 sub-categories-container">
                                     <ul id="top-categories-list">
-                                        <li class="sub-categories-list-item">Tires</li>
+                                        <li class="sub-categories-list-item" data-target="tires-product-showcase-container">Tires</li>
                                         <li class="sub-categories-list-item">Wheels</li>
                                         <li class="sub-categories-list-item">Agriculture</li>
                                         <li class="sub-categories-list-item">Pickup & SUV</li>
@@ -142,9 +142,6 @@
                                             <a href="#" id="more-button">More <i class="bi bi-arrow-right"></i></a>
                                         </div>
                                     </div>
-                                    
-                                
-                                
                                  </div>
                             </div>
                         </div>
@@ -161,8 +158,28 @@
         </div>
     </div>
     <div id="home-content">
-        <div id="top-image-div" class="container">
-            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Top Image" id="top-image">
+        <div id="top-image-div">
+            <div class="container">
+                <div class="overlay-content" id="top-image-inner-container">
+                    <!-- Subheading with icon -->
+                    <div id="learn-about-header-text">
+                        <i class="bi bi-play-circle"></i>
+                        <span>Learn about Plataforma de Vendas</span>
+                    </div>
+    
+                    <!-- Main Heading -->
+                    <h3 class="font-weight-bold">A melhor plataforma para comprar e vender produtos global</h3>
+    
+                    <!-- Search Bar -->
+                    <div class="search-bar mt-4" id="search-bar">
+                        <form class="d-flex" action="/search/" method="GET">
+                            <input type="text" id="search-input-box" placeholder="pneus" name="search">
+                            <button type="submit" class="btn btn-primary" id="search-button">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+            
     </div>
 {% endblock %}
