@@ -16,15 +16,148 @@
 {% block content %}
     <div class="home-nav-container py-2 ml-1">
         <div class="container">
-        <div class="home-nav">
-            <a href="#" class="home-nav-item"><i class="bi bi-list"></i> All categories</a>
-            <a href="#" class="home-nav-item">Featured selections</a>
-            <a href="#" class="home-nav-item">Trade Assurance</a>
-            <a href="#" class="home-nav-item">Buyer Central</a>
-            <a href="#" class="home-nav-item">Help Center</a>
-            <a href="#" class="home-nav-item">Get the app</a>
-            <a href="#" class="home-nav-item">Become a supplier</a>
-        </div>
+            <div class="home-nav">
+                <div class="dropdown home-nav-item">
+                    <div class="dropdown-toggle" id="all-categories-dropdown" aria-expanded="false" role="button" data-bs-toggle="dropdown" aria-haspopup="true">
+                        <i class="bi bi-list"></i> All categories
+                    </div>
+                    <div class="dropdown-menu" id="all-categories-dropdown-menu" aria-labelledby="all-categories-dropdown">
+                        <div class="container">
+                            <div class="row">
+                                <!-- Container for the list of main categories -->
+                                <div id="categories-container" class="col-md-4"> 
+                                    <ul id="categories-list">
+                                        <li class="categories-list-item" data-target="top-categories-list-container">Top categories <i class="bi bi-chevron-right"></i></li>
+                                        <li class="categories-list-item" data-target="home-decor-list-container">Home Decor <i class="bi bi-chevron-right"></i></li>
+                                        <li class="categories-list-item" data-target="industrial-list-container">Industrial <i class="bi bi-chevron-right"></i></li>
+                                        <li class="categories-list-item" data-target="health-personal-care-list-container">Health & Personal Care <i class="bi bi-chevron-right"></i></li>
+                                        <li class="categories-list-item" data-target="fashion-beauty-list-container">Fashion & Beauty <i class="bi bi-chevron-right"></i></li> 
+                                        <li class="categories-list-item" data-target="sports-entertainment-list-container">Sports & Entertainment <i class="bi bi-chevron-right"></i></li>
+                                        <li class="categories-list-item" data-target="tools-home-improvement-list-container">Tools & Home Improvment <i class="bi bi-chevron-right"></i></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Containers for the lists of sub-categories for each main category -->
+                                <div id="top-categories-list-container" class="col-md-3 sub-categories-container">
+                                    <ul id="top-categories-list">
+                                        <li class="sub-categories-list-item">Tires</li>
+                                        <li class="sub-categories-list-item">Wheels</li>
+                                        <li class="sub-categories-list-item">Agriculture</li>
+                                        <li class="sub-categories-list-item">Pickup & SUV</li>
+                                    </ul>
+
+                                </div>
+                                <div id="home-decor-list-container" class="col-md-4 sub-categories-container">
+                                    <ul id="home-decor-list">
+                                        <li class="sub-categories-list-item">Home Decor</li>
+                                        <li class="sub-categories-list-item">Home Decor</li>
+                                        <li class="sub-categories-list-item">Home Decor</li>
+                                        <li class="sub-categories-list-item">Home Decor</li>
+                                    </ul>
+                                </div>
+                                <div id="industrial-list-container" class="col-md-4 sub-categories-container">
+                                    <ul id="industrial-list">
+                                        <li class="sub-categories-list-item">Industrial</li>
+                                        <li class="sub-categories-list-item">Industrial</li>
+                                        <li class="sub-categories-list-item">Industrial</li>
+                                        <li class="sub-categories-list-item">Industrial</li>
+                                    </ul>
+                                </div>
+                                <div id="health-personal-care-list-container" class="col-md-4 sub-categories-container">
+                                    <ul id="health-personal-care-list">
+                                        <li class="sub-categories-list-item">Health & Personal Care</li>
+                                        <li class="sub-categories-list-item">Health & Personal Care</li>
+                                        <li class="sub-categories-list-item">Health & Personal Care</li>
+                                        <li class="sub-categories-list-item">Health & Personal Care</li>
+                                    </ul>
+                                </div>
+                                <div id="fashion-beauty-list-container" class="col-md-4 sub-categories-container">
+                                    <ul id="fashion-beauty-list">
+                                        <li class="sub-categories-list-item">Fashion & Beauty</li>
+                                        <li class="sub-categories-list-item">Fashion & Beauty</li>
+                                        <li class="sub-categories-list-item">Fashion & Beauty</li>
+                                        <li class="sub-categories-list-item">Fashion & Beauty</li>
+                                    </ul>
+                                </div>
+                                <div id="sports-entertainment-list-container" class="col-md-4 sub-categories-container">
+                                    <ul id="sports-entertainment-list">
+                                        <li class="sub-categories-list-item">Sports & Entertainment</li>
+                                        <li class="sub-categories-list-item">Sports & Entertainment</li>
+                                        <li class="sub-categories-list-item">Sports & Entertainment</li>
+                                        <li class="sub-categories-list-item">Sports & Entertainment</li>
+                                    </ul>
+                                </div>
+                                <div id="tools-home-improvement-list-container" class="col-md-4 sub-categories-container">
+                                    <ul id="tools-home-improvement-list">
+                                        <li class="sub-categories-list-item">Tools & Home Improvement</li>
+                                        <li class="sub-categories-list-item">Tools & Home Improvement</li>
+                                        <li class="sub-categories-list-item">Tools & Home Improvement</li>
+                                        <li class="sub-categories-list-item">Tools & Home Improvement</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Containers for the product showcase areas for each sub-category -->
+                                 <div class="container col-md-5 product-showcase-container" id="tires-product-showcase-container">
+                                    <div class="row">
+                                        <div class="col-md-12 product-showcase-header" id="tires-product-showcase-header">Tires</div>
+                                    </div>
+                                    <div class="row product-showcase-row">
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                    </div>
+                                    <div class="row product-showcase-row">
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                        <div class="col-md-3 product-showcase-item">
+                                            <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
+                                            <div class="product-showcase-item-title">Tire item</div>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="more-button-row">
+                                        <div class="col text-end">
+                                            <a href="#" id="more-button">More <i class="bi bi-arrow-right"></i></a>
+                                        </div>
+                                    </div>
+                                    
+                                
+                                
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="home-nav-item"><a href="#">Featured selections</a></div>
+                <div class="home-nav-item"><a href="#">Trade Assurance</a></div>
+                <div class="home-nav-item"><a href="#">Buyer Central</a></div>
+                <div class="home-nav-item"><a href="#">Help Center</a></div>
+                <div class="home-nav-item"><a href="#">Get the app</a></div>
+                <div class="home-nav-item"><a href="#">Become a supplier</a></div>
+            </div>
         </div>
     </div>
     <div id="home-content">

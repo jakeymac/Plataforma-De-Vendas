@@ -1,29 +1,113 @@
 .home-nav {
-    display: flex;
-    /* justify-content: space-around; Evenly distribute space around items */
-    align-items: center; /* Center items vertically */
-  }
+  display: flex;
+  align-items: center; 
+}
   
-  .home-nav-item {
-    color: #000; /* Text color */
-    text-decoration: none; /* Remove underline */
-    padding: 0.5rem 1rem; /* Padding for links */
-    font-weight: bold; /* Bold text */
-    flex-grow: 1; /* Allow links to grow equally */
-    text-align: center; /* Center text within each link */
-  }
-  
-  .home-nav-item:hover {
-    text-decoration: underline; /* Add underline on hover */
-  }
-  #top-image-div {
-    position: relative;
-    width: 100%;
-    height: 20%;
-    overflow: hidden;
-  }
+.home-nav-item {
+  color: #000; 
+  text-decoration: none; 
+  padding: 0.5rem 1rem; 
+  font-weight: bold; 
+  flex-grow: 1; 
+  text-align: center; 
+  border-top-left-radius: 7%;
+  border-top-right-radius: 7%;
+  height:100%;
+  border-bottom: 3px solid transparent; /* Default transparent border */
+}
 
-  #top-image {
-    width: 100%;
-    height: 50%;
-  }
+.home-nav-item:hover {
+  color: rgb(30, 30, 237);
+  background-color: rgb(198, 198, 238);
+  border-bottom: 3px solid rgb(30, 30, 237);
+}
+
+.home-nav-item a:hover {
+  color: rgb(30, 30, 237);
+}
+
+.home-nav-item a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  margin: 0; 
+  width: 60vw;
+  left: 0;
+  right: 0;
+  padding:2px;
+}
+
+#categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+                
+#all-categories-dropdown-menu li {
+  list-style-type: none;
+  color:black;
+}
+
+#categories-container #selected-category-subcategory-container {
+  height: 100%;
+}
+
+#categories-container {
+  background-color:white;
+}
+
+
+.categories-list-item {
+  margin-top: 20px;
+}
+                
+.sub-categories-container {
+  background-color: #F8FAFC;
+  display: none;
+}
+
+.sub-categories-list-item {
+  margin-top: 15px;
+}
+
+.product-showcase-row {
+  margin-top: 30px;
+  margin-left:2%;
+}
+
+.product-showcase-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.product-showcase-item-title {
+  text-align: center;
+  font-size: 12px;
+}
+
+#more-button-row {
+  margin-top:30px;
+}
+
+/* #more-button {
+  color: black !important;
+} */
+
+#top-image-div {
+  position: relative;
+  width: 100%;
+  height: 20%;
+  overflow: hidden;
+}
+
+#top-image {
+  width: 100%;
+  height: 50%;
+}
+
