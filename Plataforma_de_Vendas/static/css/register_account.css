@@ -1,0 +1,27 @@
+#registration-container {
+    width:50%;
+    height:50%;
+    margin-left: 25%;
+    margin-top: 5%;
+    border: 1px solid black;
+    padding-top: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;  
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  
+    transition: box-shadow 0.3s ease-in-out;  
+}
+
+.is-invalid {
+    border-color: #dc3545; /* Bootstrap's default red */
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Optional: Adds a red glow */
+}
+
+.custom-file .custom-file-label > span {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 75%;
+}
+
+

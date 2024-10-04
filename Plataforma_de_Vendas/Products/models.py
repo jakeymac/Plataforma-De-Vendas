@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class Product(models.Model):
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE)
-    category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE, null=True, blank=True)
+    sub_category = models.ForeignKey('ProductSubCategory', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -36,5 +36,10 @@ class ProductInOrder(models.Model):
 
 
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=45)
-    description = models.TextField(null=True, blank=True)
+    category_name = models.CharField(max_length=45)
+    category_description = models.TextField(null=True, blank=True)
+
+class ProductSubCategory(models.Model):
+    category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE)
+    subcategory_name = models.CharField(max_length=45)
+    subcategory_description = models.TextField(null=True, blank=True)

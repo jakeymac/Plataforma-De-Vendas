@@ -12,8 +12,8 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .models import Product, ProductImage, ProductInOrder
-from .serializers import ProductSerializer
+from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubCategory
+from .serializers import ProductSerializer, ProductCategorySerializer, ProductSubCategorySerializer
 from Stores.models import Store
 
 import json
@@ -367,25 +367,6 @@ def products_in_order_endpoint(request, order_id):
 @swagger_auto_schema(
     method='get',
     responses={200: 'OK'},
-    description='Get all categories or a specific category by category id'
-)
-@api_view(['GET'])
-def get_categories_endpoint(request, category_id=None):
-    if category_id is not None:
-        try:
-            category = ProductCategory.objects.get(id=category_id)
-            serializer = ProductCategorySerializer(category)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ProductCategory.DoesNotExist:
-            return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
-
-    categories = ProductCategory.objects.all()
-    serializer = ProductCategorySerializer(categories, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-@swagger_auto_schema(
-    method='get',
-    responses={200: 'OK'},
     description='Get all products in a category by category id'
 )
 @api_view(['GET'])
@@ -397,3 +378,211 @@ def find_products_in_category_endpoint(request, category_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
         return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all subcategories'
+)
+@api_view(['GET'])
+def get_subcategories_endpoint(request):
+    subcategories = ProductSubCategory.objects.all()
+    serializer = ProductSubCategorySerializer(subcategories, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get a category by category id'
+)
+@api_view(['GET'])
+def get_subcategory_endpoint(request, subcategory_id):
+    try:
+        subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+        serializer = ProductSubCategorySerializer(subcategory)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ProductSubCategory.DoesNotExist:
+        return Response({"message": f"Subcategory not found with the id {subcategory_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get subcategories by category id'
+)
+@api_view(['GET'])
+def get_subcategories_by_category_endpoint(request, category_id):
+    try:
+        category = ProductCategory.objects.get(id=category_id)
+        subcategories = ProductSubCategory.objects.filter(category=category)
+        serializer = ProductSubCategorySerializer(subcategories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ProductCategory.DoesNotExist:
+        return Response({"message": f"Category not found with the id {category_id}"}, status)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get all categories'
+)
+@api_view(['GET'])
+def get_categories_endpoint(request):
+    categories = ProductCategory.objects.all()
+    serializer = ProductCategorySerializer(categories, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@swagger_auto_schema(
+    method='get',
+    responses={200: 'OK'},
+    description='Get a category by category id'
+)
+@api_view(['GET'])
+def get_category_endpoint(request, category_id):
+    try:
+        category = ProductCategory.objects.get(id=category_id)
+        serializer = ProductCategorySerializer(category)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except ProductCategory.DoesNotExist:
+        return Response({"message": f"Category not found with the id {category_id}"}, status)
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['name', 'category_id'],
+        properties={
+            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Subcategory name'),
+            'category_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Category id'),
+            'subcategory_description': openapi.Schema(type=openapi.TYPE_STRING, description='Subcategory description'),
+        }
+    ),
+    responses={201: 'Created'}
+)
+@api_view(['POST'])
+def add_subcategory_endpoint(request):
+    # Use copy to allow for modification of the request data
+    data = request.data.copy()
+    category_id = data.get('category')
+    try:
+        category = ProductCategory.objects.get(id=category_id)
+        data['category'] = category.id
+
+        serializer = ProductSubCategorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except ProductCategory.DoesNotExist:
+        return Response({"message": f"Category not found with the id {category_id}"}, status)
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['name'],
+        properties={
+            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Category name'),
+            'category_description': openapi.Schema(type=openapi.TYPE_STRING, description='Category description'),
+        }
+    ),
+    responses={201: 'Created'}
+)
+@api_view(['POST'])
+def add_category_endpoint(request):
+    data = request.data
+    serializer = ProductCategorySerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='put',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['category', 'name'],
+        properties={
+            'category': openapi.Schema(type=openapi.TYPE_INTEGER, description='Category id'),
+            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Category name'),
+            'category_description': openapi.Schema(type=openapi.TYPE_STRING, description='Category description'),
+        }
+    ),
+    responses={200: 'Updated'}
+)  
+@api_view(['PUT'])
+def update_category_endpoint(request):
+    data = request.data
+    category_id = data.get('category')
+    try:
+        category = ProductCategory.objects.get(id=category_id)        
+        serializer = ProductCategorySerializer(category, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except ProductCategory.DoesNotExist:
+        return Response({"category": f"Category not found with the id {category_id}"}, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='put',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        required=['subcategory', 'subcategory_name', 'subcategory_description' 'category'],
+        properties={
+            'subcategory': openapi.Schema(type=openapi.TYPE_INTEGER, description='Subcategory id'),
+            'subcategory_name': openapi.Schema(type=openapi.TYPE_STRING, description='Subcategory name'),
+            'subcategory_description': openapi.Schema(type=openapi.TYPE_STRING, description='Subcategory description'),
+            'category': openapi.Schema(type=openapi.TYPE_INTEGER, description='Category id'),
+        }
+    ),
+    responses={200: 'Updated'}
+)  
+@api_view(['PUT'])
+def update_subcategory_endpoint(request):
+    breakpoint()
+    # Use copy to allow for modification of the request data
+    data = request.data.copy()
+    subcategory_id = data.get('subcategory')
+    category_id = data.get('category')
+    try:
+        category = ProductCategory.objects.get(id=category_id)
+        data['category'] = category.id
+        subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+        serializer = ProductSubCategorySerializer(subcategory, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except ProductSubCategory.DoesNotExist:
+        return Response({"category": f"Subcategory not found with the id {subcategory_id}"}, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='delete',
+    responses={200: 'OK'},
+    description='Remove a category by category id'
+)
+@api_view(['DELETE'])
+def remove_category_endpoint(request, category_id):
+    breakpoint()
+    try:
+        subcategories = ProductSubCategory.objects.filter(category=category_id)
+        for subcategory in subcategories:
+            subcategory.delete()
+        category = ProductCategory.objects.get(id=category_id)
+        category.delete()
+        return Response({"message": "Category removed successfully"}, status=status.HTTP_200_OK)
+    except ProductCategory.DoesNotExist:
+        return Response({"category": f"Category not found with the id {category_id}"}, status)
+
+@swagger_auto_schema(
+    method='delete',
+    responses={200: 'OK'},
+    description='Remove a subcategory by subcategory id'
+)
+@api_view(['DELETE'])
+def remove_subcategory_endpoint(request, subcategory_id):
+    try:
+        subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+        subcategory.delete()
+        return Response({"message": "Subcategory removed successfully"}, status=status.HTTP_200_OK)
+    except ProductSubCategory.DoesNotExist:
+        return Response({"message": f"Subcategory not found with the id {subcategory_id}"}, status)

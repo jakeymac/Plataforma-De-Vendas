@@ -160,8 +160,9 @@
         </div>
     </div>
     <div id="home-content">
-        <div id="top-image-div">
-            <div class="container">
+        <!-- Container for about button and product search bar -->
+        <div id="top-image-container">
+            <!-- <div class="container"> -->
                 <div class="overlay-content" id="top-image-inner-container">
                     <!-- Subheading with icon -->
                     <div id="learn-about-header-text">
@@ -180,8 +181,39 @@
                         </form>
                     </div>
                 </div>
+            <!-- </div> -->
+        </div>
+        <!-- Container for explore section -->
+        <div id="explore-container">
+            <div class="row"><h2 id="explore-header-text">Explore</h2></div>
+            
+            <div class="row" id="explore-inner-container">
+                
+                <div class="col-md-6 explore-column" id="left-explore-column">
+                    <div class="row explore-image-container position-relative" id="left-explore-image-container">
+                        <div class="explore-image-header-text-container position-absolute bottom-0 start-0">
+                            <div class="explore-image-top-header" id="left-explore-image-top-header">Example top Text</div>
+                            <h3 class="explore-image-bottom-header" id="left-explore-image-bottom-header">Example bottom text goes here</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 explore-column" id="right-explore-column">
+                    <div class="row explore-image-container position-relative" id="right-explore-top-image-container">
+                        <div class="explore-image-header-text-container position-absolute bottom-0 start-0">
+                            <div class="explore-image-top-header" id="right-explore-top-image-top-header">Example top Text</div>
+                            <h3 class="explore-image-bottom-header" id="right-explore-top-image-bottom-header">Example bottom text goes here</h3>
+                        </div>
+                    </div>
+                    <div class="row explore-image-container position-relative" id="right-explore-bottom-image-container">
+                        <div class="explore-image-header-text-container position-absolute bottom-0 start-0">
+                            <div class="explore-image-top-header" id="right-explore-bottom-image-top-header">Example top Text</div>
+                            <h3 class="explore-image-bottom-header" id="right-explore-bottom-image-bottom-header">Example bottom text goes here</h3>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
         </div>
-            
     </div>
 {% endblock %}

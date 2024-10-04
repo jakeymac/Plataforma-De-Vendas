@@ -1,0 +1,21 @@
+#header-container {
+    align-items: center;
+    text-align: center;
+}
+
+.form-container  {
+    margin-bottom: 10px;
+}
+
+.button-container {
+    text-align: center;
+}
+
+.error-input {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+}
+
+.error-message {
+    color: red;
+}

@@ -4,6 +4,17 @@ from django.shortcuts import redirect
 
 from django.contrib.auth.forms import AuthenticationForm
 
+from Products.models import ProductCategory, ProductSubCategory
+
+def admin_portal(request):
+    if request.user.is_authenticated:
+        if request.user.account_type == "admin" and request.user.is_staff:
+            categories = ProductCategory.objects.all()
+            subcategories = ProductSubCategory.objects.all()
+            context = {"categories": categories, "subcategories": subcategories}
+            return render(request, 'Accounts/admin_portal.html', context=context)
+    return redirect('/login')
+
 def logout_view(request):
     logout(request) #TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
     return redirect('/')
