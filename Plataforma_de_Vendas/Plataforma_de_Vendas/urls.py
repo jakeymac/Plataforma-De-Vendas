@@ -87,6 +87,7 @@ urlpatterns = [
     path('api/products/images/<int:product_id>', product_endpoints.product_images_endpoint),
     path('api/products/order/<int:order_id>', product_endpoints.products_in_order_endpoint),
     path('api/products/remove_image/<int:image_id>', product_endpoints.remove_product_image_endpoint),
+
     path('api/products/search_category/<int:category_id>', product_endpoints.find_products_in_category_endpoint),
     path('api/products/categories', product_endpoints.get_categories_endpoint),
     path('api/products/categories/<int:category_id>', product_endpoints.get_category_endpoint),
@@ -96,10 +97,14 @@ urlpatterns = [
     path('api/products/categories/add', product_endpoints.add_category_endpoint),
     path('api/products/subcategories/add', product_endpoints.add_subcategory_endpoint),
     path('api/products/categories/update', product_endpoints.update_category_endpoint),
-    path('api/products/subcategories/update', product_endpoints.update_subcategory_endpoint),
     path('api/products/categories/remove/<int:category_id>', product_endpoints.remove_category_endpoint),
+
+    path('api/products/subcategories/update', product_endpoints.update_subcategory_endpoint),
     path('api/products/subcategories/remove/<int:subcategory_id>', product_endpoints.remove_subcategory_endpoint),
 
+    path('api/products/topsubcategories/', product_endpoints.get_top_subcategories_endpoint),
+    path('api/products/topsubcategories/<int:category_id>', product_endpoints.get_top_subcategories_endpoint),
+    path('api/products/topsubcategories/update', product_endpoints.update_top_subcategories_endpoint),
 
     path('api/accounts/', account_endpoints.get_users_endpoint),
     path('api/accounts/login/', account_endpoints.login_endpoint),

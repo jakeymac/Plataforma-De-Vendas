@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubCategory
+from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubcategory, ProductTopSubcategory
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,21 +37,39 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         name = data.get('category_name')
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError({"category_name": "Category with this name already exists"})
-        if ProductSubCategory.objects.filter(subcategory_name=name).exists():
+        if ProductSubcategory.objects.filter(subcategory_name=name).exists():
             raise serializers.ValidationError({"category_name": "Category with this name already exists as a subcategory"})
         return data
 
-class ProductSubCategorySerializer(serializers.ModelSerializer):
+class ProductSubcategorySerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(queryset=ProductCategory.objects.all(), write_only=True)
 
     class Meta:
-        model = ProductSubCategory
+        model = ProductSubcategory
         fields = ['category', 'subcategory_name', 'subcategory_description']
         
     def validate(self, data):
         name = data.get('subcategory_name')
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError({"subcategory_name": "Subcategory with this name already exists as a category"})
-        if ProductSubCategory.objects.filter(subcategory_name=name).exists():
+        if ProductSubcategory.objects.filter(subcategory_name=name).exists():
             raise serializers.ValidationError({"subcategory_name": "Subcategory with this name already exists"})
         return data
+
+class ProductTopSubcategorySerializer(serializers.ModelSerializer):
+    class Meta:  
+        model = ProductTopSubcategory
+        fields = ['subcategory', 'order']
+    
+    def validate(self, data):
+        order = data.get('order')
+        if order < 1 or order > 6:
+            raise serializers.ValidationError({"order": "Order must be between 1 and 6"})
+
+        return data
+
+    def save(self, **kwargs):
+        subcategory = self.validated_data.get('subcategory')
+        order = self.validated_data.get('order')
+        ProductTopSubcategory.objects.filter(order=order).delete()
+        return super().save(**kwargs)

@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-4 form-container">
+            <div class="col-6 form-container">
                 <h2>Add Category</h2>
                 <form method="post" id="add-category-form">
                     <label for="category_name" class="form-label">Category Name:</label>
@@ -37,7 +37,7 @@
                     </div>
                 </form>
             </div>
-            <div class="col-4 form-container" id="add-category-container">
+            <div class="col-6 form-container" id="add-category-container">
                 <h2>Add Subcategory</h2>
                 <form method="post" id="add-subcategory-form">
                     <label for="subcategory_name" class="form-label">Subcategory Name:</label>
@@ -59,7 +59,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-4 form-container">
+            <div class="col-6 form-container">
                 <h2>Edit Category</h2>
                 
                 <form method="put" id="edit-category-form">
@@ -81,7 +81,7 @@
                     </div>
                 </form>
             </div>
-            <div class="col-4 form-container">
+            <div class="col-6 form-container">
                 <h2>Edit Subcategory</h2>
                 <form method="put" id="edit-subcategory-form">
                     <label for="edit_subcategory_selector" class="form-label">Select Subcategory</label>
@@ -106,6 +106,82 @@
                     <div class="button-container">
                         <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-subcategory-button">Delete Subcategory</button>
                         <button type="submit" class="btn btn-primary mt-2">Save Subcategory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="row"><h2>Top Categories</h2></div>
+                
+                <form method="post" id="top-categories-form">
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="mb-3 row">
+                                <label for ="top_subcategory_selector_1" class="col-form-label col-md-4">Select Subcategory 1</label>
+                                <select class="form-select col-md-6" id="top_subcategory_selector_1" name="top_subcategory_1">
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_1 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for ="top_subcategory_selector_2" class="col-form-label col-md-4">Select Subcategory 2</label>
+                                <select class="form-select col-md-8" id="top_subcategory_selector_2" name="top_subcategory_2">
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_2 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for ="top_subcategory_selector_3" class="col-form-label col-md-4">Select Subcategory 3</label>
+                                <select class="form-select col-md-8" id="top_subcategory_selector_3" name="top_subcategory_3">
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_3 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="mb-3 row">
+                                <label for ="top_subcategory_selector_4" class="col-form-label col-md-4">Select Subcategory 4</label>
+                                <select class="form-select col-md-8" id="top_subcategory_selector_4" name="top_subcategory_4">
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_4 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for ="top_subcategory_selector_5" class="col-form-label col-md-4">Select Subcategory 5</label>
+                                <select class="form-select col-md-8" id="top_subcategory_selector_5" name="top_subcategory_5">
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_5 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3 row">
+                                <label for="top_subcategory_selector_6" class="col-form-label col-md-4">Select Subcategory 6</label>
+                                <select class="form-select col-md-8" id="top_subcategory_selector_6" name="top_subcategory_6">
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_6 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="top-categories-error-container" class="error-message"></div>
+                            <div class="button-container">
+                                <button type="submit" class="btn btn-primary mt-2">Save Top Categories</button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

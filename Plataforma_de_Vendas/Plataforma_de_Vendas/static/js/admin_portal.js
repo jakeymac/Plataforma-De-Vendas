@@ -2,7 +2,8 @@
 const apiUrls = {'add-category-form': '/api/products/categories/add', 
               'add-subcategory-form': '/api/products/subcategories/add',
               'edit-category-form': '/api/products/categories/update',
-              'edit-subcategory-form': '/api/products/subcategories/update'};
+              'edit-subcategory-form': '/api/products/subcategories/update',
+              'top-categories-form': '/api/products/topsubcategories/update'};
 
 const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'};
 
@@ -72,7 +73,7 @@ function load_listeners() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.log(errorData);
+                alert("Error: " + errorData.error);
                 for (var field in errorData) {
                     if (formId.includes('edit')) {
                         $(`#edit_${field}_error_container`).text(errorData[field]);

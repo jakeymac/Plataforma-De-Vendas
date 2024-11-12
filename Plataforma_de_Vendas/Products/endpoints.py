@@ -12,8 +12,8 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubCategory
-from .serializers import ProductSerializer, ProductCategorySerializer, ProductSubCategorySerializer
+from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubcategory
+from .serializers import ProductSerializer, ProductCategorySerializer, ProductSubcategorySerializer, ProductTopSubcategorySerializer
 from Stores.models import Store
 
 import json
@@ -386,8 +386,8 @@ def find_products_in_category_endpoint(request, category_id):
 )
 @api_view(['GET'])
 def get_subcategories_endpoint(request):
-    subcategories = ProductSubCategory.objects.all()
-    serializer = ProductSubCategorySerializer(subcategories, many=True)
+    subcategories = ProductSubcategory.objects.all()
+    serializer = ProductSubcategorySerializer(subcategories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @swagger_auto_schema(
@@ -398,10 +398,10 @@ def get_subcategories_endpoint(request):
 @api_view(['GET'])
 def get_subcategory_endpoint(request, subcategory_id):
     try:
-        subcategory = ProductSubCategory.objects.get(id=subcategory_id)
-        serializer = ProductSubCategorySerializer(subcategory)
+        subcategory = ProductSubcategory.objects.get(id=subcategory_id)
+        serializer = ProductSubcategorySerializer(subcategory)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    except ProductSubCategory.DoesNotExist:
+    except ProductSubcategory.DoesNotExist:
         return Response({"message": f"Subcategory not found with the id {subcategory_id}"}, status=status.HTTP_404_NOT_FOUND)
 
 @swagger_auto_schema(
@@ -413,8 +413,8 @@ def get_subcategory_endpoint(request, subcategory_id):
 def get_subcategories_by_category_endpoint(request, category_id):
     try:
         category = ProductCategory.objects.get(id=category_id)
-        subcategories = ProductSubCategory.objects.filter(category=category)
-        serializer = ProductSubCategorySerializer(subcategories, many=True)
+        subcategories = ProductSubcategory.objects.filter(category=category)
+        serializer = ProductSubcategorySerializer(subcategories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
         return Response({"message": f"Category not found with the id {category_id}"}, status)
@@ -466,7 +466,7 @@ def add_subcategory_endpoint(request):
         category = ProductCategory.objects.get(id=category_id)
         data['category'] = category.id
 
-        serializer = ProductSubCategorySerializer(data=data)
+        serializer = ProductSubcategorySerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -538,7 +538,6 @@ def update_category_endpoint(request):
 )  
 @api_view(['PUT'])
 def update_subcategory_endpoint(request):
-    breakpoint()
     # Use copy to allow for modification of the request data
     data = request.data.copy()
     subcategory_id = data.get('subcategory')
@@ -546,13 +545,13 @@ def update_subcategory_endpoint(request):
     try:
         category = ProductCategory.objects.get(id=category_id)
         data['category'] = category.id
-        subcategory = ProductSubCategory.objects.get(id=subcategory_id)
-        serializer = ProductSubCategorySerializer(subcategory, data=data)
+        subcategory = ProductSubcategory.objects.get(id=subcategory_id)
+        serializer = ProductSubcategorySerializer(subcategory, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except ProductSubCategory.DoesNotExist:
+    except ProductSubcategory.DoesNotExist:
         return Response({"category": f"Subcategory not found with the id {subcategory_id}"}, status=status.HTTP_400_BAD_REQUEST)
 
 @swagger_auto_schema(
@@ -562,9 +561,8 @@ def update_subcategory_endpoint(request):
 )
 @api_view(['DELETE'])
 def remove_category_endpoint(request, category_id):
-    breakpoint()
     try:
-        subcategories = ProductSubCategory.objects.filter(category=category_id)
+        subcategories = ProductSubcategory.objects.filter(category=category_id)
         for subcategory in subcategories:
             subcategory.delete()
         category = ProductCategory.objects.get(id=category_id)
@@ -581,8 +579,65 @@ def remove_category_endpoint(request, category_id):
 @api_view(['DELETE'])
 def remove_subcategory_endpoint(request, subcategory_id):
     try:
-        subcategory = ProductSubCategory.objects.get(id=subcategory_id)
+        subcategory = ProductSubcategory.objects.get(id=subcategory_id)
         subcategory.delete()
         return Response({"message": "Subcategory removed successfully"}, status=status.HTTP_200_OK)
-    except ProductSubCategory.DoesNotExist:
+    except ProductSubcategory.DoesNotExist:
         return Response({"message": f"Subcategory not found with the id {subcategory_id}"}, status)
+
+
+@swagger_auto_schema(
+    method='GET',
+    responses={200: 'OK'},
+    description='Get all top subcategories or get all top subcategories by category id.'
+)
+@api_view(['GET'])
+def get_top_subcategories_endpoint(request, category_id=None):
+    if category_id:
+        try:
+            category = ProductCategory.objects.get(id=category_id)
+            top_subcategories = []
+            for id in category.top_subcategory_ids:
+                top_subcategories.append(TopSubCategory.objects.get(id=id))
+
+            return JsonResponse({})
+        except ProductCategory.DoesNotExist:
+            return Response({"message": f"Category not found with the id {category_id}"}, status)
+    categories = ProductCategory.objects.all()
+    for category in categories:
+        pass
+
+        
+
+@swagger_auto_schema(
+    method='POST',
+    responses={200: 'OK'},
+    description='Update top subcategories'
+)
+@api_view(['POST'])
+def update_top_subcategories_endpoint(request):
+    print("Running here")       
+    breakpoint()
+    data = request.data
+    
+    seen = set()
+    duplicates = []
+    for subcategory in request.data:
+        if data.get(subcategory) in seen:
+            duplicates.append(data.get(subcategory))
+        else:
+            seen.add(data.get(subcategory))
+    if duplicates:
+        return Response({"error": "Duplicate subcategories found", "duplicates": duplicates}, status=status.HTTP_400_BAD_REQUEST)
+    
+    organized_data = []
+    for subcategory in request.data:
+        organized_data.append({"subcategory": data.get(subcategory), "order": int(subcategory.split("_")[2])})
+
+    serializer = ProductTopSubcategorySerializer(data=organized_data, many=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

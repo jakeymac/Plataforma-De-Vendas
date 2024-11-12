@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 class Product(models.Model):
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE)
-    sub_category = models.ForeignKey('ProductSubCategory', on_delete=models.CASCADE, null=True, blank=True)
+    sub_category = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -34,12 +34,18 @@ class ProductInOrder(models.Model):
     def __str__(self):
         return f'{self.product} - {self.quantity}'
 
-
 class ProductCategory(models.Model):
     category_name = models.CharField(max_length=45)
     category_description = models.TextField(null=True, blank=True)
+    top_subcategory_ids = models.JSONField(default=list, null=True, blank=True),
+    top_subcategories_products = models.JSONField(null=True, blank=True) # TODO update this or move it to a seperate model
 
-class ProductSubCategory(models.Model):
+class ProductSubcategory(models.Model):
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE)
     subcategory_name = models.CharField(max_length=45)
     subcategory_description = models.TextField(null=True, blank=True)
+
+
+class ProductTopSubcategory(models.Model):
+    subcategory = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE)
+    order = models.IntegerField()

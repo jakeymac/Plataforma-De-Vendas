@@ -4,14 +4,22 @@ from django.shortcuts import redirect
 
 from django.contrib.auth.forms import AuthenticationForm
 
-from Products.models import ProductCategory, ProductSubCategory
+from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
 
 def admin_portal(request):
     if request.user.is_authenticated:
         if request.user.account_type == "admin" and request.user.is_staff:
             categories = ProductCategory.objects.all()
-            subcategories = ProductSubCategory.objects.all()
+            subcategories = ProductSubcategory.objects.all()
+            top_subcategories_query = ProductTopSubcategory.objects.all()
+
             context = {"categories": categories, "subcategories": subcategories}
+
+            for top_subcategory in top_subcategories_query:
+                context[f"top_subcategory_{top_subcategory.order}"] = top_subcategory.subcategory.id
+            
+
+            breakpoint()
             return render(request, 'Accounts/admin_portal.html', context=context)
     return redirect('/login')
 
