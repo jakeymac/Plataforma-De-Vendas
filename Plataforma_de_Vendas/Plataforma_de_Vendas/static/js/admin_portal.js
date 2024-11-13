@@ -10,7 +10,7 @@ const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'}
 function load_data() {
 
 }
-  
+
 function load_listeners() {
     $(".form-control").focus(function (){
         $(this).removeClass('error-input');
@@ -73,30 +73,43 @@ function load_listeners() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                alert("Error: " + errorData.error);
                 for (var field in errorData) {
                     if (formId.includes('edit')) {
                         $(`#edit_${field}_error_container`).text(errorData[field]);
-                        $(`#edit_${field}`).addClass('error-input'); 
+                        $(`#edit_${field}`).addClass('error-input');
                     } else {
                         $(`#${field}_error_container`).text(errorData[field]);
                         $(`#${field}`).addClass('error-input');
                     }
                 }
+                throw new Error({"message": errorData.error});
             } else {
                 window.location.reload();
             }
         } catch (error) {
-            alert("Network error: " + error.message);
+            alert("Error: " + error.message);
         }
     });    
     
-    
+    $("#edit_category_selector").change(function() {
+        let category = categories.find(cat=> cat.id == $(this).val());
+        $("#edit_category_name").val(category.category_name);
+        $("#edit_category_description").val(category.category_description);
+    });
+
+    $("#edit_subcategory_selector").change(function() {
+        let subcategory = subcategories.find(subcat=> subcat.id == $(this).val());
+        $("#edit_subcategory_name").val(subcategory.subcategory_name);
+        $("#edit_subcategory_description").val(subcategory.subcategory_description);
+        $("#edit_subcategory_category_selector").val(subcategory.category_id);
+    });
 }
 
 $(document).ready(function () {
     load_data();
     load_listeners();
+    console.log(categories);
+    console.log(subcategories);
 });
 
 

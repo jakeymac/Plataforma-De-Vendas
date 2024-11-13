@@ -6,7 +6,10 @@
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
-    <!-- pass category and subcategory data to javascript to use in 'admin_portal.js' -->
+    <script> 
+        var categories = JSON.parse('{{ categories_json|escapejs }}')
+        var subcategories = JSON.parse('{{ subcategories_json|escapejs }}');
+    </script>
     <script src="{% static 'js/admin_portal.js' %}"></script>
 {% endblock %}
 
@@ -64,7 +67,7 @@
                 
                 <form method="put" id="edit-category-form">
                     <label for="edit_category_selector" class="form-label">Select Category</label>
-                    <select class="form-select" id="edit_category_selector" name="category">
+                    <select class="form-select edit-selector" id="edit_category_selector" name="category">
                         <option value="">Select a category</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.category_name }}</option>
@@ -95,8 +98,8 @@
                     <input type="text" class="form-control" id="edit_subcategory_name" name="subcategory_name">
                     <label for="edit_subcategory_description" class="form-label">Subcategory description</label>
                     <textarea class="form-control" id="edit_subcategory_description" name="subcategory_description" rows="3"></textarea>
-                    <label for="edit_category_selector" class="form-label">Category:</label>
-                    <select class="form-select" id="edit_category_selector" name="category">
+                    <label for="edit_subcategory_category_selector" class="form-label">Category:</label>
+                    <select class="form-select" id="edit_subcategory_category_selector" class="edit-selector" name="category">
                         <option value="">Select a category</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.category_name }}</option>

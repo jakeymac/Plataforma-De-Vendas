@@ -615,9 +615,7 @@ def get_top_subcategories_endpoint(request, category_id=None):
     description='Update top subcategories'
 )
 @api_view(['POST'])
-def update_top_subcategories_endpoint(request):
-    print("Running here")       
-    breakpoint()
+def update_top_subcategories_endpoint(request):     
     data = request.data
     
     seen = set()
