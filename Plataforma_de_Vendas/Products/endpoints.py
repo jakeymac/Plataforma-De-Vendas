@@ -632,7 +632,6 @@ def update_top_subcategories_endpoint(request):
         organized_data.append({"subcategory": data.get(subcategory), "order": int(subcategory.split("_")[2])})
 
     serializer = ProductTopSubcategorySerializer(data=organized_data, many=True)
-    breakpoint()
     if serializer.is_valid():
         # Delete the top subcategories that are being updated
         for subcategory in organized_data:
