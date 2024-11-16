@@ -1,10 +1,24 @@
+#admin-portal-main-container {
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right:auto;
+    width: 70%;
+    margin-bottom:100px;
+}
+
 #header-container {
     align-items: center;
     text-align: center;
 }
 
+.form-row {
+    margin-top: 30px;
+    /* gap: 5px; */
+}
+
 .form-container  {
     margin-bottom: 10px;
+    padding: 30px;
 }
 
 .button-container {
