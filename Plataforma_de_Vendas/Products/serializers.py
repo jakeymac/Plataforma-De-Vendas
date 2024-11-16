@@ -60,6 +60,7 @@ class ProductTopSubcategorySerializer(serializers.ModelSerializer):
     class Meta:  
         model = ProductTopSubcategory
         fields = ['subcategory', 'order']
+
     
     def validate(self, data):
         order = data.get('order')
@@ -67,9 +68,3 @@ class ProductTopSubcategorySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"order": "Order must be between 1 and 6"})
 
         return data
-
-    def save(self, **kwargs):
-        subcategory = self.validated_data.get('subcategory')
-        order = self.validated_data.get('order')
-        ProductTopSubcategory.objects.filter(order=order).delete()
-        return super().save(**kwargs)

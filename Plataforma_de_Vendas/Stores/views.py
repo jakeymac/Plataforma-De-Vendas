@@ -1,9 +1,23 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
+
 # Create your views here.
 def home(request):
-    return render(request, 'Stores/home.html')
+    categories = ProductCategory.objects.all()
+    categories_dict = {}
+    for category in categories:
+        categories_dict[category.category_name] = ProductSubcategory.objects.filter(category=category)
+    
+    top_subcategories = ProductTopSubcategory.objects.all()
+    top_subcategories_dict = {}
+    for top_subcategory in top_subcategories:
+        top_subcategories_dict[top_subcategory] = ProductSubcategory.objects.filter(id=top_subcategory.subcategory_id)
+
+    context = {"categories": categories_dict, "top_subcategories": top_subcategories_dict}
+    print(context)
+    return render(request, 'Stores/home.html', context)
 
 def view_my_store(request):
     if request.user.is_authenticated:

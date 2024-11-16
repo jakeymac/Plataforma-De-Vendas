@@ -1,6 +1,8 @@
 {% extends "Stores/base.html" %}
 {% load static %}
 
+{% load custom_filters %}
+
 {% block title %} Home {% endblock %}
 
 {% block scripts %}
@@ -14,6 +16,7 @@
 {% endblock %}
 
 {% block content %}
+
     <div class="home-nav-container py-2 ml-1">
         <div class="container">
             <div class="home-nav">
@@ -28,26 +31,33 @@
                                 <div id="categories-container" class="col-md-4"> 
                                     <ul id="categories-list">
                                         <li class="categories-list-item" data-target="top-categories-list-container">Top categories <i class="bi bi-chevron-right"></i></li>
-                                        <li class="categories-list-item" data-target="home-decor-list-container">Home Decor <i class="bi bi-chevron-right"></i></li>
-                                        <li class="categories-list-item" data-target="industrial-list-container">Industrial <i class="bi bi-chevron-right"></i></li>
-                                        <li class="categories-list-item" data-target="health-personal-care-list-container">Health & Personal Care <i class="bi bi-chevron-right"></i></li>
-                                        <li class="categories-list-item" data-target="fashion-beauty-list-container">Fashion & Beauty <i class="bi bi-chevron-right"></i></li> 
-                                        <li class="categories-list-item" data-target="sports-entertainment-list-container">Sports & Entertainment <i class="bi bi-chevron-right"></i></li>
-                                        <li class="categories-list-item" data-target="tools-home-improvement-list-container">Tools & Home Improvment <i class="bi bi-chevron-right"></i></li>
+                                        {% for category in categories %}
+                                            <li class="categories-list-item" data-target="{{ category|slugify_name }}-list-container">{{ category }} <i class="bi bi-chevron-right"></i> </li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
-
-                                <!-- Containers for the lists of sub-categories for each main category -->
                                 <div id="top-categories-list-container" class="col-md-3 sub-categories-container">
                                     <ul id="top-categories-list">
-                                        <li class="sub-categories-list-item" data-target="tires-product-showcase-container">Tires</li>
-                                        <li class="sub-categories-list-item">Wheels</li>
-                                        <li class="sub-categories-list-item">Agriculture</li>
-                                        <li class="sub-categories-list-item">Pickup & SUV</li>
+                                        {% for top_subcategory in top_subcategories %}
+                                            <li class="sub-categories-list-item">{{ top_subcategory.subcategory.subcategory_name }}</li>
+                                        {% endfor %}
                                     </ul>
-
                                 </div>
-                                <div id="home-decor-list-container" class="col-md-4 sub-categories-container">
+                                {% for category_name, subcategories in categories.items %}
+                                    <div id="{{ category_name|slugify_name }}-list-container" class="col-md-3 sub-categories-container">
+                                        <ul id="{{ category_name|slugify_name }}-list">
+                                            {% for subcategory in subcategories %}
+                                                <li class="sub-categories-list-item">{{ subcategory.subcategory_name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+                                <!-- Containers for the lists of sub-categories for each main category -->
+                                <!-- <div id="top-categories-list-container" class="col-md-3 sub-categories-container">
+                                    
+
+                                </div> -->
+                                <!-- <div id="home-decor-list-container" class="col-md-4 sub-categories-container">
                                     <ul id="home-decor-list">
                                         <li class="sub-categories-list-item">Home Decor</li>
                                         <li class="sub-categories-list-item">Home Decor</li>
@@ -94,7 +104,7 @@
                                         <li class="sub-categories-list-item">Tools & Home Improvement</li>
                                         <li class="sub-categories-list-item">Tools & Home Improvement</li>
                                     </ul>
-                                </div>
+                                </div> -->
 
                                 <!-- Containers for the product showcase areas for each sub-category -->
                                  <div class="container col-md-5 product-showcase-container" id="tires-product-showcase-container">
@@ -188,7 +198,6 @@
             <div class="row"><h2 id="explore-header-text">Explore</h2></div>
             
             <div class="row" id="explore-inner-container">
-                
                 <div class="col-md-6 explore-column" id="left-explore-column">
                     <div class="row explore-image-container position-relative" id="left-explore-image-container">
                         <div class="explore-image-header-text-container position-absolute bottom-0 start-0">
@@ -210,8 +219,6 @@
                             <h3 class="explore-image-bottom-header" id="right-explore-bottom-image-bottom-header">Example bottom text goes here</h3>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>

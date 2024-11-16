@@ -48,3 +48,6 @@ class ProductSubcategory(models.Model):
 class ProductTopSubcategory(models.Model):
     subcategory = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE)
     order = models.IntegerField()
+
+    class Meta:
+        ordering = ['order']  # Order by 'order' field 

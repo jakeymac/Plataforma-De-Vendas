@@ -1,4 +1,5 @@
 from django import template
+from django.utils.text import slugify
 register = template.Library()
 
 @register.filter(name='none_to_empty')
@@ -26,3 +27,10 @@ def valid_value(value):
     Returns True if the value is not None, 'None', or an empty string.
     """
     return value is not None and value != 'None' and value.strip() != ''
+
+@register.filter(name='slugify_name')
+def slugify_name(value):
+    """
+    Returns a slugified version of the value. (e.g. "Hello World" -> "hello-world")
+    """
+    return slugify(value)

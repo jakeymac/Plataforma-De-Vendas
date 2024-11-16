@@ -12,7 +12,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubcategory
+from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubcategory, ProductTopSubcategory
 from .serializers import ProductSerializer, ProductCategorySerializer, ProductSubcategorySerializer, ProductTopSubcategorySerializer
 from Stores.models import Store
 
@@ -617,7 +617,6 @@ def get_top_subcategories_endpoint(request, category_id=None):
 @api_view(['POST'])
 def update_top_subcategories_endpoint(request):     
     data = request.data
-    
     seen = set()
     duplicates = []
     for subcategory in request.data:
@@ -633,7 +632,11 @@ def update_top_subcategories_endpoint(request):
         organized_data.append({"subcategory": data.get(subcategory), "order": int(subcategory.split("_")[2])})
 
     serializer = ProductTopSubcategorySerializer(data=organized_data, many=True)
+    breakpoint()
     if serializer.is_valid():
+        # Delete the top subcategories that are being updated
+        for subcategory in organized_data:
+            ProductTopSubcategory.objects.filter(order=subcategory.get('order')).delete()
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
