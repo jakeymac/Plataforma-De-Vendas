@@ -1,15 +1,13 @@
 // Dict to use for form fetch calls
 const apiUrls = {'add-category-form': '/api/products/categories/add', 
-              'add-subcategory-form': '/api/products/subcategories/add',
-              'edit-category-form': '/api/products/categories/update',
-              'edit-subcategory-form': '/api/products/subcategories/update',
-              'top-categories-form': '/api/products/topsubcategories/update'};
+                 'add-subcategory-form': '/api/products/subcategories/add',
+                 'edit-category-form': '/api/products/categories/update',
+                 'edit-subcategory-form': '/api/products/subcategories/update',
+                 'top-categories-form': '/api/products/topsubcategories/update'};
 
 const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'};
 
-function load_data() {
 
-}
 
 function load_listeners() {
     $(".form-control").focus(function (){
@@ -92,13 +90,13 @@ function load_listeners() {
     });    
     
     $("#edit_category_selector").change(function() {
-        let category = categories.find(cat=> cat.id == $(this).val());
+        let category = categories.find(cat=> cat.id == $(this).val()); // Uses the categories object pulled from the context in a script in the template
         $("#edit_category_name").val(category.category_name);
         $("#edit_category_description").val(category.category_description);
     });
 
     $("#edit_subcategory_selector").change(function() {
-        let subcategory = subcategories.find(subcat=> subcat.id == $(this).val());
+        let subcategory = subcategories.find(subcat=> subcat.id == $(this).val()); // Uses the subcategories object pulled from the context in a script in the template
         $("#edit_subcategory_name").val(subcategory.subcategory_name);
         $("#edit_subcategory_description").val(subcategory.subcategory_description);
         $("#edit_subcategory_category_selector").val(subcategory.category_id);
@@ -106,10 +104,7 @@ function load_listeners() {
 }
 
 $(document).ready(function () {
-    load_data();
     load_listeners();
-    console.log(categories);
-    console.log(subcategories);
 });
 
 
