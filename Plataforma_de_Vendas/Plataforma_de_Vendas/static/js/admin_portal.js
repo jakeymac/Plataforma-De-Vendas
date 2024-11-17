@@ -8,8 +8,27 @@ const apiUrls = {'add-category-form': '/api/products/categories/add',
 const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'};
 
 
+function update_product_selector(products) {
+    
+
+    $("#product-selector").empty();
+    if (products.length === 0) {
+        $("#product-selector").append('<option value="">No products found</option>');
+    } else {
+        $("#product-selector").append('<option value="">Select a product</option>');
+        products.forEach(product => {
+            $("#product-selector ").append(`<option value="${product.id}">${product.name}</option>`);
+        });
+    }
+}
 
 function load_listeners() {
+    $("#portal-change-selector").change(function() {
+        // 
+        $(".portal-container").hide();
+        $(`#${$(this).val()}-container`).show();
+    });
+
     $(".form-control").focus(function (){
         $(this).removeClass('error-input');
         $(`#${$(this).attr('id')}_error_container`).text("");
@@ -89,7 +108,7 @@ function load_listeners() {
         }
     });    
     
-    $("#edit_category_selector").change(function() {
+    $("#edit_category_selector").change(function () {
         let category = categories.find(cat=> cat.id == $(this).val()); // Uses the categories object pulled from the context in a script in the template
         $("#edit_category_name").val(category.category_name);
         $("#edit_category_description").val(category.category_description);
@@ -101,6 +120,12 @@ function load_listeners() {
         $("#edit_subcategory_description").val(subcategory.subcategory_description);
         $("#edit_subcategory_category_selector").val(subcategory.category_id);
     });
+
+    $("#product-search").on("input", function () {
+        let searchTerm = $(this).val();
+        let filteredProducts = products.filter(product => product.name.includes(searchTerm) || product.description.includes(searchTerm));
+        update_product_selector(filteredProducts);
+    })
 }
 
 $(document).ready(function () {

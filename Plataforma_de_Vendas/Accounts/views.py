@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.contrib.auth.forms import AuthenticationForm
 
-from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
+from Products.models import Product, ProductCategory, ProductSubcategory, ProductTopSubcategory
 
 import json
 
@@ -15,16 +15,19 @@ def admin_portal(request):
             categories_json = list(ProductCategory.objects.values())
             subcategories_json = list(ProductSubcategory.objects.values())            
             top_subcategories_query = ProductTopSubcategory.objects.all()
+            products = Product.objects.all().order_by('name')
+            products_json = list(Product.objects.values('id', 'name', 'description'))
 
             context = {"categories": categories,
                        "subcategories": subcategories, 
+                       "products": products,
                        "categories_json": json.dumps(categories_json), 
-                       "subcategories_json": json.dumps(subcategories_json)}
-
+                       "subcategories_json": json.dumps(subcategories_json),
+                       "products_json": json.dumps(products_json)}
+            
             for top_subcategory in top_subcategories_query:
                 context[f"top_subcategory_{top_subcategory.order}"] = top_subcategory.subcategory.id
             
-
             return render(request, 'Accounts/admin_portal.html', context=context)
     return redirect('/login')
 

@@ -607,8 +607,6 @@ def get_top_subcategories_endpoint(request, category_id=None):
     for category in categories:
         pass
 
-        
-
 @swagger_auto_schema(
     method='POST',
     responses={200: 'OK'},
@@ -640,4 +638,28 @@ def update_top_subcategories_endpoint(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@swagger_auto_schema(
+    method='POST',
+    responses=(200, 'OK'),
+    description='Edit a product'
+)
+@api_view(['POST'])
+def update_product_endpoint(request):
+    if request.user.is_authenticated and request.user.is_superuser: # TODO will need to update this to allow store owners to update their products
+        data = request.data
+        try:
+            product = Product.objects.get(id=data.get('id'))
+        except Product.DoesNotExist:
+            return Response({"message": "Product not found with the id"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ProductSerializer(product, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
+
+
+
 
