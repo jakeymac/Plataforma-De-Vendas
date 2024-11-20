@@ -11,7 +11,7 @@ class Product(models.Model):
     details = models.TextField(default='{}')
     minimum_quantity = models.IntegerField(default=10)
     is_active = models.BooleanField(default=True)
-    draft = models.BooleanField(default=True)
+    # draft = models.BooleanField(default=True) TODO implement this
 
     created_on = models.DateTimeField(auto_now_add=True)
     

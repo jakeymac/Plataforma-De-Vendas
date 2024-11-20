@@ -23,18 +23,19 @@ function update_product_selector(products) {
 }
 
 function load_listeners() {
-    $("#portal-change-selector").change(function() {
-        // 
-        $(".portal-container").hide();
-        $(`#${$(this).val()}-container`).show();
+    $(".form-control").on("input", function () {
+        const inputId = $(this).attr("id");
+        // Remove error class and clear error message
+        $(`#${inputId}`).removeClass("error-input");
+        $(`#${inputId}_error_container`).text("");
     });
 
-    $(".form-control").focus(function (){
-        $(this).removeClass('error-input');
-        $(`#${$(this).attr('id')}_error_container`).text("");
-    })
-
-    // TODO add a listener to the selecters to remove the error message when the user selects a value
+    $(".form-select").on("change", function () {
+        const selectId = $(this).attr("id");
+        // Remove error class and clear error message
+        $(`#${selectId}`).removeClass("error-input");
+        $(`#${selectId}_error_container`).text("");
+    });
 
 
     $(".delete-button").click(async function () {
@@ -48,7 +49,6 @@ function load_listeners() {
             $(`#edit-${cleanedButtonId}-error-container`).text("Please select a category to delete");
             return;
         }
-
         try {
             const response = await fetch(url, {
                 method: 'DELETE',
@@ -56,7 +56,6 @@ function load_listeners() {
                     'X-CSRFToken': csrfToken
                 }
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 console.log(errorData);
@@ -94,17 +93,25 @@ function load_listeners() {
                     if (formId.includes('edit')) {
                         $(`#edit_${field}_error_container`).text(errorData[field]);
                         $(`#edit_${field}`).addClass('error-input');
-                    } else {
+                    } else if (formId.includes('add')) {
                         $(`#${field}_error_container`).text(errorData[field]);
                         $(`#${field}`).addClass('error-input');
+                    } else {
+                        // This is for the top categories form
+                        $("#top-categories-message-container").text(errorData.error);
+                        $("#top-categories-message-container").addClass("error-message");
                     }
-                }
-                throw new Error({"message": errorData.error});
+                }            
             } else {
-                window.location.reload();
+                $(this).find(".message-container").text("Success");
+                $(this).find(".message-container").addClass("success-message");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error) {
-            alert("Error: " + error.message);
+            $(this).find(".message-container").text("Error: " + error.message);
+            $(this).find(".message-container").addClass("error-message");
         }
     });    
     

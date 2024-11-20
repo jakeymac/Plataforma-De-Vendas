@@ -24,201 +24,197 @@
         <div class="row">
             <div class="col-12" id="header-container">
                 <h1>Administration Portal</h1>
-                <select class="form-select" id="portal-change-selector">
-                    <option value="category">Categories</option>
-                    <option value="product">Products</option>
-                </select>
             </div>
         </div>
-        <div id="product-container" class="portal-container">
-            <div class="row form-row">
-                <div class="col-6 form-container">
-                    <h2>Add New Product</h2>
-                    <button class="btn btn-primary mt-2">Add</button>
-                </div>
-                <div class="col-6 form-container">
-                    <h2>Edit Product</h2>
-                    <input type="text" id="product-search" class="form-control" placeholder="Search for products">
-                    <form id="edit-product-form">
-                        <select class="form-select mt-3" id="product-selector">
-                            <option value="">Select a product</option>
-                            {% if products %}
-                                {% for product in products %}
-                                    <option value="{{ product.id }}">{{ product.name }}</option>
-                                {% endfor %}
-                            {% else %}
-                                <option value="">No products found</option>
-                            {% endif %}
-                        </select>
-                        <button class="btn btn-primary mt-2">Edit</button>
-                    </form>
+        <div class="row form-row">
+            <div class="col-6 form-container">
+                <h2>Add New Product</h2>
+                <div class="button-container">
+                    <button class="btn btn-primary mt-2">Add Product</button>
                 </div>
             </div>
-        </div>
-        <div id="category-container" class="portal-container">
-            <div class="row form-row">
-                <div class="col-6 form-container">
-                    <h2>Add Category</h2>
-                    <form method="post" id="add-category-form">
-                        <label for="category_name" class="form-label">Category Name:</label>
-                        <input type="text" class="form-control" id="category_name" name="category_name">
-                        <div id="category_name_error_container" class="error-message"></div>
-                        <label for="category_description" class="form-label">Category description</label>
-                        <textarea class="form-control" id="category_description" name="category_description" rows="3"></textarea>
-                        <div id="category_description_error_container" class="error-message"></div>
-                        <div class="button-container">
-                            <button type="submit" class="btn btn-primary mt-2">Add Category</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-6 form-container" id="add-category-container">
-                    <h2>Add Subcategory</h2>
-                    <form method="post" id="add-subcategory-form">
-                        <label for="subcategory_name" class="form-label">Subcategory Name:</label>
-                        <input type="text" class="form-control" id="subcategory_name" name="subcategory_name">
-                        <label for="subcategory_description" class="form-label">Subcategory description</label>
-                        <textarea class="form-control" id="subcategory_description" name="subcategory_description" rows="3"></textarea>
-                        <label for="category_selector" class="form-label">Category:</label>
-                        <select class="form-select" id="category_selector" name="category">
-                            <option value="">Select a category</option>
-                            {% for category in categories %}
-                                <option value="{{ category.id }}">{{ category.category_name }}</option>
+            <div class="col-6 form-container">
+                <h2>Edit Product</h2>
+                <input type="text" id="product-search" class="form-control" placeholder="Search for products">
+                <form id="edit-product-form">
+                    <select class="form-select mt-3" id="edit-product-selector">
+                        <option value="">Select a product</option>
+                        {% if products %}
+                            {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }}</option>
                             {% endfor %}
-                        </select> 
-                        <div id="subcategory-error-container" class="error-message"></div>                      
-                        <div class="button-container">
-                            <button type="submit" class="btn btn-primary mt-2">Add Subcategory</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row form-row" >
-                <div class="col-6 form-container">
-                    <h2>Edit Category</h2>
-                    <form method="put" id="edit-category-form">
-                        <label for="edit_category_selector" class="form-label">Select Category</label>
-                        <select class="form-select edit-selector" id="edit_category_selector" name="category">
-                            <option value="">Select a category</option>
-                            {% for category in categories %}
-                                <option value="{{ category.id }}">{{ category.category_name }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="edit_category_name" class="form-label">Category Name:</label>
-                        <input type="text" class="form-control" id="edit_category_name" name="category_name">
-                        <label for="edit_category_description" class="form-label">Category description</label>
-                        <textarea class="form-control" id="edit_category_description" name="category_description" rows="3"></textarea>
-                        <div id="edit-category-error-container" class="error-message"></div>
-                        <div class="button-container">
-                            <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-category-button">Delete Category</button>
-                            <button type="submit" class="btn btn-primary mt-2">Save Category</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-6 form-container">
-                    <h2>Edit Subcategory</h2>
-                    <form method="put" id="edit-subcategory-form">
-                        <label for="edit_subcategory_selector" class="form-label">Select Subcategory</label>
-                        <select class="form-select" id="edit_subcategory_selector" name="subcategory">
-                            <option value="">Select a subcategory</option>
-                            {% for subcategory in subcategories %}
-                                <option value="{{ subcategory.id }}">{{ subcategory.subcategory_name }}</option>
-                            {% endfor %}
-                        </select>
-                        <label for="edit_subcategory_name" class="form-label">Subcategory Name:</label>
-                        <input type="text" class="form-control" id="edit_subcategory_name" name="subcategory_name">
-                        <label for="edit_subcategory_description" class="form-label">Subcategory description</label>
-                        <textarea class="form-control" id="edit_subcategory_description" name="subcategory_description" rows="3"></textarea>
-                        <label for="edit_subcategory_category_selector" class="form-label">Category:</label>
-                        <select class="form-select" id="edit_subcategory_category_selector" class="edit-selector" name="category">
-                            <option value="">Select a category</option>
-                            {% for category in categories %}
-                                <option value="{{ category.id }}">{{ category.category_name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div id="edit-subcategory-error-container" class="error-message"></div>
-                        <div class="button-container">
-                            <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-subcategory-button">Delete Subcategory</button>
-                            <button type="submit" class="btn btn-primary mt-2">Save Subcategory</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row form-row">
-                <form method="POST" id="top-categories-form">
-                    <div class="top-categories-form-container">
-                        <div class="row"><h2>Top Subcategories</h2></div>
-                        <div class="row">
-                            <div class="col-6">
-                                <label for ="top_subcategory_selector_1" class="col-form-label col-md-4">Select Subcategory 1</label>
-                                <select class="form-select col-md-6" id="top_subcategory_selector_1" name="top_subcategory_1">
-                                    <option value="">Select a subcategory</option>
-                                    {% for subcategory in subcategories %}
-                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_1 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label for ="top_subcategory_selector_2" class="col-form-label col-md-4">Select Subcategory 2</label>
-                                <select class="form-select col-md-8" id="top_subcategory_selector_2" name="top_subcategory_2">
-                                    <option value="">Select a subcategory</option>
-                                    {% for subcategory in subcategories %}
-                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_2 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <label for ="top_subcategory_selector_3" class="col-form-label col-md-4">Select Subcategory 3</label>
-                                <select class="form-select col-md-8" id="top_subcategory_selector_3" name="top_subcategory_3">
-                                    <option value="">Select a subcategory</option>
-                                    {% for subcategory in subcategories %}
-                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_3 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label for ="top_subcategory_selector_4" class="col-form-label col-md-4">Select Subcategory 4</label>
-                                <select class="form-select col-md-8" id="top_subcategory_selector_4" name="top_subcategory_4">
-                                    <option value="">Select a subcategory</option>
-                                    {% for subcategory in subcategories %}
-                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_4 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <label for ="top_subcategory_selector_5" class="col-form-label col-md-4">Select Subcategory 5</label>
-                                <select class="form-select col-md-8" id="top_subcategory_selector_5" name="top_subcategory_5">
-                                    <option value="">Select a subcategory</option>
-                                    {% for subcategory in subcategories %}
-                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_5 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label for ="top_subcategory_selector_6" class="col-form-label col-md-4">Select Subcategory 6</label>
-                                <select class="form-select col-md-8" id="top_subcategory_selector_6" name="top_subcategory_6">
-                                    <option value="">Select a subcategory</option>
-                                    {% for subcategory in subcategories %}
-                                        <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_6 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div id="top-categories-error-container" class="error-message"></div>
-                                <div class="button-container">
-                                    <button type="submit" class="btn btn-primary mt-2">Save Top Categories</button>
-                                </div>
-                            </div>
-                        </div>
+                        {% else %}
+                            <option value="">No products found</option>
+                        {% endif %}
+                    </select>
+                    <div class="button-container">
+                        <button class="btn btn-primary mt-2">Edit Product</button>
                     </div>
                 </form>
             </div>
         </div>
-        
+        <div class="row form-row">
+            <div class="col-6 form-container">
+                <h2>Add Category</h2>
+                <form method="post" id="add-category-form">
+                    <label for="category_name" class="form-label">Category Name:</label>
+                    <input type="text" class="form-control" id="category_name" name="category_name">
+                    <div id="category_name_error_container" class="error-message"></div>
+                    <label for="category_description" class="form-label">Category description</label>
+                    <textarea class="form-control" id="category_description" name="category_description" rows="3"></textarea>
+                    <div id="category_description_error_container" class="error-message"></div>
+                    <div class="message-container" id="add-category-message-container"></div>
+                    <div class="button-container">
+                        <button type="submit" class="btn btn-primary mt-2">Add Category</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-6 form-container" id="add-category-container">
+                <h2>Add Subcategory</h2>
+                <form method="post" id="add-subcategory-form">
+                    <label for="subcategory_name" class="form-label">Subcategory Name:</label>
+                    <input type="text" class="form-control" id="subcategory_name" name="subcategory_name">
+                    <label for="subcategory_description" class="form-label">Subcategory description</label>
+                    <textarea class="form-control" id="subcategory_description" name="subcategory_description" rows="3"></textarea>
+                    <label for="category_selector" class="form-label">Category:</label>
+                    <select class="form-select" id="category_selector" name="category">
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select> 
+                    <div class="message-container" id="add-subcategory-message-container"></div>                      
+                    <div class="button-container">
+                        <button type="submit" class="btn btn-primary mt-2">Add Subcategory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row form-row" >
+            <div class="col-6 form-container">
+                <h2>Edit Category</h2>
+                <form method="put" id="edit-category-form">
+                    <label for="edit_category_selector" class="form-label">Select Category</label>
+                    <select class="form-select edit-selector" id="edit_category_selector" name="category">
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="edit_category_name" class="form-label">Category Name:</label>
+                    <input type="text" class="form-control" id="edit_category_name" name="category_name">
+                    <label for="edit_category_description" class="form-label">Category description</label>
+                    <textarea class="form-control" id="edit_category_description" name="category_description" rows="3"></textarea>
+                    <div  class="message-container" id="edit-category-message-container"></div>
+                    <div class="button-container">
+                        <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-category-button">Delete Category</button>
+                        <button type="submit" class="btn btn-primary mt-2">Save Category</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-6 form-container">
+                <h2>Edit Subcategory</h2>
+                <form method="put" id="edit-subcategory-form">
+                    <label for="edit_subcategory_selector" class="form-label">Select Subcategory</label>
+                    <select class="form-select" id="edit_subcategory_selector" name="subcategory">
+                        <option value="">Select a subcategory</option>
+                        {% for subcategory in subcategories %}
+                            <option value="{{ subcategory.id }}">{{ subcategory.subcategory_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="edit_subcategory_name" class="form-label">Subcategory Name:</label>
+                    <input type="text" class="form-control" id="edit_subcategory_name" name="subcategory_name">
+                    <label for="edit_subcategory_description" class="form-label">Subcategory description</label>
+                    <textarea class="form-control" id="edit_subcategory_description" name="subcategory_description" rows="3"></textarea>
+                    <label for="edit_subcategory_category_selector" class="form-label">Category:</label>
+                    <select class="form-select" id="edit_subcategory_category_selector" class="edit-selector" name="category">
+                        <option value="">Select a category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="message-container" id="edit-subcategory-message-container"></div>
+                    <div class="button-container">
+                        <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-subcategory-button">Delete Subcategory</button>
+                        <button type="submit" class="btn btn-primary mt-2">Save Subcategory</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row form-row">
+            <form method="POST" id="top-categories-form">
+                <div class="top-categories-form-container">
+                    <div class="row"><h2>Top Subcategories</h2></div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for ="top_subcategory_selector_1" class="col-form-label col-md-4">Select Subcategory 1</label>
+                            <select class="form-select col-md-6" id="top_subcategory_selector_1" name="top_subcategory_1">
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_1 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for ="top_subcategory_selector_2" class="col-form-label col-md-4">Select Subcategory 2</label>
+                            <select class="form-select col-md-8" id="top_subcategory_selector_2" name="top_subcategory_2">
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_2 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for ="top_subcategory_selector_3" class="col-form-label col-md-4">Select Subcategory 3</label>
+                            <select class="form-select col-md-8" id="top_subcategory_selector_3" name="top_subcategory_3">
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_3 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for ="top_subcategory_selector_4" class="col-form-label col-md-4">Select Subcategory 4</label>
+                            <select class="form-select col-md-8" id="top_subcategory_selector_4" name="top_subcategory_4">
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_4 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for ="top_subcategory_selector_5" class="col-form-label col-md-4">Select Subcategory 5</label>
+                            <select class="form-select col-md-8" id="top_subcategory_selector_5" name="top_subcategory_5">
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_5 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for ="top_subcategory_selector_6" class="col-form-label col-md-4">Select Subcategory 6</label>
+                            <select class="form-select col-md-8" id="top_subcategory_selector_6" name="top_subcategory_6">
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory.id == top_subcategory_6 %}selected{% endif %}>{{ subcategory.subcategory_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="message-container" id="top-categories-message-container"></div>
+                            <div class="button-container">
+                                <button type="submit" class="btn btn-primary mt-2">Save Top Categories</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
