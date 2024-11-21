@@ -1,0 +1,32 @@
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block title %} Add New Product {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script> var csrfToken = "{{ csrf_token }}"; </script>
+    <script src="{% static 'Products/js/add_new_product.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/add_new_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" id="main-container">
+    <div class="row">
+        <div class="col-md-12" >
+            <h1>Add New Product</h1>
+            <form id="add_new_product_form" method="POST">
+                <div class="form-group">
+                    <label for="product_name">Product Name</label>
+                    <input type="text" class="form-control" id="product_name" name="product_name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Product</button>
+            </form>
+        </div>
+    </div>                
+</div>
+{% endblock %}

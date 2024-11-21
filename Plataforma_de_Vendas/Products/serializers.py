@@ -35,8 +35,13 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         name = data.get('category_name')
-        if ProductCategory.objects.filter(category_name=name).exists():
-            raise serializers.ValidationError({"category_name": "Category with this name already exists"})
+        if self.instance:
+            if ProductCategory.objects.filter(category_name=name).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError({"category_name": "Category with this name already exists"})
+        else:
+            if ProductCategory.objects.filter(category_name=name).exists():
+                raise serializers.ValidationError({"category_name": "Category with this name already exists"})
+
         if ProductSubcategory.objects.filter(subcategory_name=name).exists():
             raise serializers.ValidationError({"category_name": "Category with this name already exists as a subcategory"})
         return data
@@ -52,8 +57,12 @@ class ProductSubcategorySerializer(serializers.ModelSerializer):
         name = data.get('subcategory_name')
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError({"subcategory_name": "Subcategory with this name already exists as a category"})
-        if ProductSubcategory.objects.filter(subcategory_name=name).exists():
-            raise serializers.ValidationError({"subcategory_name": "Subcategory with this name already exists"})
+        if self.instance:
+            if ProductSubcategory.objects.filter(subcategory_name=name).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError({"subcategory_name": "Subcategory with this name already exists"})
+        else:
+            if ProductSubcategory.objects.filter(subcategory_name=name).exists():
+                raise serializers.ValidationError({"subcategory_name": "Subcategory with this name already exists"})
         return data
 
 class ProductTopSubcategorySerializer(serializers.ModelSerializer):

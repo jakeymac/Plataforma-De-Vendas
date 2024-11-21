@@ -30,7 +30,7 @@
             <div class="col-6 form-container">
                 <h2>Add New Product</h2>
                 <div class="button-container">
-                    <button class="btn btn-primary mt-2">Add Product</button>
+                    <button class="btn btn-primary mt-2" onclick="window.location.href='/add_new_product/'">Add Product</button>
                 </div>
             </div>
             <div class="col-6 form-container">
@@ -41,7 +41,7 @@
                         <option value="">Select a product</option>
                         {% if products %}
                             {% for product in products %}
-                                <option value="{{ product.id }}">{{ product.name }}</option>
+                          §      <option value="{{ product.id }}">{{ product.name }} {% if product.draft %}(draft){% endif %}</option>
                             {% endfor %}
                         {% else %}
                             <option value="">No products found</option>
@@ -103,8 +103,10 @@
                     </select>
                     <label for="edit_category_name" class="form-label">Category Name:</label>
                     <input type="text" class="form-control" id="edit_category_name" name="category_name">
+                    <div id="edit_category_name_error_container" class="error-message"></div>
                     <label for="edit_category_description" class="form-label">Category description</label>
                     <textarea class="form-control" id="edit_category_description" name="category_description" rows="3"></textarea>
+                    <div id="edit_category_description_error_container" class="error-message"></div>
                     <div  class="message-container" id="edit-category-message-container"></div>
                     <div class="button-container">
                         <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-category-button">Delete Category</button>
@@ -124,8 +126,10 @@
                     </select>
                     <label for="edit_subcategory_name" class="form-label">Subcategory Name:</label>
                     <input type="text" class="form-control" id="edit_subcategory_name" name="subcategory_name">
+                    <div id="edit_subcategory_name_error_container" class="error-message"></div>
                     <label for="edit_subcategory_description" class="form-label">Subcategory description</label>
                     <textarea class="form-control" id="edit_subcategory_description" name="subcategory_description" rows="3"></textarea>
+                    <div id="edit_subcategory_description_error_container" class="error-message"></div>
                     <label for="edit_subcategory_category_selector" class="form-label">Category:</label>
                     <select class="form-select" id="edit_subcategory_category_selector" class="edit-selector" name="category">
                         <option value="">Select a category</option>

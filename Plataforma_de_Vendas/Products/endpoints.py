@@ -275,11 +275,13 @@ def remove_product_endpoint(request):
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
 
 def check_product_quantity(current_stock, minimum_stock, store_id, product_id):
+    """ Check if the current stock is below the minimum stock and send a notification if it is """
     out_of_stock = current_stock == 0
     if current_stock <= minimum_stock:
         send_low_stock_notification(store_id, product_id, out_of_stock, current_stock)
 
 def send_low_stock_notification(store_id, product_id, out_of_stock, current_stock):
+    """ Send a notification to all users who have opted in to receive stock notifications. """
     product = Product.objects.get(id=product_id)
     product_name = product.name
     subject = 'Product Notification'
@@ -460,19 +462,22 @@ def get_category_endpoint(request, category_id):
 @api_view(['POST'])
 def add_subcategory_endpoint(request):
     # Use copy to allow for modification of the request data
-    data = request.data.copy()
-    category_id = data.get('category')
-    try:
-        category = ProductCategory.objects.get(id=category_id)
-        data['category'] = category.id
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        data = request.data.copy()
+        category_id = data.get('category')
+        try:
+            category = ProductCategory.objects.get(id=category_id)
+            data['category'] = category.id
 
-        serializer = ProductSubcategorySerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except ProductCategory.DoesNotExist:
-        return Response({"message": f"Category not found with the id {category_id}"}, status)
+            serializer = ProductSubcategorySerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ProductCategory.DoesNotExist:
+            return Response({"message": f"Category not found with the id {category_id}"}, status)
+    else:
+        return Response({"message": "You do not have permission to add a subcategory"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='post',
@@ -488,13 +493,15 @@ def add_subcategory_endpoint(request):
 )
 @api_view(['POST'])
 def add_category_endpoint(request):
-    data = request.data
-    serializer = ProductCategorySerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        data = request.data
+        serializer = ProductCategorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"message": "You do not have permission to add a category"}, status=status.HTTP_403_FORBIDDEN)
 @swagger_auto_schema(
     method='put',
     request_body=openapi.Schema(
@@ -510,17 +517,20 @@ def add_category_endpoint(request):
 )  
 @api_view(['PUT'])
 def update_category_endpoint(request):
-    data = request.data
-    category_id = data.get('category')
-    try:
-        category = ProductCategory.objects.get(id=category_id)        
-        serializer = ProductCategorySerializer(category, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except ProductCategory.DoesNotExist:
-        return Response({"category": f"Category not found with the id {category_id}"}, status=status.HTTP_400_BAD_REQUEST)
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        data = request.data
+        category_id = data.get('category')
+        try:
+            category = ProductCategory.objects.get(id=category_id)        
+            serializer = ProductCategorySerializer(category, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ProductCategory.DoesNotExist:
+            return Response({"category": f"Category not found with the id {category_id}"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"message": "You do not have permission to update this category"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='put',
@@ -538,21 +548,24 @@ def update_category_endpoint(request):
 )  
 @api_view(['PUT'])
 def update_subcategory_endpoint(request):
-    # Use copy to allow for modification of the request data
-    data = request.data.copy()
-    subcategory_id = data.get('subcategory')
-    category_id = data.get('category')
-    try:
-        category = ProductCategory.objects.get(id=category_id)
-        data['category'] = category.id
-        subcategory = ProductSubcategory.objects.get(id=subcategory_id)
-        serializer = ProductSubcategorySerializer(subcategory, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except ProductSubcategory.DoesNotExist:
-        return Response({"category": f"Subcategory not found with the id {subcategory_id}"}, status=status.HTTP_400_BAD_REQUEST)
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        # Use copy to allow for modification of the request data
+        data = request.data.copy()
+        subcategory_id = data.get('subcategory')
+        category_id = data.get('category')
+        try:
+            category = ProductCategory.objects.get(id=category_id)
+            data['category'] = category.id
+            subcategory = ProductSubcategory.objects.get(id=subcategory_id)
+            serializer = ProductSubcategorySerializer(subcategory, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except ProductSubcategory.DoesNotExist:
+            return Response({"category": f"Subcategory not found with the id {subcategory_id}"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"message": "You do not have permission to update this subcategory"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='delete',
@@ -614,30 +627,33 @@ def get_top_subcategories_endpoint(request, category_id=None):
 )
 @api_view(['POST'])
 def update_top_subcategories_endpoint(request):     
-    data = request.data
-    seen = set()
-    duplicates = []
-    for subcategory in request.data:
-        if data.get(subcategory) in seen:
-            duplicates.append(data.get(subcategory))
-        else:
-            seen.add(data.get(subcategory))
-    if duplicates:
-        return Response({"error": "Duplicate subcategories found", "duplicates": duplicates}, status=status.HTTP_400_BAD_REQUEST)
-    
-    organized_data = []
-    for subcategory in request.data:
-        organized_data.append({"subcategory": data.get(subcategory), "order": int(subcategory.split("_")[2])})
+    if request.user.is_authenticated and request.user.is_superuser:
+        data = request.data
+        seen = set()
+        duplicates = []
+        for subcategory in request.data:
+            if data.get(subcategory) in seen:
+                duplicates.append(data.get(subcategory))
+            else:
+                seen.add(data.get(subcategory))
+        if duplicates:
+            return Response({"error": "Duplicate subcategories found", "duplicates": duplicates}, status=status.HTTP_400_BAD_REQUEST)
+        
+        organized_data = []
+        for subcategory in request.data:
+            organized_data.append({"subcategory": data.get(subcategory), "order": int(subcategory.split("_")[2])})
 
-    serializer = ProductTopSubcategorySerializer(data=organized_data, many=True)
-    if serializer.is_valid():
-        # Delete the top subcategories that are being updated
-        for subcategory in organized_data:
-            ProductTopSubcategory.objects.filter(order=subcategory.get('order')).delete()
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = ProductTopSubcategorySerializer(data=organized_data, many=True)
+        if serializer.is_valid():
+            # Delete the top subcategories that are being updated
+            for subcategory in organized_data:
+                ProductTopSubcategory.objects.filter(order=subcategory.get('order')).delete()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "You do not have permission to update top subcategories"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='POST',

@@ -9,8 +9,6 @@ const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'}
 
 
 function update_product_selector(products) {
-    
-
     $("#product-selector").empty();
     if (products.length === 0) {
         $("#product-selector").append('<option value="">No products found</option>');
@@ -60,7 +58,11 @@ function load_listeners() {
                 const errorData = await response.json();
                 console.log(errorData);
             } else {
-                window.location.reload();
+                $(this).closest("form").find(".message-container").text("Success");
+                $(this).closest("form").find(".message-container").addClass("success-message");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error) {
             alert("Network error: " + error.message);

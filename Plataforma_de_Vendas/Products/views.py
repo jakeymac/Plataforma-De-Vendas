@@ -1,10 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Product
 
 # Create your views here.
 
-def add_new_product(request):
-    new_product = Product()
-    new_product.save()
-    context = {"product_id": new_product.id}
-    return render(request, 'Products/add_new_product.html', context)
+def add_product_view(request):
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        return render(request, 'products/add_new_product.html')
+    else:
+        # TODO add a forbidden page to let users know what's happening
+        return redirect('home')
+
+    

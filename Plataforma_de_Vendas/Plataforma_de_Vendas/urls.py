@@ -61,7 +61,9 @@ urlpatterns = [
     path('home/', store_views.home, name='home'),
 
     path('account/', account_views.view_account, name='view_account'),
-    path('my_store', store_views.view_my_store, name='view_my_store'),
+    path('my_stor/', store_views.view_my_store, name='view_my_store'),
+
+    path('add_new_product/', product_views.add_product_view, name='add_product'),
 
     path('swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
     path('api/swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
