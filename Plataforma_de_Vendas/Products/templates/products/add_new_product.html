@@ -18,14 +18,19 @@
 <div class="container" id="main-container">
     <div class="row">
         <div class="col-md-12" >
-            <h1>Add New Product</h1>
-            <form id="add_new_product_form" method="POST">
-                <div class="form-group">
-                    <label for="product_name">Product Name</label>
-                    <input type="text" class="form-control" id="product_name" name="product_name" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Product</button>
-            </form>
+            <div class="container" id="form-container">
+                <h2>Add New Product</h2>
+                <form id="add_new_product_form" method="POST">
+                    <div class="form-group">
+                        <label for="product_name">Product Name</label>
+                        <input type="text" class="form-control" id="product_name" name="product_name" required>
+                        <div id="product_name_error_container" class="error-message"></div>
+                    </div>
+                    <div id="button-container">
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>                
 </div>
