@@ -23,7 +23,7 @@ import json
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
 def get_users_endpoint(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         users = CustomUser.objects.all()
         serializer = CustomUserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -35,7 +35,7 @@ def get_users_endpoint(request):
     responses={200: CustomUserSerializer()})
 @api_view(['GET'])
 def get_user_endpoint(request, user_id):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         try:
             user = CustomUser.objects.get(id=user_id)
             serializer = CustomUserSerializer(user)
@@ -50,7 +50,7 @@ def get_user_endpoint(request, user_id):
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
 def get_customers_endpoint(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         customers = CustomUser.objects.filter(account_type='customer')
         serializer = CustomUserSerializer(customers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -62,7 +62,7 @@ def get_customers_endpoint(request):
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
 def get_admins_endpoint(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         admins = CustomUser.objects.filter(account_type='admin')
         serializer = CustomUserSerializer(admins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

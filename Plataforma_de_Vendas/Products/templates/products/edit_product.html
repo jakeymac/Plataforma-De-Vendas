@@ -1,0 +1,60 @@
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block title %} Edit Product Details {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script> var csrfToken = "{{ csrf_token }}"; </script>
+    <script src="{% static 'js/edit_product.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/edit_product.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" id="main-container">
+    <div class="container" id="form-container">
+        <div class="row">
+            <div class="col-12" id="header-container">
+                <h2 id="header-title">Edit Product</h2>
+                <div id="saving-status-icon-container">
+                    <div id="product-saving-icon-container"><img src="{% static 'images/product_saving_icon.gif' %}" alt="Saving Icon"> Saving... </div>
+                    <div id="product-saved-icon-container"><i class="bi bi-check product-save-successful" id="product-saved-icon" width="40"></i></div>
+                </div>
+            </div>
+        </div>
+        <form id="edit_product_form" method="POST">
+            {% csrf_token %}
+            <div class="row form-row">
+                <label for="product_name">Product Name</label>
+                <input type="text" class="form-control" id="product_name" name="product_name" required>    
+            </div>
+            <div class="row form-row">
+                <label for="product_description">Product Description</label>
+                <textarea class="form-control" id="product_description" name="product_description" required></textarea>
+            </div>
+            <div class="row form-row">
+                <label for="subcategory">Subcategory</label>
+                <select class="form-select" id="subcategory" name="subcategory" required>
+                    <option value="" selected disabled>Select a Subcategory</option>
+                    <option value="1">Subcategory 1</option>
+                    <option value="2">Subcategory 2</option>
+                    <option value="3">Subcategory 3</option>
+                </select>
+            </div>
+            <div id="add-detail-button-container" class="row form-row">
+                <button id="add-detail-button" class="btn btn-primary">Add Detail</button>
+            </div>
+            <div id="button-container">
+                <!-- TODO edit the cancel's button to go back to either the  -->
+                <button type="button" class="btn btn-secondary">Cancel</button> 
+                <button type="button" class="btn btn-danger">Delete</button>
+                <button type="submit" class="btn btn-primary">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

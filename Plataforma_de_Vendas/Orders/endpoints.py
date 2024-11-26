@@ -20,7 +20,7 @@ import json
     responses={200: OrderSerializer(many=True)})
 @api_view(['GET'])
 def get_orders_endpoint(request):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -35,7 +35,7 @@ def get_order_endpoint(request, order_id):
     if request.user.is_authenticated:
         try:
             order = Order.objects.get(id=order_id)
-            if request.user.is_superuser or (request.user.account_type == "seller" and order.store == request.user.store) or order.user == request.user:
+            if request.user.account_type == 'admin' or (request.user.account_type == "seller" and order.store == request.user.store) or order.user == request.user:
                 serializer = OrderSerializer(order)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response({"message": "You are not authorized to view this order"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -50,7 +50,7 @@ def get_order_endpoint(request, order_id):
     responses={200: OrderSerializer(many=True)})
 @api_view(['GET'])
 def get_orders_by_user_endpoint(request, user_id):
-    if request.user.is_authenticated and (request.user.is_superuser or request.user.id == user_id):
+    if request.user.is_authenticated and (request.user.account_type == 'admin' or request.user.id == user_id):
         try:
             user_object = CustomUser.objects.get(id=user_id)
             orders = Order.objects.filter(user=user_object)
@@ -67,7 +67,7 @@ def get_orders_by_user_endpoint(request, user_id):
     responses={200: OrderSerializer(many=True)})
 @api_view(['GET'])
 def get_orders_by_store_endpoint(request, store_id):
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         try:
             store = Store.objects.get(id=store_id)
             orders = Order.objects.filter(store=store)
@@ -103,7 +103,7 @@ def update_order_endpoint(request):
         data = request.data
         try:
             order = Order.objects.get(id=data['id'])
-            if request.user.is_superuser or (request.user.account_type == "seller" and order.store == request.user.store) or order.user == request.user:
+            if request.user.account_type == 'admin' or (request.user.account_type == "seller" and order.store == request.user.store) or order.user == request.user:
                 serializer = OrderSerializer(order, data=data)
                 if serializer.is_valid():
                     serializer.save()

@@ -12,8 +12,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         errors = {}
 
-        if data.get('account_type') == 'admin' and not self.instance.is_superuser:
-            raise serializers.ValidationError('Only superusers can create admin accounts')
+        if data.get('account_type') == 'admin' and not self.instance.account_type == 'admin':
+            raise serializers.ValidationError('Only admins can create admin accounts')
             return data
 
         if self.instance:

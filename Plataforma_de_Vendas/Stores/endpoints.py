@@ -78,7 +78,7 @@ def update_store_endpoint(request):
         store = Store.objects.get(id=store_id)
         if request.user.is_authenticated:
 
-            if request.user.is_superuser or request.user.id == store.owner.id:
+            if request.user.account_type == 'admin' or request.user.id == store.owner.id:
                 serializer = StoreSerializer(store, data=data)
                 if serializer.is_valid():
                     serializer.save()

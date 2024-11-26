@@ -97,7 +97,7 @@
                         </ul>
                     </li>
                     {% if user.is_authenticated %}
-                        {% if user.is_staff %}
+                        {% if user.account_type == 'admin' %}
                             <li class="nav-item">
                                 <a class="nav-link" href="/admin_portal"><i class="bi bi-person-fill-gear"></i> Admin Portal</a>
                             </li>

@@ -19,3 +19,26 @@
     margin-top: 15px;
     margin-bottom: 15px;
 }
+
+#messages-container {
+    text-align: center;
+    color: white;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+}
+
+.error-input {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+}
+
+.error-message {
+    background-color: red;
+}
+
+.success-message {
+    background-color: green;
+}
+

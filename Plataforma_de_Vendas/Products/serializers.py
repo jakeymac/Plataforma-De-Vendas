@@ -7,14 +7,14 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate(self, data):
-        name = data.get('name')
-        store_id = data.get('store_id')
-        quantity = data.get('quantity')
-        if quantity < 0:
+        product_name = data.get('product_name')
+        # TODO possibly remove this entirely
+        if data.get('quantity') and data.get('quantity') < 0:
             raise serializers.ValidationError({"quantity": "Quantity cannot be negative"})
-         
-        if Product.objects.filter(name=name, store_id=store_id).exists():
-            raise serializers.ValidationError({"name": "Product with this name already exists in this store"})
+
+         # TODO possibly update this check to allow for the same product name in different stores
+        if Product.objects.filter(product_name=product_name).exists():
+            raise serializers.ValidationError({"product_name": "Product with this name already exists"})
             
         return data
 

@@ -35,7 +35,6 @@ function load_listeners() {
         $(`#${selectId}_error_container`).text("");
     });
 
-
     $(".delete-button").click(async function () {
         const buttonId = $(this).attr('id');
         // Remove the delete- prefix and -button suffix

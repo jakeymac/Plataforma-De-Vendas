@@ -6,7 +6,7 @@
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
-    <script src="{% static 'Products/js/add_new_product.js' %}"></script>
+    <script src="{% static 'js/add_new_product.js' %}"></script>
 {% endblock %}
 
 {% block styles %}
@@ -22,9 +22,10 @@
                 <h2>Add New Product</h2>
                 <form id="add_new_product_form" method="POST">
                     <div class="form-group">
+                        {% csrf_token %}
                         <label for="product_name">Product Name</label>
                         <input type="text" class="form-control" id="product_name" name="product_name" required>
-                        <div id="product_name_error_container" class="error-message"></div>
+                        <div id="messages-container"></div>
                     </div>
                     <div id="button-container">
                         <button type="submit" class="btn btn-primary">Add Product</button>

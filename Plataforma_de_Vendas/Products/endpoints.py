@@ -82,111 +82,6 @@ def search_for_product_endpoint(request, store_id=None):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @swagger_auto_schema(
-    method='post',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['name', 'description', 'price', 'store_id'],
-        properties={
-            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Product name'),
-            'description': openapi.Schema(type=openapi.TYPE_STRING, description='Product description'),
-            'price': openapi.Schema(type=openapi.TYPE_NUMBER, description='Product price'),
-            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product quantity'),
-            'store_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Store id'),
-            'details': openapi.Schema(type=openapi.TYPE_STRING, description='Product details', default='{}'),
-            'minimum_quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Minimum quantity for product for notifications'),
-            'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Product status'),
-        }
-    ),
-    responses={201: 'Created'}
-)
-@api_view(['POST'])
-def add_product_endpoint(request):
-    data = request.data
-    store = Store.objects.get(id=data.get('store_id'))
-    if request.user.is_authenticated:
-        if request.user.is_superuser or request.user.store == store:
-
-            serializer = ProductSerializer(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    return Response({"message": "You do not have permission to add a product to this store"}, status=status.HTTP_401_UNAUTHORIZED)
-
-@swagger_auto_schema(
-    method='put',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['id'],
-        properties={
-            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
-            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Product name'),
-            'description': openapi.Schema(type=openapi.TYPE_STRING, description='Product description'),
-            'price': openapi.Schema(type=openapi.TYPE_NUMBER, description='Product price'),
-            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product quantity'),
-            'store_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Store id'),
-            'details': openapi.Schema(type=openapi.TYPE_STRING, description='Product details', default='{}'),
-            'minimum_quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Minimum quantity for product for notifications'),
-            'is_active': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Product status'),
-        }
-    ),
-    responses={200: 'Updated'}
-)
-@api_view(['PUT'])
-def update_product_endpoint(request):
-    data = request.data
-    product_id = data.get('id')
-    try:
-        product = Product.objects.get(id=product_id)
-        if request.user.is_authenticated:
-            if request.user.is_superuser or request.user.store == product.store:
-                serializer = ProductSerializer(product, data=data)
-                if serializer.is_valid():
-                    serializer.save()
-                    product = Product.objects.get(id=product_id)
-                    check_product_quantity(product.quantity, product.minimum_quantity, serializer.data.get('store_id'), product_id)
-
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
-    except Product.DoesNotExist:
-        return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
-
-@swagger_auto_schema(
-    method='put',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['id', 'quantity'],
-        properties={
-            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
-            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product quantity'),
-        }
-    ),
-    responses={200: 'Updated'}
-)
-@api_view(['PUT'])
-def update_product_stock_endpoint(request):
-    data = request.data
-    product_id = data.get('id')
-    try:
-        product = Product.objects.get(id=product_id)
-        if data.get('quantity') < 0:
-            return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
-        if request.user.is_authenticated:
-            if request.user.is_superuser or request.user.store == product.store:
-                if data.get('quantity') < 0:
-                    return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST) 
-                product.quantity = data.get('quantity')
-                product.save()
-                check_product_quantity(product.quantity, product.minimum_quantity, product.store.id, product.id)
-                    
-                return Response({"message": "Product stock updated successfully"}, status=status.HTTP_200_OK)
-        return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
-    except Product.DoesNotExist:
-        return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
-
-@swagger_auto_schema(
     method='put',
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -207,7 +102,7 @@ def remove_stock_endpoint(request):
         if data.get('quantity') < 0:
             return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
         if request.user.is_authenticated:
-            if request.user.is_superuser or request.user.store == product.store:
+            if request.user.account_type == 'admin' or request.user.store == product.store:
                 if data.get('quantity') > product.quantity:
                     return Response({"message": "You cannot remove more stock than is available"}, status=status.HTTP_400_BAD_REQUEST)
                 product.quantity -= data.get('quantity')
@@ -240,7 +135,7 @@ def add_stock_endpoint(request):
         if data.get('quantity') < 0:
             return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
         if request.user.is_authenticated:
-            if request.user.is_superuser or request.user.store == product.store:
+            if request.user.account_type == 'admin' or request.user.store == product.store:
                 product.quantity += data.get('quantity')
                 product.save()
                 return Response({"message": "Product stock updated successfully"}, status=status.HTTP_200_OK)
@@ -266,7 +161,7 @@ def remove_product_endpoint(request):
     try:
         product = Product.objects.get(id=product_id)
         if request.user.is_authenticated:
-            if request.user.is_superuser or request.user.store == product.store:
+            if request.user.account_type == 'admin' or request.user.store == product.store:
                 product.is_active = False
                 product.save()
                 return Response({"message": "Product deactivated successfully"}, status=status.HTTP_200_OK)
@@ -627,7 +522,7 @@ def get_top_subcategories_endpoint(request, category_id=None):
 )
 @api_view(['POST'])
 def update_top_subcategories_endpoint(request):     
-    if request.user.is_authenticated and request.user.is_superuser:
+    if request.user.is_authenticated and request.user.account_type == 'admin':
         data = request.data
         seen = set()
         duplicates = []
@@ -662,7 +557,7 @@ def update_top_subcategories_endpoint(request):
 )
 @api_view(['POST'])
 def update_product_endpoint(request):
-    if request.user.is_authenticated and request.user.is_superuser: # TODO will need to update this to allow store owners to update their products
+    if request.user.is_authenticated and request.user.account_type == 'admin': # TODO will need to update this to allow store owners to update their products
         data = request.data
         try:
             product = Product.objects.get(id=data.get('id'))
@@ -676,6 +571,26 @@ def update_product_endpoint(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
 
+@swagger_auto_schema(
+    method='POST',
+    responses=(200, 'OK'),
+    description='Add a new product'
+)
+@api_view(['POST'])
+def add_product_endpoint(request):
+    breakpoint()
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        data = request.data
+        if Product.objects.filter(product_name=data.get('product_name')).exists():
+            return Response({"message": "Product with that name already exists"}, status=status.HTTP_400_BAD_REQUEST)   
+        else:
+            product_serializer = ProductSerializer(data=data, partial=True)
+            if product_serializer.is_valid():
+                product_serializer.save()
+                return Response(product_serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "Product added successfully", "id": new_product.id}, status=status.HTTP_201_CREATED)
+
+    return Response({"message": "You do not have permission to add a product"}, status=status.HTTP_403_FORBIDDEN)
 
 
 

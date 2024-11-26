@@ -33,7 +33,7 @@ from Stores import views as store_views, endpoints as store_endpoints
 
 # Custom admin check
 def is_admin(user):
-    return user.is_authenticated and user.is_staff
+    return user.is_authenticated and user.account_type == 'admin'
 
 # Swagger schema view
 schema_view = get_schema_view(
@@ -61,9 +61,10 @@ urlpatterns = [
     path('home/', store_views.home, name='home'),
 
     path('account/', account_views.view_account, name='view_account'),
-    path('my_stor/', store_views.view_my_store, name='view_my_store'),
+    path('my_store/', store_views.view_my_store, name='view_my_store'),
 
-    path('add_new_product/', product_views.add_product_view, name='add_product'),
+    path('add_new_product/', product_views.add_product_view, name='add_new_product'),
+    path('edit_product/<int:product_id>/', product_views.edit_product_view, name='edit_product'),
 
     path('swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
     path('api/swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
@@ -81,9 +82,6 @@ urlpatterns = [
     path('api/products/search/<int:store_id>', product_endpoints.search_for_product_endpoint),
     path('api/products/add', product_endpoints.add_product_endpoint),
     path('api/products/update', product_endpoints.update_product_endpoint),
-    path('api/products/update_stock', product_endpoints.update_product_stock_endpoint),
-    path('api/products/remove_stock', product_endpoints.remove_stock_endpoint),
-    path('api/products/add_stock', product_endpoints.add_stock_endpoint),
     path('api/products/remove', product_endpoints.remove_product_endpoint),
     path('api/products/add_image', product_endpoints.add_product_image_endpoint),
     path('api/products/images/<int:product_id>', product_endpoints.product_images_endpoint),
