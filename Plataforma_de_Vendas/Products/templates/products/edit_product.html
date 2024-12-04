@@ -6,11 +6,14 @@
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
+    <script> var counter = {{ properties|length }} || 0; // Fallback to 0 if no properties </script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="{% static 'js/edit_product.js' %}"></script>
 {% endblock %}
 
 {% block styles %}
     {{ block.super }}
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="{% static 'css/edit_product.css' %}">
 {% endblock %}
 
@@ -30,7 +33,7 @@
             {% csrf_token %}
             <div class="row form-row">
                 <label for="product_name">Product Name</label>
-                <input type="text" class="form-control" id="product_name" name="product_name" required>    
+                <input type="text" class="form-control" id="product_name" name="product_name" reqbrekuired>    
             </div>
             <div class="row form-row">
                 <label for="product_description">Product Description</label>
@@ -45,14 +48,35 @@
                     <option value="3">Subcategory 3</option>
                 </select>
             </div>
-            <div id="add-detail-button-container" class="row form-row">
-                <button id="add-detail-button" class="btn btn-primary">Add Detail</button>
+            <div id="sortable-properties">
+                {% for property in properties %}
+                    <div class="sortable-item" id="property-row-{{ forloop.counter }}">
+                        <div class="col-md-5">
+                            <label for="property-name-{{ forloop.counter }}">Property Name</label>
+                            <input type="text" class="form-control" id="property-name-{{ forloop.counter }}" name="property-name-{{ forloop.counter }}" value="{{property.name }}" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="property-value-{{ forloop.counter }}">Property Value</label>
+                            <input type="text" class="form-control" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{property.value}}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger remove-property-button">Remove</button>
+                        </div>
+                    </div>
+                {% endfor %}
+
             </div>
+            
+            <div id="add-property-button-container" class="row form-row">
+                <button type="button" id="add-property-button" class="btn btn-primary">Add Detail</button>
+            </div>
+            
+
             <div id="button-container">
-                <!-- TODO edit the cancel's button to go back to either the  -->
+                <!-- TODO edit the cancel's button to go back to different pages  -->
                 <button type="button" class="btn btn-secondary">Cancel</button> 
                 <button type="button" class="btn btn-danger">Delete</button>
-                <button type="submit" class="btn btn-primary">Save Product</button>
+                <button type="submit" class="btn btn-success">Save Product</button>
             </div>
         </form>
     </div>

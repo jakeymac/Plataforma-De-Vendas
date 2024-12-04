@@ -578,7 +578,6 @@ def update_product_endpoint(request):
 )
 @api_view(['POST'])
 def add_product_endpoint(request):
-    breakpoint()
     if request.user.is_authenticated and request.user.account_type == 'admin':
         data = request.data
         if Product.objects.filter(product_name=data.get('product_name')).exists():

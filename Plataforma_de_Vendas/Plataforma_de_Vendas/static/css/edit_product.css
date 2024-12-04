@@ -58,14 +58,46 @@
     width: 80%;
 }
 
-#add-detail-button-container {
+#add-property-button-container {
     justify-content: center;
 }
 
-#add-detail-button {
+#add-property-button {
     width: 20%;
 }
 
 #button-container {
     text-align: center;
+}
+
+#sortable-properties {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sortable-item {
+    cursor: move; /* Show a "move" cursor */
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+
+}
+
+
+.sortable-placeholder {
+    background-color: #e9ecef;
+    border: 2px dashed #ccc;
+    height: 50px;
+    border-radius: 5px;
+}
+
+/* Item while being dragged */
+.ui-sortable-helper {
+    box-sizing: border-box;
 }

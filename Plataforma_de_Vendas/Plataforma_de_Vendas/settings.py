@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,6 +31,9 @@ SECRET_KEY = 'django-insecure-7x00smj5q!!f-6+viux&@yhug#&joo9lg%**d0c+&3xc==xnsa
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','localhost', 'plataforma-de-vendas.com',]
+
+# Automatic logout after 30 minutes of inactivity
+session_inactivity_timeout = 1800
 
 
 # Application definition
@@ -58,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Plataforma_de_Vendas.middleware.InactivityTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'Plataforma_de_Vendas.urls'
