@@ -33,6 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1','localhost', 'plataforma-de-vendas.com',]
 
 # Automatic logout after 30 minutes of inactivity
+# This value is used in the InactvitiyTimeoutMiddleware
 session_inactivity_timeout = 1800
 
 
@@ -62,7 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'Plataforma_de_Vendas.middleware.InactivityTimeoutMiddleware',
+    'Plataforma_de_Vendas.middleware.InactivityTimeoutMiddleware', # Custom middleware for logging out users after a period of inactivity
 ]
 
 ROOT_URLCONF = 'Plataforma_de_Vendas.urls'
