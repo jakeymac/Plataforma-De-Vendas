@@ -18,7 +18,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 #DEPLOYMENT ROOT 
-#BASE_DIR = Path('/home/ec2-user/project_files/Plataforma-de-Vendas/Plataforma_de_Vendas/Plataforma_de_Vendas')
+# BASE_DIR = Path('/home/ec2-user/project_files/Plataforma-de-Vendas/Plataforma_de_Vendas/Plataforma_de_Vendas')
 
 
 # Quick-start development settings - unsuitable for production

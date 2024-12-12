@@ -13,8 +13,12 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"quantity": "Quantity cannot be negative"})
 
          # TODO possibly update this check to allow for the same product name in different stores
-        if Product.objects.filter(product_name=product_name).exists():
-            raise serializers.ValidationError({"product_name": "Product with this name already exists"})
+        if self.instance:
+            if Product.objects.filter(product_name=product_name).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError({"product_name": "Product with this name already exists"})
+        else:
+            if Product.objects.filter(product_name=product_name).exists():
+                raise serializers.ValidationError({"product_name": "Product with this name already exists"})
             
         return data
 

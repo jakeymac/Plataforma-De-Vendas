@@ -1,9 +1,9 @@
 // Dict to use for form fetch calls
-const apiUrls = {'add-category-form': '/api/products/categories/add', 
-                 'add-subcategory-form': '/api/products/subcategories/add',
-                 'edit-category-form': '/api/products/categories/update',
-                 'edit-subcategory-form': '/api/products/subcategories/update',
-                 'top-categories-form': '/api/products/topsubcategories/update'};
+const apiUrls = {'add-category-form': '/api/products/categories/add/', 
+                 'add-subcategory-form': '/api/products/subcategories/add/',
+                 'edit-category-form': '/api/products/categories/update/',
+                 'edit-subcategory-form': '/api/products/subcategories/update/',
+                 'top-categories-form': '/api/products/topsubcategories/update/'};
 
 const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'};
 
@@ -41,7 +41,7 @@ function load_listeners() {
         const cleanedButtonId = buttonId.replace(/^delete-/, '').replace(/-button$/, '');
         
         const targetId = $(`#edit_${cleanedButtonId}_selector`).val();
-        const url = `/api/products/${deleteButtons[cleanedButtonId]}/remove/${targetId}`;
+        const url = `/api/products/${deleteButtons[cleanedButtonId]}/remove/${targetId}/`;
         if (targetId === "") {
             $(`#edit-${cleanedButtonId}-error-container`).text("Please select a category to delete");
             return;

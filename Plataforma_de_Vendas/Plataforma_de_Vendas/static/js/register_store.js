@@ -21,7 +21,7 @@ function load_user_registration_listeners() {
         foundErrors = true;
     } else {
         try {
-            const response = await fetch('/api/accounts/username_available', {
+            const response = await fetch('/api/accounts/username_available/', {
                 method: 'POST',
                 body: JSON.stringify({ "username": $("#username").val() }),
                 headers: {
@@ -53,7 +53,7 @@ function load_user_registration_listeners() {
         foundErrors = true;
     } else {
         try {
-            const response = await fetch('/api/accounts/email_available', {
+            const response = await fetch('/api/accounts/email_available/', {
                 method: 'POST',
                 body: JSON.stringify({ "email": $("#email").val() }),
                 headers: {

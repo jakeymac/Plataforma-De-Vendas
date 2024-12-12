@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from nanoid import generate
+
+def generate_unique_id():
+    return generate(size=12)
 
 class CustomUser(AbstractUser):
 
@@ -11,6 +15,8 @@ class CustomUser(AbstractUser):
         ('seller', 'Seller'),
         ('admin', 'Admin'),
     ]
+
+    id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
 
     account_type = models.CharField(choices=ACCOUNT_TYPES, max_length=10, default='customer')
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE, null=True, blank=True) # For sellers to have a store
@@ -31,6 +37,19 @@ class CustomUser(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
 
     created_on = models.DateTimeField(auto_now_add=True)
+
+    # Custom save method to generate unique id and ensure it is unique
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.id = generate_unique_id()
+        while True:
+            try:
+                super().save(*args, **kwargs)
+                break
+            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            except IntegrityError:
+                # Regenerate the id and try again
+                self.id = generate_unique_id()
 
     def __str__(self):
         return self.username

@@ -3,7 +3,7 @@ function load_event_listeners() {
 }
 
 function load_data() {
-    fetch('/api/accounts/current_user', {
+    fetch('/api/accounts/current_user/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

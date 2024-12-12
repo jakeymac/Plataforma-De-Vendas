@@ -4,7 +4,7 @@ function load_listeners() {
         const formData = new FormData(this);
         
         try {
-            let response = await fetch('/api/products/add', {
+            let response = await fetch('/api/products/add/', {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrfToken

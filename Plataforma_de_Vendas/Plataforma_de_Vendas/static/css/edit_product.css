@@ -3,8 +3,11 @@
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid black;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding-top: 30px;
+    padding-bottom: 15px;
+    margin-top: 40px;
 }
 
 #header-container {
@@ -22,6 +25,8 @@
 #saving-status-icon-container {
     display: flex;
     align-items: center;
+    height: 40px;
+    width: 40px;
 }
 
 #saving-status-icon-container img, #saving-icon-container .bi {
@@ -35,6 +40,10 @@
 }
 
 #product-saved-icon-container {
+    display: none;
+}
+
+#product-save-error-icon-container {
     display: none;
 }
 
@@ -60,6 +69,8 @@
 
 #add-property-button-container {
     justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 10px;
 }
 
 #add-property-button {
@@ -68,27 +79,29 @@
 
 #button-container {
     text-align: center;
+
 }
 
 #sortable-properties {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 30px;
 }
 
 .sortable-item {
     cursor: move; /* Show a "move" cursor */
     background-color: #f9f9f9;
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 15px;
     border-radius: 5px;
     align-items: center;
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
+    margin-top: 15px;
 
 }
-
 
 .sortable-placeholder {
     background-color: #e9ecef;
@@ -100,4 +113,25 @@
 /* Item while being dragged */
 .ui-sortable-helper {
     box-sizing: border-box;
+}
+
+.error-input {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+}
+
+.error-message-div {
+    color: red;
+}
+
+.form-row .error-message-div {
+    height:30px;
+}
+
+.sortable-item .error-message-div {
+    height: 15px;
+}
+
+.remove-property-button {
+    margin-top: 25%;
 }
