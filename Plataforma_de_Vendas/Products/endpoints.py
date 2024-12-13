@@ -12,7 +12,10 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .models import Product, ProductImage, ProductInOrder, ProductCategory, ProductSubcategory, ProductTopSubcategory
+from .models import (
+    Product, ProductImage, ProductInOrder, ProductCategory, ProductSubcategory, ProductTopSubcategory,
+    InitialProductState, InitialProductImage
+)
 from .serializers import ProductSerializer, ProductCategorySerializer, ProductSubcategorySerializer, ProductTopSubcategorySerializer
 from Stores.models import Store
 
@@ -591,5 +594,63 @@ def add_product_endpoint(request):
 
     return Response({"message": "You do not have permission to add a product"}, status=status.HTTP_403_FORBIDDEN)
 
+@swagger_auto_schema(
+    method='POST',
+    responses=(200, 'OK'),
+    description='Rollback a product to a previous state'
+)
+@api_view(['POST'])
+def rollback_product_changes_endpoint(request):
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        data = request.data
 
+        product_not_found = False
+        initial_state_not_found = False
+        try:
+            product = Product.objects.get(id=data.get('product_id'))
+        except Product.DoesNotExist:
+            product_not_found = True
 
+        try:
+            initial_state = InitialProductState.objects.get(id=data.get('initial_product_state_id'))
+        except ProductInitialState.DoesNotExist:
+            initial_state_not_found = True
+
+        if product_not_found and initial_state_not_found:
+            return Response({"message": f"Product with id {data.get('id')} and initial state with {data.get('id')} not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        elif product_not_found:
+            return Response({"message": f"Product with id {data.get('id')} not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        elif initial_state_not_found:
+            return Response({"message": f"Initial state with id {data.get('initial_state_id')} not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        else:
+            product.store = initial_state.store
+            product.sub_category = initial_state.sub_category
+            product.product_name = initial_state.product_name
+            product.description = initial_state.description
+            product.properties = initial_state.properties
+            product.is_active = initial_state.is_active
+            product.draft = initial_state.draft
+            product.save()
+
+            for image in product.productimage_set.all():
+                image.delete()
+            
+            for initial_image in initial_state.initialproductimage_set.all():
+                ProductImage.objects.create(
+                    product = product,
+                    is_primary = initial_image.is_primary,
+                    image = initial_image.image
+                )
+
+                initial_image.delete()
+            
+            initial_state.delete()
+
+            return Response({"message": "Product rolled back successfully"}, status=status.HTTP_200_OK)
+        
+        return Response({"message": "There was an error rolling back the product"}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"message": "You do not have permission to rollback a product"}, status=status.HTTP_403_FORBIDDEN)

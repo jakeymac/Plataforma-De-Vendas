@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Product, ProductSubcategory
+from .models import Product, ProductSubcategory, InitialProductState, InitialProductImage
 
 
 def add_product_view(request):
@@ -12,9 +12,29 @@ def add_product_view(request):
 def edit_product_view(request, product_id):
     if request.user.is_authenticated and request.user.account_type == 'admin':
         product = Product.objects.get(id=product_id)
+
+        initial_product_state = InitialProductState.objects.create(
+            product=product,
+            store=product.store,
+            sub_category=product.sub_category,
+            product_name=product.product_name,
+            description=product.description,
+            properties=product.properties,
+            is_active=product.is_active,
+            draft=product.draft,
+        )
+
+        for image in product.productimage_set.all():
+            InitialProductImage.objects.create(
+                product = initial_product_state,
+                is_primary = image.is_primary,
+                image = image.image
+            )
+
         properties = product.properties
         subcategories = ProductSubcategory.objects.all()
-        return render(request, 'products/edit_product.html', {'product': product, 'subcategories': subcategories, 'properties': properties})
+        return render(request, 'products/edit_product.html', {'product': product, 'initial_product_state': initial_product_state, 
+                                                            'subcategories': subcategories, 'properties': properties})
     else:
         # TODO add a forbidden page to let users know what's happening
         return redirect('home')

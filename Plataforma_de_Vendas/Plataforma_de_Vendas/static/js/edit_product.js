@@ -34,7 +34,7 @@ function loadListeners() {
             if (propertyName || propertyValue) {
                 addNewPropertyRow();
                 clearTimeout(autoSaveTimeout);
-                autoSaveTimeout = setTimeout(autoSaveProductInfo, 1000);
+                autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
             }
         // If there are no property rows, add one
         } else {
@@ -48,14 +48,38 @@ function loadListeners() {
         $(`#${id}_error_field`).text("");
         checkForRemainingErrors();
         clearTimeout(autoSaveTimeout);
-        autoSaveTimeout = setTimeout(autoSaveProductInfo, 1000);
+        autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
     })
 
     $("#sortable-properties").sortable({
         update: function (event, ui) {
             clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(autoSaveProductInfo, 1000);
+            autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
         }
+    })
+
+    $("#cancel-changes-button").on("click", function() {
+        fetch('/api/products/rollback_product_changes/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({"product_id": productId, 
+                                  "initial_product_state_id": initialProductStateId})
+        }).then(response => {
+            if (response.ok) {
+                // TODO - add redirection to whatever the previous page actually was
+                location.href = `/admin_portal/`;
+            } else {
+                $("#extra-error-message-div").text("Error rolling back changes");
+                setTimeout(() => {
+                    $("#extra-error-message-div").text("");
+                }, 2000);
+                console.error("Error rolling back changes: ", response.json());
+
+            }
+        });
     })
 }
 

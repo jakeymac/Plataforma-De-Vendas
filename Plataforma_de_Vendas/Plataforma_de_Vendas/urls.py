@@ -87,6 +87,7 @@ urlpatterns = [
     path('api/products/images/<int:product_id>/', product_endpoints.product_images_endpoint),
     path('api/products/order/<int:order_id>/', product_endpoints.products_in_order_endpoint),
     path('api/products/remove_image/<int:image_id>/', product_endpoints.remove_product_image_endpoint),
+    path('api/products/rollback_product_changes/', product_endpoints.rollback_product_changes_endpoint),
 
     path('api/products/search_category/<int:category_id>/', product_endpoints.find_products_in_category_endpoint),
     path('api/products/categories/', product_endpoints.get_categories_endpoint),

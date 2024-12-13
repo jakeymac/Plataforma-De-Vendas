@@ -6,7 +6,10 @@
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
-    <script> var counter = {{ properties|length }} || 0; // Fallback to 0 if no properties </script>
+    <script> var counter = {{ properties|length }} || 0; // Defaults to 0 if no properties are found
+             var productId = "{{ product.id }}";
+             var initialProductStateId = "{{ initial_product_state.id }}";
+    </script> 
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="{% static 'js/edit_product.js' %}"></script>
 {% endblock %}
@@ -68,8 +71,8 @@
                             <button type="button" class="btn btn-danger remove-property-button">Remove</button>
                         </div>
                         <div class="col-md-12">
-                            <div class="error-message-div" id=""></div>
-                            <div class="error-message-div"></div>
+                            <div class="error-message-div" id="property-name-{{ forloop.counter }}-error_field"></div>
+                            <div class="error-message-div" id="property-value-{{ forloop.counter }}-error_field"></div>
                         </div>
 
                     </div>
@@ -84,10 +87,11 @@
 
             <div id="button-container">
                 <!-- TODO edit the cancel's button to go back to different pages  -->
-                <button type="button" class="btn btn-secondary">Cancel</button> 
-                <button type="button" class="btn btn-danger">Delete</button>
-                <button type="submit" class="btn btn-success">Save Product</button>
+                <button type="button" class="btn btn-secondary" id="cancel-changes-button">Cancel</button> 
+                <button type="button" class="btn btn-danger" id="remove-product-button">Delete</button>
+                <button type="submit" class="btn btn-success" id="save-product-button">Save Product</button>
             </div>
+            <div class="error-message-div" id="extra-error-message-div"></div>"
         </form>
     </div>
 </div>
