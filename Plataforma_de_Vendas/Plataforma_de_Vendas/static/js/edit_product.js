@@ -209,11 +209,14 @@ function loadListeners() {
                     console.log("Success");
                     
                     addNewImageRow(response.url, response.id);
+                    clearTimeout(autoSaveTimeout);
+                    autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
                     $("#photos-inner-container").sortable({
                         placeholder: "sortable-placeholder",
                         start: function (e, ui) {
                             // Optionally adjust placeholder height to match dragged element
                             ui.placeholder.height(ui.item.outerHeight());
+
                         }
                     })
                     
@@ -370,6 +373,8 @@ function bindRemovalButtons() {
         
         $(this).closest(".sortable-item").remove();
         checkForRemainingErrors();
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
     })
 }
 $(document).ready(function() {
@@ -381,6 +386,7 @@ $(document).ready(function() {
         start: function (e, ui) {
             // Optionally adjust placeholder height to match dragged element
             ui.placeholder.height(ui.item.outerHeight());
+            
         }
     });    
 });
