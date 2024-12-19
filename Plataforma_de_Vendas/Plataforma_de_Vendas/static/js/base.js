@@ -1,7 +1,6 @@
 
 
 function load_event_listeners() {
-    console.log("hi there")
     $("#home-nav-button").on("click", function() {
         window.location.href = "/";
         console.log("Clicked home button");

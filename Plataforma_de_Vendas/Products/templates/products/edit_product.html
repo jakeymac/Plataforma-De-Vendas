@@ -34,64 +34,83 @@
             </div>
         </div>
         <form id="edit_product_form" method="POST">
-            {% csrf_token %}
-            <input type="hidden" id="id" name="id" value="{{ product.id }}"> 
-            <div class="row form-row">
-                <label for="product_name">Product Name</label>
-                <input type="text" class="form-control product-info-input" id="product_name" name="product_name" value="{{ product.product_name }}" required>    
-                <div class="error-message-div" id ="product_name_error_field"></div>
-            </div>
-            <div class="row form-row">
-                <label for="product_description">Product Description</label>
-                <textarea class="form-control product-info-input" id="product_description" name="product_description" value=" {{ product.description }}"required></textarea>
-                <div class="error-message-div" id ="product_description_error_field"></div>
-            </div>
-            <div class="row form-row">
-                <label for="subcategory">Subcategory</label>
-                <select class="form-select product-info-input" id="subcategory" name="subcategory" required>
-
-                    <option value="" selected disabled>Select a Subcategory</option>
-                    {% for subcategory in subcategories %}
-                        <option value="{{ subcategory.id }}" {% if subcategory.id == product %} selected {% endif %}>{{ subcategory.subcategory_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div id="sortable-properties">
-                {% for property_name, property_value in properties.items %}
-                    <div class="row sortable-item" id="property-row-{{ forloop.counter }}">
-                        <div class="col-md-5">
-                            <label for="property-name-{{ forloop.counter }}">Property Name</label>
-                            <input type="text" class="form-control product-info-input property-name-input" id="property-name-{{ forloop.counter }}" name="property-name-{{ forloop.counter }}" value="{{ property_name }}" required>
-                        </div>
-                        <div class="col-md-5">
-                            <label for="property-value-{{ forloop.counter }}">Property Value</label>
-                            <input type="text" class="form-control product-info-input property-value-input" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{ property_value}}" required>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-danger remove-property-button">Remove</button>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="error-message-div" id="property-name-{{ forloop.counter }}-error_field"></div>
-                            <div class="error-message-div" id="property-value-{{ forloop.counter }}-error_field"></div>
-                        </div>
-
+            <div class="row">
+                <div class="col-8" id="product-details-container">
+                    {% csrf_token %}
+                    <input type="hidden" id="product_id" name="product_id" value="{{ product.id }}"> 
+                    <div class="row form-row">
+                        <label for="product_name">Product Name</label>
+                        <input type="text" class="form-control product-info-input" id="product_name" name="product_name" value="{{ product.product_name }}" required>    
+                        <div class="error-message-div" id ="product_name_error_field"></div>
                     </div>
-                {% endfor %}
-
+                    <div class="row form-row">
+                        <label for="product_description">Product Description</label>
+                        <textarea class="form-control product-info-input" id="product_description" name="product_description" value=" {{ product.description }}"required></textarea>
+                        <div class="error-message-div" id ="product_description_error_field"></div>
+                    </div>
+                    <div class="row form-row">
+                        <label for="subcategory">Subcategory</label>
+                        <select class="form-select product-info-input" id="subcategory" name="subcategory" required>
+        
+                            <option value="" selected disabled>Select a Subcategory</option>
+                            {% for subcategory in subcategories %}
+                                <option value="{{ subcategory.id }}" {% if subcategory.id == product %} selected {% endif %}>{{ subcategory.subcategory_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="sortable-properties">
+                        {% for property_name, property_value in properties.items %}
+                            <div class="row sortable-item property-row" id="property-row-{{ forloop.counter }}">
+                                <div class="col-md-5">
+                                    <label for="property-name-{{ forloop.counter }}">Property Name</label>
+                                    <input type="text" class="form-control product-info-input property-name-input" id="property-name-{{ forloop.counter }}" name="property-name-{{ forloop.counter }}" value="{{ property_name }}" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="property-value-{{ forloop.counter }}">Property Value</label>
+                                    <input type="text" class="form-control product-info-input property-value-input" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{ property_value}}" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-danger remove-property-button">Remove</button>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="error-message-div" id="property-name-{{ forloop.counter }}-error_field"></div>
+                                    <div class="error-message-div" id="property-value-{{ forloop.counter }}-error_field"></div>
+                                </div>
+        
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div id="add-property-button-container" class="row form-row">
+                        <button type="button" id="add-property-button" class="btn btn-primary">Add Detail</button>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="row form-row">
+                        <button type="button" class="btn btn-primary" id="upload-image-button">Upload Image</button>
+                        <input type="file" id="image-input" style="display: none;" accept="image/*">
+                        <div class="container" id="image-upload-progress-container" >
+                            <progress id="image-upload-progress" value="0" max="100"></progress>
+                        </div>
+                    </div>
+                    
+                    <div id="photos-container">
+                        <div id="photos-inner-container">
+                            <div id="initial-image-loading-icon-container">
+                                <img src="{% static 'images/edit-product-images-loading-animation.gif' %}" alt="Loading Images" id="initial-image-loading-icon">
+                                <p id="initial-image-loading-text">Loading Product Images</p>
+                            </div>
+                        </div>
+                        
+                    </div>                
+                </div>
             </div>
-            
-            <div id="add-property-button-container" class="row form-row">
-                <button type="button" id="add-property-button" class="btn btn-primary">Add Detail</button>
-            </div>
-            
-
             <div id="button-container">
                 <!-- TODO edit the cancel's button to go back to different pages  -->
                 <button type="button" class="btn btn-secondary" id="cancel-changes-button">Cancel</button> 
                 <button type="button" class="btn btn-danger" id="remove-product-button">Delete</button>
                 <button type="submit" class="btn btn-success" id="save-product-button">Save Product</button>
             </div>
-            <div class="error-message-div" id="extra-error-message-div"></div>"
+            <div class="error-message-div" id="extra-error-message-div"></div>
         </form>
     </div>
 </div>

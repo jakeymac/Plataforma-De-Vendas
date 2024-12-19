@@ -61,16 +61,16 @@ class InitialProductState(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    is_primary = models.BooleanField(default=False)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
+    order = models.PositiveIntegerField(default=0) 
 
     def __str__(self):
-        return self.product.name
+        return f"{self.product.product_name} - {self.order}"
 
 class InitialProductImage(models.Model):
     product = models.ForeignKey('InitialProductState', on_delete=models.CASCADE)
-    is_primary = models.BooleanField(default=False)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
+    order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"Initial Image of {self.product.name}"

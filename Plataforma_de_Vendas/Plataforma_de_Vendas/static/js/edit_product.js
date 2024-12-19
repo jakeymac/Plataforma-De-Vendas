@@ -1,9 +1,12 @@
 // Debounce timer for auto-saving
+// TODO make sure auto save isn't on while images are uploading
+
 let autoSaveTimeout;
+let uploadInProgress = false;
 
 function addNewPropertyRow() {
     $("#sortable-properties").append(`
-        <div class="row sortable-item" id="property-row-${counter}">
+        <div class="row sortable-item property-row" id="property-row-${counter}">
             <div class="col-md-5">
                 <label for="property-name-${counter}">Property Name</label>
                 <input type="text" class="form-control product-info-input property-name-input" id="property-name-${counter}" name="property-name-${counter}">
@@ -22,6 +25,79 @@ function addNewPropertyRow() {
         </div>`);
     counter++;
     bindRemovalButtons();
+}
+
+function addNewImageRow(imageUrl, imageId, isInitial=false) {
+    let newPhotoRow = `<div class="row photo-row">
+                            <div class="col-12 photo-row-inner-container sortable-item">
+                                <div class="col-6" id="product-image-${imageId}-container">
+                                    <img src="${imageUrl}" alt="Product Image" class="product-image">
+                                </div>
+                                <div class="col-6 remove-image-button-container">
+                                    <button type="button" class="btn btn-danger remove-image-button" id="remove-image-${imageId}">Remove Image</button>
+                                </div>
+                                <input type="hidden" name="image_id" id="image_id" value="${imageId}">
+                            </div>
+                        </div>`;
+    $("#photos-inner-container").append(newPhotoRow); 
+    if (!isInitial) {
+        $(".photo-row").show();
+    }   
+}
+
+function loadData() {
+    // Load the product images
+    $("#initial-image-loading-icon-container").show();
+    fetch(`/api/products/images/${productId}/`)
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            console.error("Error loading images: ", response.json());
+            // TODO add error message to page
+            $("#initial-image-loading-icon-container").hide();
+        } 
+    })
+    .then(data => {
+        if (data.images && data.images.length > 0) {
+            let images = data.images;
+            let imagesLoaded = 0;
+            var totalImages = images.length;
+
+            if (!images) {
+                $("#initial-image-loading-icon-container").hide();
+            }
+
+            for (let image of images) {
+                addNewImageRow(image.url, image.id, true);
+                $(`#product-image-${image.id}-container img`).on("load", function () {
+                    imagesLoaded++;
+                    console.log(imagesLoaded);
+                    if (imagesLoaded === totalImages) {
+                        $("#initial-image-loading-icon-container").hide();
+                        $(".photo-row").show();   
+                        $("#photos-inner-container").sortable({
+                            placeholder: "sortable-placeholder",
+                            start: function (e, ui) {
+                                // Optionally adjust placeholder height to match dragged element
+                                ui.placeholder.height(ui.item.outerHeight());
+                            }
+                        })
+                    }
+                });
+            }
+            $("#initial-image-loading-icon-container").hide();
+        }
+        $("#initial-image-loading-icon-container").hide();
+
+    })
+    .catch(error => {
+        console.error("Error loading images: ", error);
+        // TODO add error message to page
+        $("#initial-image-loading-icon-container").hide();
+    })
+
+
 }
 
 function loadListeners() {
@@ -58,6 +134,13 @@ function loadListeners() {
         }
     })
 
+    $("#photos-inner-container").sortable({
+        update: function (event, ui) {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
+        }
+    });
+
     $("#cancel-changes-button").on("click", function() {
         fetch('/api/products/rollback_product_changes/', {
             method: 'POST',
@@ -77,10 +160,80 @@ function loadListeners() {
                     $("#extra-error-message-div").text("");
                 }, 2000);
                 console.error("Error rolling back changes: ", response.json());
-
+                
             }
         });
     })
+
+    $("#upload-image-button").on("click", function() {
+        if (!uploadInProgress) {
+            $("#image-input").click();
+        }
+    });
+
+    $("#image-input").on("change", function() {
+        let imageFile = this.files[0];
+        if (!imageFile) {
+            return;
+        }
+
+        uploadInProgress = true;
+        $("#upload-image-button").text("Uploading...");
+        $("#upload-image-button").prop("disabled", true);
+        $("#image-upload-progress").show();
+
+        let formData = new FormData();
+        formData.append("image", imageFile);
+        formData.append("product_id", productId);
+
+        $.ajax({
+            url: "/api/products/add_image/",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { "X-CSRFToken": csrfToken },
+            xhr: function() {
+                let xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(event) {
+                    if (event.lengthComputable) {            
+                        let percentComplete = event.loaded / event.total * 100;
+                        console.log(percentComplete)
+                        $("#image-upload-progress").val(percentComplete);
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(response) {
+                if (response && response.url) {
+                    console.log("Success");
+                    
+                    addNewImageRow(response.url, response.id);
+                    $("#photos-inner-container").sortable({
+                        placeholder: "sortable-placeholder",
+                        start: function (e, ui) {
+                            // Optionally adjust placeholder height to match dragged element
+                            ui.placeholder.height(ui.item.outerHeight());
+                        }
+                    })
+                    
+                } else {
+                    console.error("Error uploading image: ", response);
+                    // Show error message on page
+                }
+            },
+            error: function() {
+                console.error("Error uploading image");
+                // Show error message on page
+            },
+            complete: function() {
+                uploadInProgress = false;
+                $("#upload-image-button").text("Upload Image");
+                $("#upload-image-button").prop("disabled", false);
+                $("#image-upload-progress").hide();
+            }
+        });
+    });
 }
 
 function showSavingIcon() {
@@ -112,6 +265,8 @@ function organizeFormData(data) {
     // Organize the form data into a dictionary, seperating properties into a sub-dictionary
     let organizedData = {};
     let properties = {};
+    let imageIds = [];
+    
     for (let entry of data.entries()) {
         let key = entry[0];
         let value = entry[1];
@@ -120,11 +275,14 @@ function organizeFormData(data) {
             let propertyName = value;
             let propertyValue = data.get(`property-value-${propertyNumber}`);
             properties[propertyName] = propertyValue;
+        } else if (key === "image_id") {
+            imageIds.push(value);
         } else if (!key.includes("property-value")) {
             organizedData[key] = value;
-        }
+        } 
     }
     organizedData["properties"] = properties;
+    organizedData["image_ids"] = imageIds;
     return organizedData;
 }
 
@@ -134,7 +292,7 @@ async function saveProductForm(data) {
 
     console.log(organizedData);
     try {
-        let response = await fetch('/api/products/update/', {
+        let response = await fetch('/api/products/autosave_product/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -163,7 +321,7 @@ async function autoSaveProductInfo() {
         $("#product_name").addClass("error-input");
     }
 
-    $(".sortable-item").each(function () {
+    $(".property-row").each(function () {
         let row = $(this);
         let propertyName = row.find(".property-name-input").val().trim();
         let propertyValue = row.find(".property-value-input").val().trim();
@@ -215,6 +373,7 @@ function bindRemovalButtons() {
     })
 }
 $(document).ready(function() {
+    loadData();
     loadListeners();
     bindRemovalButtons(); // This is necessary to bind the removal buttons that are already present on the page at load time
     $("#sortable-properties").sortable({
@@ -223,5 +382,5 @@ $(document).ready(function() {
             // Optionally adjust placeholder height to match dragged element
             ui.placeholder.height(ui.item.outerHeight());
         }
-    });
+    });    
 });

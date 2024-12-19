@@ -24,17 +24,19 @@ def edit_product_view(request, product_id):
             draft=product.draft,
         )
 
-        for image in product.productimage_set.all():
+        images = product.productimage_set.all().order_by('order')
+        for image in images:
             InitialProductImage.objects.create(
                 product = initial_product_state,
-                is_primary = image.is_primary,
-                image = image.image
+                image = image.image,
+                order=image.order
             )
-
+        
         properties = product.properties
         subcategories = ProductSubcategory.objects.all()
         return render(request, 'products/edit_product.html', {'product': product, 'initial_product_state': initial_product_state, 
-                                                            'subcategories': subcategories, 'properties': properties})
+                                                              'images': images, 'subcategories': subcategories, 'properties': properties})
+    
     else:
         # TODO add a forbidden page to let users know what's happening
         return redirect('home')

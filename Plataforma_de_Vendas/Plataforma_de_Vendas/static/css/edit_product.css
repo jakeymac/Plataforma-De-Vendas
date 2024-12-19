@@ -1,5 +1,6 @@
 #form-container {
-    width: 70%;
+    width: 100%;
+    height: 1000px;
     background-color: #f8f9fa;
     border-radius: 8px;
     border: 1px solid black;
@@ -8,6 +9,12 @@
     padding-top: 30px;
     padding-bottom: 15px;
     margin-top: 40px;
+    padding-left: 15px;
+    padding-right:15px;
+}
+
+#edit_product_form {
+    height: 100%;
 }
 
 #header-container {
@@ -15,7 +22,6 @@
     align-items: center;
     justify-content: center;
     gap: 15px;
-
 }
 #header-title {
     text-align: center;
@@ -49,7 +55,6 @@
 
 #product-saved-icon {
     font-size:40px;
-
 }
 
 .product-save-successful {
@@ -58,6 +63,11 @@
 
 .product-save-error {
     color: red;
+}
+
+#product-details-container {
+    overflow-y: auto;
+    height: 810px;
 }
 
 .form-row {
@@ -90,7 +100,7 @@
 }
 
 .sortable-item {
-    cursor: move; /* Show a "move" cursor */
+    cursor: move; /* Show a move cursor */
     background-color: #f9f9f9;
     border: 1px solid #ccc;
     padding: 15px;
@@ -134,4 +144,76 @@
 
 .remove-property-button {
     margin-top: 25%;
+}
+
+#image-upload-progress-container {
+    height: 20px;
+}
+
+#image-upload-progress {
+    display: none;
+    width: 100%;
+    margin: 10px auto;
+    height: 100%;
+}
+
+#initial-image-loading-icon-container {
+    display: none;
+    margin-top: 50px;
+    color: rgb(50, 50, 255);
+    text-align: center;
+}
+
+#initial-image-loading-icon {
+    width: 20%;
+    height: 20%;
+    margin-left: 40%;
+    margin-right: 40%;
+}
+
+#initial-image-loading-text {
+    margin-top: 20px;
+}
+
+#photos-container {
+    height: 780px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+#photos-inner-container {
+    padding: 15px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+
+.photo-row {
+    display: none; /* Hide the photo row by default until the image is actually loaded in when loading the page with all images */
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 30px;
+    border-radius: 5px;
+}
+
+.photo-row-inner-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+
+.product-image {
+    width: 90%;
+    height: 90%;
+
+}
+
+.remove-image-button-container {
+    display: flex;
+    justify-content: end;
 }

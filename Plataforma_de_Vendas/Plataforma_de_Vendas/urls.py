@@ -48,8 +48,6 @@ schema_view = get_schema_view(
     public=False,  # Swagger is not public; authentication required
     permission_classes=(permissions.IsAuthenticated,),  # Only authenticated users can access
 )
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('admin_portal/', account_views.admin_portal, name='admin_portal'), # custom admin portal for ease of use
@@ -81,13 +79,14 @@ urlpatterns = [
     path('api/products/search/', product_endpoints.search_for_product_endpoint),
     path('api/products/search/<int:store_id>/', product_endpoints.search_for_product_endpoint),
     path('api/products/add/', product_endpoints.add_product_endpoint),
-    path('api/products/update/', product_endpoints.update_product_endpoint),
     path('api/products/remove/', product_endpoints.remove_product_endpoint),
     path('api/products/add_image/', product_endpoints.add_product_image_endpoint),
-    path('api/products/images/<int:product_id>/', product_endpoints.product_images_endpoint),
+    path('api/products/images/<str:product_id>/', product_endpoints.product_images_endpoint),
     path('api/products/order/<int:order_id>/', product_endpoints.products_in_order_endpoint),
     path('api/products/remove_image/<int:image_id>/', product_endpoints.remove_product_image_endpoint),
     path('api/products/rollback_product_changes/', product_endpoints.rollback_product_changes_endpoint),
+    path('api/products/autosave_product/', product_endpoints.autosave_product_endpoint),
+    path('api/products/final_save_product/', product_endpoints.final_save_product_endpoint),
 
     path('api/products/search_category/<int:category_id>/', product_endpoints.find_products_in_category_endpoint),
     path('api/products/categories/', product_endpoints.get_categories_endpoint),
