@@ -83,7 +83,7 @@ urlpatterns = [
     path('api/products/add_image/', product_endpoints.add_product_image_endpoint),
     path('api/products/images/<str:product_id>/', product_endpoints.product_images_endpoint),
     path('api/products/order/<int:order_id>/', product_endpoints.products_in_order_endpoint),
-    path('api/products/remove_image/<int:image_id>/', product_endpoints.remove_product_image_endpoint),
+    path('api/products/remove_image/<str:image_id>/', product_endpoints.remove_product_image_endpoint),
     path('api/products/rollback_product_changes/', product_endpoints.rollback_product_changes_endpoint),
     path('api/products/autosave_product/', product_endpoints.autosave_product_endpoint),
     path('api/products/final_save_product/', product_endpoints.final_save_product_endpoint),

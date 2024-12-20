@@ -60,9 +60,25 @@ class InitialProductState(models.Model):
         return f"Initial State of {self.product_name}"
 
 class ProductImage(models.Model):
+    id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     order = models.PositiveIntegerField(default=0) 
+    s3_key = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)    
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self. id = generate_unique_id()
+        while True:
+            try:
+                super().save(*args, **kwargs)
+                break
+            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            except IntegrityError:
+                # Regenerate the id and try again
+                self.id = generate_unique
 
     def __str__(self):
         return f"{self.product.product_name} - {self.order}"
@@ -71,6 +87,9 @@ class InitialProductImage(models.Model):
     product = models.ForeignKey('InitialProductState', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
     order = models.PositiveIntegerField(default=0)
+    s3_key = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Initial Image of {self.product.name}"

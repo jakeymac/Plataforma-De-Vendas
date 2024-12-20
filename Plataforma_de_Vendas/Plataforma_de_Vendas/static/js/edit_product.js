@@ -43,6 +43,27 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
     if (!isInitial) {
         $(".photo-row").show();
     }   
+    $(`#remove-image-${imageId}`).on("click", function() {
+        let imageId = $(this).closest(".photo-row").find("#image_id").val();
+        console.log(imageId);
+        fetch(`/api/products/remove_image/${imageId}/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                $(this).closest(".photo-row").remove();
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
+            } else {
+                console.error("Error removing image: ", response.json());
+                // TODO add error message to page
+            }
+        });
+    })
 }
 
 function loadData() {
@@ -237,6 +258,8 @@ function loadListeners() {
             }
         });
     });
+
+    
 }
 
 function showSavingIcon() {

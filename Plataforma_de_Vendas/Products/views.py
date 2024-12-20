@@ -29,7 +29,10 @@ def edit_product_view(request, product_id):
             InitialProductImage.objects.create(
                 product = initial_product_state,
                 image = image.image,
-                order=image.order
+                order=image.order,
+                s3_key=image.s3_key,
+                created_at=image.created_at,
+                updated_at=image.updated_at,
             )
         
         properties = product.properties

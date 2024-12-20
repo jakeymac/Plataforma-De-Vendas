@@ -669,7 +669,10 @@ def create_initial_product_state_endpoint(request):
                 InitialProductImage.objects.create(
                     initial_product_state = initial_state,
                     image = image.image,
-                    order=image.order
+                    order=image.order,
+                    s3_key=image.s3_key,
+                    created_at=image.created_at,
+                    updated_at=image.updated_at,
                 )
 
             return Response({"message": "Initial state created successfully"}, status=status.HTTP_200_OK)
