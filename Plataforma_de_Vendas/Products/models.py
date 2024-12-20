@@ -14,7 +14,7 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False) # TODO implement this
 
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     # Custom save method to generate unique id and ensure it is unique
     def save(self, *args, **kwargs):
@@ -42,6 +42,9 @@ class InitialProductState(models.Model):
     properties = models.JSONField(null=True, blank=True, default=dict)
     is_active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False) # TODO implement this
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    original_created_at = models.DateTimeField() # The original product's creation date
 
     # Custom save method to generate unique id and ensure it is unique
     def save(self, *args, **kwargs):
@@ -89,7 +92,9 @@ class InitialProductImage(models.Model):
     order = models.PositiveIntegerField(default=0)
     s3_key = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    original_created_at = models.DateTimeField() # The original product image's creation date
     updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return f"Initial Image of {self.product.name}"

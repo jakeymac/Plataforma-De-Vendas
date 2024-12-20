@@ -22,6 +22,7 @@ def edit_product_view(request, product_id):
             properties=product.properties,
             is_active=product.is_active,
             draft=product.draft,
+            original_created_at=product.created_at
         )
 
         images = product.productimage_set.all().order_by('order')
@@ -31,7 +32,7 @@ def edit_product_view(request, product_id):
                 image = image.image,
                 order=image.order,
                 s3_key=image.s3_key,
-                created_at=image.created_at,
+                original_created_at=image.created_at,
                 updated_at=image.updated_at,
             )
         

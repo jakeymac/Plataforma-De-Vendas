@@ -661,7 +661,8 @@ def create_initial_product_state_endpoint(request):
                 description = product.description,
                 properties = product.properties,
                 is_active = product.is_active,
-                draft = product.draft
+                draft = product.draft,
+                original_created_at=product.created_at
             )
             initial_state.save()
 
@@ -671,7 +672,7 @@ def create_initial_product_state_endpoint(request):
                     image = image.image,
                     order=image.order,
                     s3_key=image.s3_key,
-                    created_at=image.created_at,
+                    original_created_at=image.created_at,
                     updated_at=image.updated_at,
                 )
 
