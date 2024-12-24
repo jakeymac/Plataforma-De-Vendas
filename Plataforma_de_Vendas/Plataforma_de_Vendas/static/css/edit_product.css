@@ -190,8 +190,6 @@
     overflow-y: auto;
 }
 
-
-
 .photo-row {
     display: none; /* Hide the photo row by default until the image is actually loaded in when loading the page with all images */
     margin-right: auto;

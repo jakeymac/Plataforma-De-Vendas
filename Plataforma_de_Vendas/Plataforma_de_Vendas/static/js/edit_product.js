@@ -91,6 +91,7 @@ function loadData() {
 
             for (let image of images) {
                 addNewImageRow(image.url, image.id, true);
+                // TODO look into fixing this, if there are any issues with loading, no images will be shown
                 $(`#product-image-${image.id}-container img`).on("load", function () {
                     imagesLoaded++;
                     console.log(imagesLoaded);
@@ -102,6 +103,14 @@ function loadData() {
                             start: function (e, ui) {
                                 // Optionally adjust placeholder height to match dragged element
                                 ui.placeholder.height(ui.item.outerHeight());
+                                ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
+                                ui.placeholder.css("margin-top", ui.item.css("margin-top"));
+                                ui.item.siblings(".sortable-item").each(function () {
+                                    $(this).css({
+                                        "margin-top": $(this).css("margin-top"),
+                                        "margin-bottom": $(this).css("margin-bottom")
+                                    });
+                                });
                             }
                         })
                     }
@@ -149,6 +158,10 @@ function loadListeners() {
     })
 
     $("#sortable-properties").sortable({
+        start: function (e, ui) {
+            ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
+            ui.placeholder.css("margin-top", ui.item.css("margin-top"));
+        }, 
         update: function (event, ui) {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
@@ -237,7 +250,14 @@ function loadListeners() {
                         start: function (e, ui) {
                             // Optionally adjust placeholder height to match dragged element
                             ui.placeholder.height(ui.item.outerHeight());
-
+                            ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
+                            ui.placeholder.css("margin-top", ui.item.css("margin-top"));
+                            ui.item.siblings(".sortable-item").each(function () {
+                                $(this).css({
+                                    "margin-top": $(this).css("margin-top"),
+                                    "margin-bottom": $(this).css("margin-bottom")
+                                });
+                            });
                         }
                     })
                     
@@ -409,7 +429,14 @@ $(document).ready(function() {
         start: function (e, ui) {
             // Optionally adjust placeholder height to match dragged element
             ui.placeholder.height(ui.item.outerHeight());
-            
+            ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
+            ui.placeholder.css("margin-top", ui.item.css("margin-top"));
+            ui.item.siblings(".sortable-item").each(function () {
+                $(this).css({
+                    "margin-top": $(this).css("margin-top"),
+                    "margin-bottom": $(this).css("margin-bottom")
+                });
+            });
         }
     });    
 });

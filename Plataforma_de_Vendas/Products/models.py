@@ -4,6 +4,13 @@ from nanoid import generate
 def generate_unique_id():
     return generate(size=12)
 
+def product_image_upload_path(instance, filename):
+    """
+    Generate a dynamic path for image upload.
+    Organize by product ID and image ID.
+    """
+    return f"product_images/{instance.product.id}/{instance.id}/{filename}"
+
 class Product(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE, null=True, blank=True)
@@ -65,7 +72,7 @@ class InitialProductState(models.Model):
 class ProductImage(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='product_images/', null=True, blank=True)
+    image = models.ImageField(upload_to=product_image_upload_path, null=True, blank=True)
     order = models.PositiveIntegerField(default=0) 
     s3_key = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -77,6 +84,9 @@ class ProductImage(models.Model):
         while True:
             try:
                 super().save(*args, **kwargs)
+                # Set the s3 key after saving
+                self.s3_key = product_image_upload_path(self, self.image.name)
+                super().save(update_fields=['s3_key'])
                 break
             # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
             except IntegrityError:
