@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-7x00smj5q!!f-6+viux&@yhug#&joo9lg%**d0c+&3xc==xnsa
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost', 'plataforma-de-vendas.com',]
+ALLOWED_HOSTS = ['127.0.0.1','localhost', 'plataforma-de-vendas.com', '3.144.239.149']
 
 # Automatic logout after 30 minutes of inactivity
 # This value is used in the InactvitiyTimeoutMiddleware
