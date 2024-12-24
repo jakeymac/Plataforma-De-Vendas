@@ -235,8 +235,12 @@ def add_product_image_endpoint(request):
             else:
                 order = 0
     
+        image_file = request.FILES.get('image')
+        if not image_file:
+            return Response({"message": "No image file provided"}, status=status.HTTP_400_BAD_REQUEST)
+        
         #TODO add a checker to see if this image already exists (or with this name)
-        image = ProductImage(product=product, image=data.get('image'), order=order)
+        image = ProductImage(product=product, image=image_file, order=order)
         image.save()
         return Response({"message": "Image added successfully", "id": image.id, "url": image.image.url}, status=status.HTTP_201_CREATED)
     except Product.DoesNotExist:
