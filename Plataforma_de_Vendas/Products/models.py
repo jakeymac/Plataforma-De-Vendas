@@ -85,7 +85,7 @@ class ProductImage(models.Model):
             try:
                 super().save(*args, **kwargs)
                 # Set the s3 key after saving
-                self.s3_key = product_image_upload_path(self, self.image.name)
+                self.s3_key = self.image.name
                 super().save(update_fields=['s3_key'])
                 break
             # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
@@ -107,7 +107,7 @@ class InitialProductImage(models.Model):
 
 
     def __str__(self):
-        return f"Initial Image of {self.product.name}"
+        return f"Initial Image of {self.product.product_name}"
 
 class ProductInOrder(models.Model):
     order = models.ForeignKey('Orders.Order', on_delete=models.CASCADE)
