@@ -178,3 +178,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = '	plataformadevendassistema@gmail.com'
 EMAIL_HOST_PASSWORD = 'pwzg oyhu dcyr nkgl'
+
+from django.core.files.storage import default_storage
+from storages.backends.s3boto3 import S3Boto3Storage
+
+# Force reinitialization of default_storage - this is to ensure that the default storage is set to S3Boto3Storage in the production environment
+default_storage._wrapped = S3Boto3Storage()
