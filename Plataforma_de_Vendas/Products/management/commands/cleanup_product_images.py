@@ -3,6 +3,8 @@ from django.core.management.base import BaseCommand
 from Products.models import ProductImage, InitialProductImage
 from django.conf import settings
 
+from datetime import timezone, timedelta
+
 class Command(BaseCommand):
     help = "Cleanup orphaned images in the S3 bucket"
 
