@@ -11,8 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self.stdout.write("Beginning Product Images Cleanup...")
-        self.stdout.write("Current date: ", timezone.now())
-        self.stdout.write("Current time: ", timezone.now().time())
+        self.stdout.write(f"Current date/time: {timezone.now()}")
 
         s3 = boto3.resource('s3')
         bucket_name = settings.AWS_STORAGE_BUCKET_NAME
