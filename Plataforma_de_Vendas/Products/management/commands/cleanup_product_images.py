@@ -10,6 +10,10 @@ class Command(BaseCommand):
     help = "Cleanup orphaned images in the S3 bucket"
 
     def handle(self, *args, **kwargs):
+        self.stdout.write("Beginning Product Images Cleanup...")
+        self.stdout.write("Current date: ", timezone.now())
+        self.stdout.write("Current time: ", timezone.now().time())
+
         s3 = boto3.resource('s3')
         bucket_name = settings.AWS_STORAGE_BUCKET_NAME
         bucket = s3.Bucket(bucket_name)
