@@ -125,7 +125,6 @@ def get_current_user_info_endpoint(request):
 )
 @api_view(['POST','GET'])
 def login_endpoint(request):
-    logger.info("logging in endpoint...")
     try:
         data = request.data
         username = data.get("username")
@@ -135,6 +134,8 @@ def login_endpoint(request):
         if user is not None:
             login(request, user)
             return Response({"message": "Logged in"}, status.HTTP_200_OK)
+        else:
+            return Response({"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
         logger.warning(f"Error logging in: {e}")
         return Response({"message": e}, status.HTTP_401_UNAUTHORIZED)
