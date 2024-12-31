@@ -159,3 +159,5 @@ from storages.backends.s3boto3 import S3Boto3Storage
 
 # Force reinitialization of default_storage - this is to ensure that the default storage is set to S3Boto3Storage in the production environment
 default_storage._wrapped = S3Boto3Storage()
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
