@@ -9,13 +9,13 @@ const deleteButtons = {'category': 'categories', 'subcategory': 'subcategories'}
 
 
 function update_product_selector(products) {
-    $("#product-selector").empty();
+    $("#edit-product-selector").empty();
     if (products.length === 0) {
-        $("#product-selector").append('<option value="">No products found</option>');
+        $("#edit-product-selector").append('<option value="">No products found</option>');
     } else {
-        $("#product-selector").append('<option value="">Select a product</option>');
+        $("#edit-product-selector").append('<option value="">Select a product</option>');
         products.forEach(product => {
-            $("#product-selector ").append(`<option value="${product.id}">${product.name}</option>`);
+            $("#edit-product-selector ").append(`<option value="${product.id}">${product.product_name}</option>`);
         });
     }
 }
@@ -115,6 +115,36 @@ function load_listeners() {
             $(this).find(".message-container").addClass("error-message");
         }
     });    
+
+    $("#edit-product-button").on("click", function() {
+        let productId = $("#edit-product-selector").val();
+        if (productId == "") {
+            $("#edit-product-message-container").removeClass("error-message");
+            $("#edit-product-message-container").text("Please select a product to edit");
+        } else {
+            // Check for product's existence to avoid errors
+            fetch(`/api/products/${productId}/`,
+            {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        $("#edit-product-message-container").addClass("error-message");
+                        $("#edit-product-message-container").text("Product not found");
+                    } else {
+                        $("#edit-product-message-container").addClass("error-message");
+                        $("#edit-product-message-container").text("An error occurred");
+                    }
+                } else {
+                    window.location.href = '/edit_product/' + productId;
+                }
+            })
+        }
+    })
     
     $("#edit_category_selector").change(function () {
         let category = categories.find(cat=> cat.id == $(this).val()); // Uses the categories object pulled from the context in a script in the template
@@ -131,7 +161,9 @@ function load_listeners() {
 
     $("#product-search").on("input", function () {
         let searchTerm = $(this).val();
-        let filteredProducts = products.filter(product => product.name.includes(searchTerm) || product.product_description.includes(searchTerm));
+        let filteredProducts = products.filter(product => {
+            return product.product_name.includes(searchTerm) || (product.product_description && product.product_description.includes(searchTerm));
+        });
         update_product_selector(filteredProducts);
     })
 }

@@ -36,21 +36,20 @@
             <div class="col-6 form-container">
                 <h2>Edit Product</h2>
                 <input type="text" id="product-search" class="form-control" placeholder="Search for products">
-                <form id="edit-product-form">
-                    <select class="form-select mt-3" id="edit-product-selector">
-                        <option value="">Select a product</option>
-                        {% if products %}
-                            {% for product in products %}
-                          §      <option value="{{ product.id }}">{{ product.name }} {% if product.draft %}(draft){% endif %}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="">No products found</option>
-                        {% endif %}
-                    </select>
-                    <div class="button-container">
-                        <button class="btn btn-primary mt-2">Edit Product</button>
-                    </div>
-                </form>
+                <select class="form-select mt-3" id="edit-product-selector">
+                    <option value="">Select a product</option>
+                    {% if products %}
+                        {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.product_name }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">No products found</option>
+                    {% endif %}
+                </select>
+                <div class="message-container" id="edit-product-message-container"></div>
+                <div class="button-container">
+                    <button class="btn btn-primary mt-2" id="edit-product-button">Edit Product</button>
+                </div>
             </div>
         </div>
         <div class="row form-row">

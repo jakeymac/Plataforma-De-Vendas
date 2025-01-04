@@ -37,6 +37,9 @@ def get_products_endpoint(request, store_id=None, product_id=None):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Store.DoesNotExist:
             return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
+        except Product.DoesNotExist:
+            return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+
     elif product_id is not None:
         try:
             product = Product.objects.get(id=product_id)
@@ -44,6 +47,7 @@ def get_products_endpoint(request, store_id=None, product_id=None):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Product.DoesNotExist:
             return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+
     else:
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
@@ -147,7 +151,7 @@ def add_stock_endpoint(request):
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
 
 @swagger_auto_schema(
-    method='put',
+    method='delete',
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         required=['id'],
@@ -157,12 +161,9 @@ def add_stock_endpoint(request):
     ),
     responses={200: 'Updated'}
 )
-@api_view(['PUT'])
-def remove_product_endpoint(request):
-    data = request.data
-    product_id = data.get('product_id')
+@api_view(['DELETE'])
+def remove_product_endpoint(request, product_id):
     try:
-        
         product = Product.objects.get(id=product_id)
         if request.user.is_authenticated and request.user.account_type == 'admin':
             initial_products = InitialProductState.objects.filter(product=product)
@@ -182,7 +183,7 @@ def remove_product_endpoint(request):
     except Exception as e:
         return Response({"message": f"An error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE
+    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, if changed, may use PUT instead of DELETE
     # data = request.data
     # product_id = data.get('id')
     # try:
