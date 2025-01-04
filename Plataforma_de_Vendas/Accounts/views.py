@@ -15,7 +15,7 @@ def admin_portal(request):
         subcategories_json = list(ProductSubcategory.objects.values())            
         top_subcategories_query = ProductTopSubcategory.objects.all()
         products = Product.objects.all().order_by('product_name')
-        products_json = list(Product.objects.values('id', 'product_name', 'description'))
+        products_json = list(Product.objects.values('id', 'product_name', 'product_description'))
 
         context = {"categories": categories,
                     "subcategories": subcategories, 

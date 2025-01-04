@@ -1,6 +1,8 @@
 {% extends "Stores/base.html" %}
 {% load static %}
 
+
+
 {% block title %} Edit Product Details {% endblock %}
 
 {% block scripts %}
@@ -45,7 +47,7 @@
                     </div>
                     <div class="row form-row">
                         <label for="product_description">Product Description</label>
-                        <textarea class="form-control product-info-input" id="product_description" name="product_description" value=" {{ product.description }}"required></textarea>
+                        <textarea class="form-control product-info-input" id="product_description" name="product_description">{{ product.product_description|default:"" }} </textarea>
                         <div class="error-message-div" id ="product_description_error_field"></div>
                     </div>
                     <div class="row form-row">
@@ -54,9 +56,10 @@
         
                             <option value="" selected disabled>Select a Subcategory</option>
                             {% for subcategory in subcategories %}
-                                <option value="{{ subcategory.id }}" {% if subcategory.id == product %} selected {% endif %}>{{ subcategory.subcategory_name }}</option>
+                                <option value="{{ subcategory.id }}" {% if subcategory.id == product.subcategory.id %} selected {% endif %}>{{ subcategory.subcategory_name }}</option>
                             {% endfor %}
                         </select>
+                        <div class="error-message-div" id ="subcategory_error_field"></div>
                     </div>
                     <div id="sortable-properties">
                         {% for property_name, property_value in properties.items %}
@@ -64,19 +67,17 @@
                                 <div class="col-md-5">
                                     <label for="property-name-{{ forloop.counter }}">Property Name</label>
                                     <input type="text" class="form-control product-info-input property-name-input" id="property-name-{{ forloop.counter }}" name="property-name-{{ forloop.counter }}" value="{{ property_name }}" required>
+                                    <div class="error-message-div property-name_error_field" id="property-name-{{ forloop.counter }}_error_field"></div>
                                 </div>
                                 <div class="col-md-5">
                                     <label for="property-value-{{ forloop.counter }}">Property Value</label>
                                     <input type="text" class="form-control product-info-input property-value-input" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{ property_value}}" required>
+                                    <div class="error-message-div property-value_error_field" id="property-value-{{ forloop.counter }}_error_field"></div>
+
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-danger remove-property-button">Remove</button>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="error-message-div" id="property-name-{{ forloop.counter }}-error_field"></div>
-                                    <div class="error-message-div" id="property-value-{{ forloop.counter }}-error_field"></div>
-                                </div>
-        
                             </div>
                         {% endfor %}
                     </div>
@@ -108,9 +109,9 @@
                 <!-- TODO edit the cancel's button to go back to different pages  -->
                 <button type="button" class="btn btn-secondary" id="cancel-changes-button">Cancel</button> 
                 <button type="button" class="btn btn-danger" id="remove-product-button">Delete</button>
-                <button type="submit" class="btn btn-success" id="save-product-button">Save Product</button>
+                <button type="button" class="btn btn-success" id="save-product-button">Save Product</button>
             </div>
-            <div class="error-message-div" id="extra-error-message-div"></div>
+            <div class="message-div" id="extra-message-div"></div>
         </form>
     </div>
 </div>

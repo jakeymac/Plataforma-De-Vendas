@@ -152,7 +152,7 @@ def add_stock_endpoint(request):
         type=openapi.TYPE_OBJECT,
         required=['id'],
         properties={
-            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
+            'product_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
         }
     ),
     responses={200: 'Updated'}
@@ -160,17 +160,41 @@ def add_stock_endpoint(request):
 @api_view(['PUT'])
 def remove_product_endpoint(request):
     data = request.data
-    product_id = data.get('id')
+    product_id = data.get('product_id')
     try:
+        
         product = Product.objects.get(id=product_id)
-        if request.user.is_authenticated:
-            if request.user.account_type == 'admin' or request.user.store == product.store:
-                product.is_active = False
-                product.save()
-                return Response({"message": "Product deactivated successfully"}, status=status.HTTP_200_OK)
+        if request.user.is_authenticated and request.user.account_type == 'admin':
+            initial_products = InitialProductState.objects.filter(product=product)
+            with transaction.atomic():
+                for initial_product in initial_products:
+                    for initial_product_image in initial_product.initialproductimage_set.all():
+                        initial_product_image.delete()
+                    initial_product.delete()
+                product.delete()
+                return Response({"message": "Product removed successfully"}, status=status.HTTP_200_OK)
+
         return Response({"message": "You do not have permission to delete this product"}, status=status.HTTP_403_FORBIDDEN)
+
     except Product.DoesNotExist:
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+        
+    except Exception as e:
+        return Response({"message": f"An error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE
+    # data = request.data
+    # product_id = data.get('id')
+    # try:
+    #     product = Product.objects.get(id=product_id)
+    #     if request.user.is_authenticated:
+    #         if request.user.account_type == 'admin' or request.user.store == product.store:
+    #             product.is_active = False
+    #             product.save()
+    #             return Response({"message": "Product deactivated successfully"}, status=status.HTTP_200_OK)
+    #     return Response({"message": "You do not have permission to delete this product"}, status=status.HTTP_403_FORBIDDEN)
+    # except Product.DoesNotExist:
+    #     return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
 
 def check_product_quantity(current_stock, minimum_stock, store_id, product_id):
     """ Check if the current stock is below the minimum stock and send a notification if it is """
@@ -210,7 +234,7 @@ def product_images_endpoint(request, product_id):
 
 @swagger_auto_schema(
     method='post',
-    request_body=openapi.Schema(
+    request_body=openapi.Schema( 
         type=openapi.TYPE_OBJECT,
         required=['product_id', 'image'],
         properties={
@@ -243,8 +267,12 @@ def add_product_image_endpoint(request):
         image = ProductImage(product=product, image=image_file, order=order)
         image.save()
         return Response({"message": "Image added successfully", "id": image.id, "url": image.image.url}, status=status.HTTP_201_CREATED)
+
     except Product.DoesNotExist:
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        return Response({"message": f"An error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @swagger_auto_schema(
     method='delete',
@@ -603,7 +631,7 @@ def rollback_product_changes_endpoint(request):
 
         try:
             initial_state = InitialProductState.objects.get(id=data.get('initial_product_state_id'))
-        except ProductInitialState.DoesNotExist:
+        except InitialProductState.DoesNotExist:
             initial_state_not_found = True
 
         if product_not_found and initial_state_not_found:
@@ -616,30 +644,31 @@ def rollback_product_changes_endpoint(request):
             return Response({"message": f"Initial state with id {data.get('initial_state_id')} not found"}, status=status.HTTP_404_NOT_FOUND)
         
         else:
-            product.store = initial_state.store
-            product.sub_category = initial_state.sub_category
-            product.product_name = initial_state.product_name
-            product.description = initial_state.description
-            product.properties = initial_state.properties
-            product.is_active = initial_state.is_active
-            product.draft = initial_state.draft
-            product.save()
+            with transaction.atomic():
+                product.store = initial_state.store
+                product.subcategory = initial_state.subcategory
+                product.product_name = initial_state.product_name
+                product.product_description = initial_state.product_description
+                product.properties = initial_state.properties
+                product.is_active = initial_state.is_active
+                product.draft = initial_state.draft
+                product.save()
 
-            for image in product.productimage_set.all():
-                image.delete()
-            
-            for initial_image in initial_state.initialproductimage_set.all():
-                ProductImage.objects.create(
-                    product = product,
-                    image = initial_image.image,
-                    order=initial_image.order
-                )
+                for image in product.productimage_set.all():
+                    image.delete()
+                
+                for initial_image in initial_state.initialproductimage_set.all():
+                    ProductImage.objects.create(
+                        product = product,
+                        image = initial_image.image,
+                        order=initial_image.order
+                    )
 
-                initial_image.delete()
-            
-            initial_state.delete()
+                    initial_image.delete()
+                
+                initial_state.delete()
 
-            return Response({"message": "Product rolled back successfully"}, status=status.HTTP_200_OK)
+                return Response({"message": "Product rolled back successfully"}, status=status.HTTP_200_OK)
         
         return Response({"message": "There was an error rolling back the product"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -660,9 +689,9 @@ def create_initial_product_state_endpoint(request):
             initial_state = InitialProductState(
                 product = product,
                 store = product.store,
-                sub_category = product.sub_category,
+                subcategory = product.subcategory,
                 product_name = product.product_name,
-                description = product.description,
+                product_description = product.product_description,
                 properties = product.properties,
                 is_active = product.is_active,
                 draft = product.draft,
@@ -699,16 +728,14 @@ def autosave_product_endpoint(request):
         data = request.data
         product_id = data.get('product_id')
         try:
+            # Get the product and update it with the new data
             product = Product.objects.get(id=product_id)
-            product.store = data.get('store')
-            product.sub_category = data.get('sub_category')
-            product.product_name = data.get('product_name')
-            product.description = data.get('description')
-            product.properties = data.get('properties')
-            product.save()
-        # TODO IMPLEMENT THIS CORRECTLY
-        # SAVE ONLY NEW IMAGES, AND FLAG ANY IMAGES THAT AREN'T IN THIS REQUEST 
-        # THAT DO EXIST ALREADY IN THE DATABASE FOR DELETION
+            serializer = ProductSerializer(product, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
             order = 0
             ids_not_found = []
             for image_id in data.get('image_ids'):
@@ -729,7 +756,48 @@ def autosave_product_endpoint(request):
 
     return Response({"message": "You do not have permission to autosave a product"}, status=status.HTTP_403_FORBIDDEN)
 
-# TODO implement this:
-# This endpoint saves the final changes to a product, deleting the initial state of the product, and deleting the images of the product in storage that are flagged for deletion
+# This endpoint finalizes the save of a product, deleting the initial state of the product, and deleting the images of the product in storage
+@swagger_auto_schema(
+    method='POST',
+    responses=(200, 'OK'),
+    description='Final save a product'
+)
+@api_view(['POST'])
 def final_save_product_endpoint(request):
-    pass
+    if request.user.is_authenticated and request.user.account_type == 'admin':
+        data = request.data
+        product_id = data.get('product_id')
+        try:
+            # Get the product and update it with the new data
+            product = Product.objects.get(id=product_id)
+            serializer = ProductSerializer(product, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            order = 0
+            ids_not_found = []
+            for image_id in data.get('image_ids'):
+                try:
+                    product_image = ProductImage.objects.get(id=image_id)
+                    product_image.order = order
+                    product_image.save()
+                    order += 1
+                except ProductImage.DoesNotExist:
+                    ids_not_found.append(image_id)
+                if ids_not_found:
+                    return Response({"message": f"Images not found with the ids {ids_not_found}"}, status=status.HTTP_404_NOT_FOUND)                
+
+            initial_states = InitialProductState.objects.filter(product=product)
+            for initial_state in initial_states:
+                for image in initial_state.initialproductimage_set.all():
+                    image.delete()
+                initial_state.delete()
+
+            return Response({"message": "Product saved successfully"}, status=status.HTTP_200_OK)
+
+        except Product.DoesNotExist:
+            return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+        
+    return Response({"message": "You do not have permission to save a product"}, status=status.HTTP_403_FORBIDDEN)

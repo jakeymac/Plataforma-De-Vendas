@@ -14,9 +14,9 @@ def product_image_upload_path(instance, filename):
 class Product(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE, null=True, blank=True)
-    sub_category = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE, null=True, blank=True)
+    subcategory = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE, null=True, blank=True)
     product_name = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    product_description = models.TextField(null=True, blank=True)
     properties = models.JSONField(null=True, blank=True, default=dict)
     is_active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False) # TODO implement this
@@ -43,9 +43,9 @@ class InitialProductState(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE, null=True, blank=True)
-    sub_category = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE, null=True, blank=True)
+    subcategory = models.ForeignKey('ProductSubcategory', on_delete=models.CASCADE, null=True, blank=True)
     product_name = models.CharField(max_length=255, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    product_description = models.TextField(null=True, blank=True)
     properties = models.JSONField(null=True, blank=True, default=dict)
     is_active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False) # TODO implement this
@@ -79,19 +79,24 @@ class ProductImage(models.Model):
     updated_at = models.DateTimeField(auto_now=True)    
 
     def save(self, *args, **kwargs):
+        # Generate a unique ID if not already set
         if not self.id:
-            self. id = generate_unique_id()
-        while True:
-            try:
-                super().save(*args, **kwargs)
-                # Set the s3 key after saving
-                self.s3_key = self.image.name
-                super().save(update_fields=['s3_key'])
-                break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
-            except IntegrityError:
-                # Regenerate the id and try again
-                self.id = generate_unique
+            self.id = generate_unique_id()
+
+        # Save the instance without the `image` field to ensure `id` is generated
+        if not self.pk:  # Checks if the object is new
+            while True:
+                try:
+                    super().save(*args, **kwargs)
+                    break
+                except IntegrityError:
+                    # Handle non-unique ID by regenerating it
+                    self.id = generate_unique_id()
+
+        # Now save the instance with the `image` field and set the `s3_key`
+        if self.image and not self.s3_key:
+            self.s3_key = self.image.name
+            super().save(update_fields=['s3_key'])
 
     def __str__(self):
         return f"{self.product.product_name} - {self.order}"

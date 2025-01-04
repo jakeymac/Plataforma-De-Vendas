@@ -10,17 +10,15 @@ function addNewPropertyRow() {
             <div class="col-md-5">
                 <label for="property-name-${counter}">Property Name</label>
                 <input type="text" class="form-control product-info-input property-name-input" id="property-name-${counter}" name="property-name-${counter}">
+                <div class="error-message-div property-name_error_field" id="property-name-${counter}_error_field"></div>
             </div>
             <div class="col-md-5">
                 <label for="property-value-${counter}">Property Value</label>
                 <input type="text" class="form-control product-info-input property-value-input" id="property-value-${counter}" name="property-value-${counter}">
+                <div class="error-message-div property-value_error_field" id="property-value-${counter}_error_field"></div>
             </div>
             <div class="col-md-2">
                 <button type="button" class="btn btn-danger remove-property-button">Remove</button>
-            </div>
-            <div class="col-md-12">
-                <div class="error-message-div" id=""></div>
-                <div class="error-message-div"></div>
             </div>
         </div>`);
     counter++;
@@ -126,8 +124,6 @@ function loadData() {
         // TODO add error message to page
         $("#initial-image-loading-icon-container").hide();
     })
-
-
 }
 
 function loadListeners() {
@@ -189,9 +185,9 @@ function loadListeners() {
                 // TODO - add redirection to whatever the previous page actually was
                 location.href = `/admin_portal/`;
             } else {
-                $("#extra-error-message-div").text("Error rolling back changes");
+                $("#extra-message-div").text("Error rolling back changes");
                 setTimeout(() => {
-                    $("#extra-error-message-div").text("");
+                    $("#extra-message-div").text("");
                 }, 2000);
                 console.error("Error rolling back changes: ", response.json());
                 
@@ -279,7 +275,17 @@ function loadListeners() {
         });
     });
 
-    
+    $("#cancel-changes-button").on("click", function() {
+        rollBackProduct();
+    });
+
+    $("#remove-product-button").on("click", function() {
+        removeProduct();
+    })
+
+    $("#save-product-button").on("click", function() {
+        saveProductInfo();
+    });
 }
 
 function showSavingIcon() {
@@ -332,7 +338,7 @@ function organizeFormData(data) {
     return organizedData;
 }
 
-async function saveProductForm(data) {
+async function autoSaveProductForm(data) {
     // Send the form data to the server
     let organizedData = organizeFormData(data);
 
@@ -349,6 +355,28 @@ async function saveProductForm(data) {
 
         return response;
         
+    } catch (error) {
+        console.log(error);
+        showErrorIcon();
+        return null;
+    }
+}
+
+async function saveProductForm(data) {
+    console.log(data);
+    let organizedData = organizeFormData(data);
+    console.log(organizedData);
+    try {
+        let response = await fetch('/api/products/final_save_product/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': organizedData.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(organizedData)
+        });
+
+        return response;
     } catch (error) {
         console.log(error);
         showErrorIcon();
@@ -388,7 +416,7 @@ async function autoSaveProductInfo() {
 
     if (readyToSubmit) {
         // Submit the form
-        let response = await saveProductForm(formData);
+        let response = await autoSaveProductForm(formData);
         if (response) {
             if (response.ok) {
                 showSavedIcon();
@@ -401,7 +429,6 @@ async function autoSaveProductInfo() {
                     $(`#${field}_error_field`).text(errorData[field]);
                 });
             }
-        
         } else {
             // Unknown error
             showErrorIcon();
@@ -410,6 +437,129 @@ async function autoSaveProductInfo() {
         showErrorIcon();
     }
 }
+async function rollBackProduct() {
+    let response = await fetch('/api/products/rollback_product_changes/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({"product_id": productId, 
+                              "initial_product_state_id": initialProductStateId})
+    });
+    if (response.ok) {
+        // TODO - add redirection to whatever the previous page actually was
+        window.location.href = `/admin_portal/`;
+    } else {
+        $("#extra-message-div").removeClass("success-message-div");
+        $("#extra-message-div").addClass("error-message-div");
+        $("#extra-message-div").text("Error canceling changes");
+        
+        setTimeout(() => {
+            $("#extra-message-div").text("");
+        }, 2000);
+        console.error("Error rolling back changes: ", response.json());
+        
+    }
+}
+
+async function removeProduct() {
+    let response = await fetch(`/api/products/remove/`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ "product_id": productId })
+    });
+
+    if (response.ok) {
+        // TODO - add redirection to whatever the previous page actually was
+        $("#extra-message-div").removeClass("error-message-div");
+        $("#extra-message-div").addClass("success-message-div");
+        $("#extra-message-div").text("Product removed successfully");
+        setTimeout(() => {
+            $("#extra-message-div").text("");
+            window.location.href = `/admin_portal/`;
+        }, 2000);
+        
+    } else {
+        $("#extra-message-div").removeClass("success-message-div");
+        $("#extra-message-div").addClass("error-message-div");
+        $("#extra-message-div").text("Error removing product");
+        
+        setTimeout(() => {
+            $("#extra-message-div").text("");
+        }, 2000);
+        console.error("Error removing product: ", response.json());
+    }
+}
+async function saveProductInfo() {
+    let readyToSave = true;
+        if ($("#product_name").val().trim() == "") {
+            $("#product_name").addClass("error-input");
+            $("#product_name_error_field").text("Product name is required");
+            readyToSave = false;
+        }
+
+        if (!$("#subcategory").val()) {
+            $("#subcategory").addClass("error-input");
+            $("#subcategory_error_field").text("Subcategory is required");
+            readyToSave = false;
+        }
+        
+        $(".property-row").each(function() {
+            let row = $(this);
+            let propertyName = row.find(".property-name-input").val().trim();
+            let propertyValue = row.find(".property-value-input").val().trim();
+            
+            if (!propertyName) {
+                row.find(".property-name-input").addClass("error-input");
+                row.find(".property-name_error_field").text("Property name is required");
+                readyToSave = false;
+            }
+
+            if (!propertyValue) {
+                row.find(".property-value-input").addClass("error-input");
+                row.find(".property-value_error_field").text("Property value is required");
+                readyToSave = false;
+            }
+        });
+
+    if (readyToSave) {
+        let  formData = new FormData(document.getElementById("edit_product_form"));
+        let response = await saveProductForm(formData);
+        console.log(response)
+        console.log("Testing..");
+        if (response) {
+            if (response.ok) {
+                $("#extra-message-div").text("Product saved successfully");
+                $("#extra-message-div").removeClass("error-message-div");
+                $("#extra-message-div").addClass("success-message-div");
+                setTimeout(() => {
+                    // TODO - add redirection to view product page
+                    window.location.href = `/admin_portal/`;
+                }, 2000);
+            } else {
+                let errorData = await response.json();
+                console.error("Validation errors", errorData);
+                Object.keys(errorData).forEach(function(field) {
+                    $(`#${field}`).addClass("error-input");
+                    $(`#${field}_error_field`).text(errorData[field]);
+                });
+            }
+        } else {
+            $("#extra-message-div").text("Error saving product");
+            $("#extra-message-div").removeClass("success-message-div");
+            $("#extra-message-div").addClass("error-message-div");
+            setTimeout(() => {
+                $("#extra-message-div").text("");
+            }, 2000);
+        }
+    }
+    
+}
+
 
 function bindRemovalButtons() {
     $(".remove-property-button").on("click", function() {

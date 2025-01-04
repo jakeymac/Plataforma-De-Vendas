@@ -131,7 +131,7 @@ function load_listeners() {
 
     $("#product-search").on("input", function () {
         let searchTerm = $(this).val();
-        let filteredProducts = products.filter(product => product.name.includes(searchTerm) || product.description.includes(searchTerm));
+        let filteredProducts = products.filter(product => product.name.includes(searchTerm) || product.product_description.includes(searchTerm));
         update_product_selector(filteredProducts);
     })
 }

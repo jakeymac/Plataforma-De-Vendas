@@ -16,9 +16,9 @@ def edit_product_view(request, product_id):
         initial_product_state = InitialProductState.objects.create(
             product=product,
             store=product.store,
-            sub_category=product.sub_category,
+            subcategory=product.subcategory,
             product_name=product.product_name,
-            description=product.description,
+            product_description=product.product_description,
             properties=product.properties,
             is_active=product.is_active,
             draft=product.draft,
