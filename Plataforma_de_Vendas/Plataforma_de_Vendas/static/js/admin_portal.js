@@ -162,7 +162,7 @@ function load_listeners() {
     $("#product-search").on("input", function () {
         let searchTerm = $(this).val();
         let filteredProducts = products.filter(product => {
-            return product.product_name.includes(searchTerm) || (product.product_description && product.product_description.includes(searchTerm));
+            return product.product_name.toLowerCase().includes(searchTerm) || (product.product_description && product.product_description.toLowerCase().includes(searchTerm));
         });
         update_product_selector(filteredProducts);
     })

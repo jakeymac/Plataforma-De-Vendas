@@ -1,36 +1,43 @@
-
+const $homeButton = $("#home-nav-button");
+const $adminAccountButton = $("#admin-account-nav-button");
+const $customerAccountButton = $("#customer-account-nav-button");
+const $myStoreButton = $("#my-store-nav-button");
+const $loginButton = $("#login-nav-button");
+const $registerAccountButton = $("#register-account-nav-button");
+const $registerSellerButton = $("#register-seller-nav-button");
+const $logoutButton = $("#logout-nav-button");
 
 function load_event_listeners() {
-    $("#home-nav-button").on("click", function() {
+    $homeButton.on("click", function() {
         window.location.href = "/";
         console.log("Clicked home button");
     });
 
-    $("#admin-account-nav-button").on("click", function() {
+    $adminAccountButton.on("click", function() {
         window.location.href = "/admin_account";
     });
 
-    $("#customer-account-nav-button").on("click", function() {
+    $customerAccountButton.on("click", function() {
         window.location.href = "/customer_account";
     });
 
-    $("#my-store-nav-button").on("click", function() {
+    $myStoreButton.on("click", function() {
         window.location.href = "/my_store";
     });
 
-    $("#login-nav-button").on("click", function() {
+    $loginButton.on("click", function() {
         window.location.href = "/login";
     });
 
-    $("#register-account-nav-button").on("click", function() {
+    $registerAccountButton.on("click", function() {
         window.location.href = "/register_account";
     });
 
-    $("#register-seller-nav-button").on("click", function() {
+    $registerSellerButton.on("click", function() {
         window.location.href = "/register_seller";
     });
 
-    $("#logout-nav-button").on("click", function() {
+    $logoutButton.on("click", function() {
         window.location.href = "/logout";
     });
 }
