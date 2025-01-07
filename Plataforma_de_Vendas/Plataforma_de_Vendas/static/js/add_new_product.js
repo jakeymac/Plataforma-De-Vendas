@@ -1,8 +1,5 @@
-const $addNewProductForm = $("#add_new_product_form");
-const $productNameInput = $("#product_name");
-const $messagesContainer = $("#messages-container");
 function load_listeners() {
-    $addNewProductForm.submit( async function (e) {
+    $("#add_new_product_form").submit( async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
         
@@ -18,9 +15,9 @@ function load_listeners() {
             if (!response.ok) {
                 let errorData = await response.json();
                 if (errorData.message) {
-                    $messagesContainer.text(errorData.message);
-                    $messagesContainer.addClass("error-message");
-                    $productNameInput.addClass('error-input');
+                    $("#messages-container").text(errorData.message);
+                    $("#messages-container").addClass("error-message");
+                    $("#product_name").addClass('error-input');
                 }
             } else {
                 let responseData = await response.json();
@@ -37,10 +34,10 @@ function load_listeners() {
         }
     });
 
-    $productNameInput.on("input", function() {
-        $productNameInput.removeClass('error-input');
-        $messagesContainer.text("");
-        $messagesContainer.removeClass("error-message");
+    $("#product_name").on("input", function() {
+        $("#product_name").removeClass('error-input');
+        $("#messages-container").text("");
+        $("#messages-container").removeClass("error-message");
     })
 }
 $(document).ready(function() {
