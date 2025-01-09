@@ -464,13 +464,12 @@ async function rollBackProduct() {
 }
 
 async function removeProduct() {
-    let response = await fetch(`/api/products/remove/`, {
-        method: 'PUT',
+    let response = await fetch(`/api/products/remove/${productId}`, {
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': csrfToken
         },
-        body: JSON.stringify({ "product_id": productId })
     });
 
     if (response.ok) {

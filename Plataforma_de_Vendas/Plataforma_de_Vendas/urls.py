@@ -51,6 +51,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('admin_portal/', account_views.admin_portal, name='admin_portal'), # custom admin portal for ease of use
+
     path('', store_views.home, name='index'),
     path('login/', account_views.login_page, name='login'),
     path('register/', account_views.register_account_page, name='register_account'),
@@ -74,12 +75,12 @@ urlpatterns = [
     path('api/stores/update/',store_endpoints.update_store_endpoint),
 
     path('api/products/', product_endpoints.get_products_endpoint),
-    path('api/products/<int:product_id>/', product_endpoints.get_products_endpoint),
+    path('api/products/<str:product_id>/', product_endpoints.get_products_endpoint),
     path('api/products/store/<int:store_id>/', product_endpoints.get_products_endpoint),
     path('api/products/search/', product_endpoints.search_for_product_endpoint),
     path('api/products/search/<int:store_id>/', product_endpoints.search_for_product_endpoint),
     path('api/products/add/', product_endpoints.add_product_endpoint),
-    path('api/products/remove/', product_endpoints.remove_product_endpoint),
+    path('api/products/remove/<str:product_id>', product_endpoints.remove_product_endpoint),
     path('api/products/add_image/', product_endpoints.add_product_image_endpoint),
     path('api/products/images/<str:product_id>/', product_endpoints.product_images_endpoint),
     path('api/products/order/<int:order_id>/', product_endpoints.products_in_order_endpoint),
