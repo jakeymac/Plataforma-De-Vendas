@@ -29,6 +29,9 @@ from django.core.mail import send_mail
 )
 @api_view(['GET'])
 def get_products_endpoint(request, store_id=None, product_id=None):
+    if store_id and product_id:
+        return Response({"message": "You cannot specify both a store id and a product id"}, status=status.HTTP_400_BAD_REQUEST)
+
     if store_id is not None:
         try:
             store = Store.objects.get(id=store_id)
@@ -37,8 +40,11 @@ def get_products_endpoint(request, store_id=None, product_id=None):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Store.DoesNotExist:
             return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
+<<<<<<< Updated upstream
         except Product.DoesNotExist:
             return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+=======
+>>>>>>> Stashed changes
 
     elif product_id is not None:
         try:
@@ -159,12 +165,11 @@ def add_stock_endpoint(request):
             'product_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
         }
     ),
-    responses={200: 'Updated'}
+    responses={200: 'Deleted'}
 )
 @api_view(['DELETE'])
 def remove_product_endpoint(request, product_id):
     try:
-        
         product = Product.objects.get(id=product_id)
         if request.user.is_authenticated and request.user.account_type == 'admin':
             initial_products = InitialProductState.objects.filter(product=product)
@@ -184,7 +189,11 @@ def remove_product_endpoint(request, product_id):
     except Exception as e:
         return Response({"message": f"An error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
+<<<<<<< Updated upstream
     # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, if changed, may use PUT instead of DELETE
+=======
+    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, if changed back to use , may use PUT instead of DELETE.
+>>>>>>> Stashed changes
     # data = request.data
     # product_id = data.get('id')
     # try:
