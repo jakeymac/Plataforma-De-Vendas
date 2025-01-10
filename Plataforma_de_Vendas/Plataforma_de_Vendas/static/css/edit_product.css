@@ -99,7 +99,7 @@
     margin-top: 10px;
 }
 
-#sortable-properties {
+#product-properties {
     width: 80%;
     margin-left: auto;
     margin-right: auto;
@@ -191,7 +191,7 @@
     margin-top: 20px;
 }
 
-#photos-container {
+#images-container {
     height: 780px;
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -200,21 +200,21 @@
     margin-right: 10px;
 }
 
-#photos-inner-container {
+#images-inner-container {
     padding: 15px;
     height: 100%;
     overflow-y: auto;
 }
 
-.photo-row {
-    display: none; /* Hide the photo row by default until the image is actually loaded in when loading the page with all images */
+.image-row {
+    display: none; /* Hide the image row by default until the image is actually loaded in when loading the page with all images */
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 30px;
     border-radius: 5px;
 }
 
-.photo-row-inner-container {
+.image-row-inner-container {
     display: flex;
     align-items: center;
     padding: 10px;

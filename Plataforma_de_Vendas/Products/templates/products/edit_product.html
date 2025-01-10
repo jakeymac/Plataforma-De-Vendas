@@ -61,7 +61,7 @@
                         </select>
                         <div class="error-message-div" id ="subcategory_error_field"></div>
                     </div>
-                    <div id="sortable-properties">
+                    <div id="product-properties">
                         {% for property_name, property_value in properties.items %}
                             <div class="row sortable-item property-row" id="property-row-{{ forloop.counter }}">
                                 <div class="col-md-5">
@@ -94,8 +94,8 @@
                         </div>
                     </div>
                     
-                    <div id="photos-container">
-                        <div id="photos-inner-container">
+                    <div id="images-container">
+                        <div id="images-inner-container">
                             <div id="initial-image-loading-icon-container">
                                 <img src="{% static 'images/edit-product-images-loading-animation.gif' %}" alt="Loading Images" id="initial-image-loading-icon">
                                 <p id="initial-image-loading-text">Loading Product Images</p>

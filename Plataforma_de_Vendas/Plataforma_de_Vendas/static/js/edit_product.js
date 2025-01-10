@@ -5,7 +5,7 @@ let autoSaveTimeout;
 let uploadInProgress = false;
 
 function addNewPropertyRow() {
-    $("#sortable-properties").append(`
+    $("#product-properties").append(`
         <div class="row sortable-item property-row" id="property-row-${counter}">
             <div class="col-md-5">
                 <label for="property-name-${counter}">Property Name</label>
@@ -26,8 +26,8 @@ function addNewPropertyRow() {
 }
 
 function addNewImageRow(imageUrl, imageId, isInitial=false) {
-    let newPhotoRow = `<div class="row photo-row">
-                            <div class="col-12 photo-row-inner-container sortable-item">
+    let newImageRow = `<div class="row image-row">
+                            <div class="col-12 image-row-inner-container sortable-item">
                                 <div class="col-6" id="product-image-${imageId}-container">
                                     <img src="${imageUrl}" alt="Product Image" class="product-image">
                                 </div>
@@ -37,12 +37,12 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
                                 <input type="hidden" name="image_id" id="image_id" value="${imageId}">
                             </div>
                         </div>`;
-    $("#photos-inner-container").append(newPhotoRow); 
+    $("#images-inner-container").append(newImageRow); 
     if (!isInitial) {
-        $(".photo-row").show();
+        $(".image-row").show();
     }   
     $(`#remove-image-${imageId}`).on("click", function() {
-        let imageId = $(this).closest(".photo-row").find("#image_id").val();
+        let imageId = $(this).closest(".image-row").find("#image_id").val();
         console.log(imageId);
         fetch(`/api/products/remove_image/${imageId}/`, {
             method: 'DELETE',
@@ -53,7 +53,7 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
         })
         .then(response => {
             if (response.ok) {
-                $(this).closest(".photo-row").remove();
+                $(this).closest(".image-row").remove();
                 clearTimeout(autoSaveTimeout);
                 autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
             } else {
@@ -95,8 +95,8 @@ function loadData() {
                     console.log(imagesLoaded);
                     if (imagesLoaded === totalImages) {
                         $("#initial-image-loading-icon-container").hide();
-                        $(".photo-row").show();   
-                        $("#photos-inner-container").sortable({
+                        $(".image-row").show();   
+                        $("#images-inner-container").sortable({
                             placeholder: "sortable-placeholder",
                             start: function (e, ui) {
                                 // Optionally adjust placeholder height to match dragged element
@@ -129,7 +129,7 @@ function loadData() {
 function loadListeners() {
     $("#add-property-button").on("click", function() {
         // Grab the last property row in the form and check if it has values, otherwise don't add a new row
-        let lastPropertyRow = $("#sortable-properties .sortable-item:last");
+        let lastPropertyRow = $("#product-properties .sortable-item:last");
         if (lastPropertyRow.length > 0) {
             let propertyName = lastPropertyRow.find(".property-name-input").val().trim();
             let propertyValue = lastPropertyRow.find(".property-value-input").val().trim();
@@ -153,7 +153,7 @@ function loadListeners() {
         autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
     })
 
-    $("#sortable-properties").sortable({
+    $("#product-properties").sortable({
         start: function (e, ui) {
             ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
             ui.placeholder.css("margin-top", ui.item.css("margin-top"));
@@ -164,7 +164,7 @@ function loadListeners() {
         }
     })
 
-    $("#photos-inner-container").sortable({
+    $("#images-inner-container").sortable({
         update: function (event, ui) {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
@@ -241,7 +241,7 @@ function loadListeners() {
                     addNewImageRow(response.url, response.id);
                     clearTimeout(autoSaveTimeout);
                     autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
-                    $("#photos-inner-container").sortable({
+                    $("#images-inner-container").sortable({
                         placeholder: "sortable-placeholder",
                         start: function (e, ui) {
                             // Optionally adjust placeholder height to match dragged element
@@ -573,7 +573,7 @@ $(document).ready(function() {
     loadData();
     loadListeners();
     bindRemovalButtons(); // This is necessary to bind the removal buttons that are already present on the page at load time
-    $("#sortable-properties").sortable({
+    $("#product-properties").sortable({
         placeholder: "sortable-placeholder",
         start: function (e, ui) {
             // Optionally adjust placeholder height to match dragged element
