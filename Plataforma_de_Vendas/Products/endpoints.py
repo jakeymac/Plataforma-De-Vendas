@@ -40,11 +40,8 @@ def get_products_endpoint(request, store_id=None, product_id=None):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Store.DoesNotExist:
             return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
-<<<<<<< Updated upstream
         except Product.DoesNotExist:
             return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
-=======
->>>>>>> Stashed changes
 
     elif product_id is not None:
         try:
@@ -189,11 +186,7 @@ def remove_product_endpoint(request, product_id):
     except Exception as e:
         return Response({"message": f"An error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-<<<<<<< Updated upstream
     # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, if changed, may use PUT instead of DELETE
-=======
-    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, if changed back to use , may use PUT instead of DELETE.
->>>>>>> Stashed changes
     # data = request.data
     # product_id = data.get('id')
     # try:
