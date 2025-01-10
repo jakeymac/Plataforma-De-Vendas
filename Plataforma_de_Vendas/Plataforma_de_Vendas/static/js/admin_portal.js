@@ -144,7 +144,7 @@ function load_listeners() {
                 }
             })
         }
-    })
+    });
     
     $("#edit_category_selector").change(function () {
         let category = categories.find(cat=> cat.id == $(this).val()); // Uses the categories object pulled from the context in a script in the template
@@ -171,5 +171,3 @@ function load_listeners() {
 $(document).ready(function () {
     load_listeners();
 });
-
-

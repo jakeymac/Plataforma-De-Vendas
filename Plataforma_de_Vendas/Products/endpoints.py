@@ -29,6 +29,9 @@ from django.core.mail import send_mail
 )
 @api_view(['GET'])
 def get_products_endpoint(request, store_id=None, product_id=None):
+    if store_id and product_id:
+        return Response({"message": "You cannot specify both a store id and a product id"}, status=status.HTTP_400_BAD_REQUEST)
+
     if store_id is not None:
         try:
             store = Store.objects.get(id=store_id)
@@ -159,7 +162,7 @@ def add_stock_endpoint(request):
             'product_id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
         }
     ),
-    responses={200: 'Updated'}
+    responses={200: 'Deleted'}
 )
 @api_view(['DELETE'])
 def remove_product_endpoint(request, product_id):
