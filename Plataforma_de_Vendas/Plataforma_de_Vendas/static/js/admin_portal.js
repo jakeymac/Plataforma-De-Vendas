@@ -15,7 +15,7 @@ function update_product_selector(products) {
     } else {
         $("#edit-product-selector").append('<option value="">Select a product</option>');
         products.forEach(product => {
-            $("#edit-product-selector ").append(`<option value="${product.id}">${product.product_name}</option>`);
+            $("#edit-product-selector").append(`<option value="${product.id}">${product.product_name}</option>`);
         });
     }
 }
@@ -171,5 +171,3 @@ function load_listeners() {
 $(document).ready(function () {
     load_listeners();
 });
-
-
