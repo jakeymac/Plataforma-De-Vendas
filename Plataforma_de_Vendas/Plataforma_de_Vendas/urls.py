@@ -63,6 +63,7 @@ urlpatterns = [
 
     path('add_new_product/', product_views.add_product_view, name='add_new_product'),
     path('edit_product/<str:product_id>/', product_views.edit_product_view, name='edit_product'),
+    path('view_product/<str:product_id>/', product_views.view_product, name='view_product'),
 
     path('swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
     path('api/swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),

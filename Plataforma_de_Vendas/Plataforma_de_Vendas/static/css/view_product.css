@@ -1,0 +1,7 @@
+#main-container {
+    border: 1px solid black;
+}
+
+#main-product-info-container {
+    border: 1 px solid red !important;
+}

@@ -1,0 +1,38 @@
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block title %} View Product - {{ product.product_name }} {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script> var productId = "{{ product.id }}"; </script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="{% static 'js/view_product.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'css/view_product.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container" id="main-container">
+        <div class="row">
+            <div class="col-md-5" id="product-iamge-container">
+                <div class="col-md-3" id="image-preview-container"></div>
+                <div class="col-md-9" id-="image-viewer-container"></div>
+            </div>
+            <div class="col-md-7" id="product-details-container">
+                <div class="row">
+                    <div id="main-product-info-container">
+                        <h2>Product Information</h2>
+
+                    </div>
+                </div>
+                <div class="row" id="product-properties-info-container"></div>
+            </div>
+        </div>
+            
+    </div>
+{% endblock %}
