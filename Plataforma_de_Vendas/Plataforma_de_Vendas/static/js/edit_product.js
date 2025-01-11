@@ -57,6 +57,11 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
         .then(response => {
             if (response.ok) {
                 $(this).closest(".image-row").remove();
+                if ($(".image-row").length === 0) {
+                    $("#inner-images-messages-label").text("No images found for this product");
+                    $("#inner-images-messages-label").removeClass("error-message-div");
+                    $("#inner-images-messages-label").show();
+                }
                 clearTimeout(autoSaveTimeout);
                 autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
             } else {
