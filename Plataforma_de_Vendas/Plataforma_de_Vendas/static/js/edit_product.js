@@ -306,7 +306,11 @@ function loadListeners() {
     });
 
     $("#remove-product-button").on("click", function() {
-        removeProduct();
+        $("#confirm-deletion-modal").modal('show');        
+        $("#confirm-deletion-main-text").text("Are you sure you want to remove this product?");
+        $("#confirm-deletion-button").on("click", function() {
+            removeProduct();
+        });
     })
 
     $("#save-product-button").on("click", function() {
@@ -500,21 +504,21 @@ async function removeProduct() {
 
     if (response.ok) {
         // TODO - add redirection to whatever the previous page actually was
-        $("#extra-message-div").removeClass("error-message-div");
-        $("#extra-message-div").addClass("success-message-div");
-        $("#extra-message-div").text("Product removed successfully");
+        $("#confirm-deletion-main-text").removeClass("error-message-div");
+        $("#confirm-deletion-main-text").addClass("deletion-success-message");
+        $("#confirm-deletion-main-text").text("Product removed successfully");
         setTimeout(() => {
-            $("#extra-message-div").text("");
+            $("#confirm-deletion-main-text").text("");
             window.location.href = `/admin_portal/`;
         }, 2000);
         
     } else {
-        $("#extra-message-div").removeClass("success-message-div");
-        $("#extra-message-div").addClass("error-message-div");
-        $("#extra-message-div").text("Error removing product");
+        $("#confirm-deletion-main-text").removeClass("deletion-success-message");
+        $("#confirm-deletion-main-text").addClass("error-message-div");
+        $("#confirm-deletion-main-text").text("Error removing product");
         
         setTimeout(() => {
-            $("#extra-message-div").text("");
+            $("#confirm-deletion-main-text").text("");
         }, 2000);
         console.error("Error removing product: ", response.json());
     }

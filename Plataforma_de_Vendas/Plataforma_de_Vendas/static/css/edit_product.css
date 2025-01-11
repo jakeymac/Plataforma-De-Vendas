@@ -146,6 +146,14 @@
     color: white;
 }
 
+.deletion-success-message {
+    color: white;
+    background-color: rgb(17, 163, 17);
+    border-radius: 5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .form-row .error-message-div {
     height:30px;
 }

@@ -51,7 +51,6 @@
                     <div class="row form-row">
                         <label for="subcategory">Subcategory</label>
                         <select class="form-select product-info-input" id="subcategory" name="subcategory" required>
-        
                             <option value="" selected disabled>Select a Subcategory</option>
                             {% for subcategory in subcategories %}
                                 <option value="{{ subcategory.id }}" {% if subcategory.id == product.subcategory.id %} selected {% endif %}>{{ subcategory.subcategory_name }}</option>
@@ -71,7 +70,6 @@
                                     <label for="property-value-{{ forloop.counter }}">Property Value</label>
                                     <input type="text" class="form-control product-info-input property-value-input" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{ property_value}}" required>
                                     <div class="error-message-div property-value_error_field" id="property-value-{{ forloop.counter }}_error_field"></div>
-
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button" class="btn btn-danger remove-property-button">Remove</button>
@@ -91,7 +89,6 @@
                             <progress id="image-upload-progress" value="0" max="100"></progress>
                         </div>
                     </div>
-                    
                     <div id="images-container">
                         <div id="images-inner-container">
                             <div id="initial-image-loading-icon-container">
@@ -101,9 +98,7 @@
                             <div id="inner-images-messages-container">
                                 <p id="inner-images-messages-label"></p>
                             </div>
-
                         </div>
-                        
                     </div>                
                 </div>
             </div>
@@ -117,4 +112,6 @@
         </form>
     </div>
 </div>
+
+{% include "modals/confirm_deletion.html" %}
 {% endblock %}
