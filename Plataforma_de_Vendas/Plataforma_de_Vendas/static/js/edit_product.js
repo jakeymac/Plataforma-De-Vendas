@@ -58,7 +58,7 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
             if (response.ok) {
                 $(this).closest(".image-row").remove();
                 if ($(".image-row").length === 0) {
-                    $("#inner-images-messages-label").text("No images found for this product");
+                    $("#inner-images-messages-label").text("No images have been added for this product");
                     $("#inner-images-messages-label").removeClass("error-message-div");
                     $("#inner-images-messages-label").show();
                 }
@@ -129,7 +129,7 @@ function loadData() {
             }
             $("#initial-image-loading-icon-container").hide();
         } else {
-            $("#inner-images-messages-label").text("No images found for this product");
+            $("#inner-images-messages-label").text("No images have been added for this product");
             $("#inner-images-messages-label").show();
         }
         $("#initial-image-loading-icon-container").hide();
