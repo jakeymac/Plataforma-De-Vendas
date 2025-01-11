@@ -60,7 +60,14 @@
     border-radius: 5%;
     text-align: center;
     font-size: 15px;
-    
+}
+
+.deletion-success-message {
+    color: white;
+    background-color: rgb(17, 163, 17);
+    border-radius: 5%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .message-container {

@@ -57,7 +57,9 @@ ROOT_URLCONF = 'Plataforma_de_Vendas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / "Plataforma_de_Vendas",
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

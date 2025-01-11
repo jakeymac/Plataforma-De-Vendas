@@ -108,7 +108,7 @@
                     <div id="edit_category_description_error_container" class="error-message"></div>
                     <div  class="message-container" id="edit-category-message-container"></div>
                     <div class="button-container">
-                        <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-category-button">Delete Category</button>
+                        <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-category-button" data-type="category">Delete Category</button>
                         <button type="submit" class="btn btn-primary mt-2">Save Category</button>
                     </div>
                 </form>
@@ -138,7 +138,7 @@
                     </select>
                     <div class="message-container" id="edit-subcategory-message-container"></div>
                     <div class="button-container">
-                        <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-subcategory-button">Delete Subcategory</button>
+                        <button type="button" class="btn btn-danger mt-2 delete-button" id="delete-subcategory-button" data-type="subcategory">Delete Subcategory</button>
                         <button type="submit" class="btn btn-primary mt-2">Save Subcategory</button>
                     </div>
                 </form>
@@ -220,4 +220,5 @@
             </form>
         </div>
     </div>
+    {% include "modals/confirm_deletion.html" %}
 {% endblock %}

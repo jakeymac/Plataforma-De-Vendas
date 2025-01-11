@@ -35,37 +35,87 @@ function load_listeners() {
         $(`#${selectId}_error_container`).text("");
     });
 
-    $(".delete-button").click(async function () {
-        const buttonId = $(this).attr('id');
-        // Remove the delete- prefix and -button suffix
-        const cleanedButtonId = buttonId.replace(/^delete-/, '').replace(/-button$/, '');
-        
-        const targetId = $(`#edit_${cleanedButtonId}_selector`).val();
-        const url = `/api/products/${deleteButtons[cleanedButtonId]}/remove/${targetId}/`;
-        if (targetId === "") {
-            $(`#edit-${cleanedButtonId}-error-container`).text("Please select a category to delete");
-            return;
-        }
-        try {
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': csrfToken
+    $(".delete-button").click(function () {
+        let deleteType = $(this).data("type");
+        let deleteId = $(`#edit_${deleteType}_selector`).val();
+        let deleteItemName = $(`#edit_${deleteType}_selector option:selected`).text();
+
+        let pluralDeleteTypes = {"category": "categories", "subcategory": "subcategories"};
+        let pluralDeleteType = pluralDeleteTypes[deleteType]; // To use in the endpoint URL
+
+        if (deleteId != "") {
+            $("#confirm-deletion-modal").modal('show');
+            $("#confirm-deletion-main-text").text(`Are you sure you want to delete ${deleteType} ${deleteItemName}?`);
+            $("#confirm-deletion-button").on("click", async function() {
+                let endpointUrl = `/api/products/${pluralDeleteType}/remove/${deleteId}/`;
+                try {
+                    let response = await fetch(endpointUrl, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        }
+                    });
+                    if (!response.ok) {
+                        $("#confirm-deletion-main-text").text(`There was an error trying to delete the ${deleteType}`);
+                        $("#confirm-deletion-main-text").addClass("error-message");
+                        setTimeout(function() {
+                            $("#confirm-deletion-main-text").text(`Are you sure you want to delete ${deleteType} ${deleteItemName}?`);
+                            $("#confirm-deletion-main-text").removeClass("error-message");
+                        }, 2000);
+                    } else {
+                        $("#confirm-deletion-main-text").text(`The ${deleteType} was successfully deleted`);
+                        $("#confirm-deletion-main-text").addClass("deletion-success-message");
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                } catch (error) {
+                    $("#confirm-deletion-main-text").text(`There was an error trying to delete the ${deleteType}`);
+                    $("#confirm-deletion-main-text").addClass("error-message");
+                    setTimeout(function() {
+                        $("#confirm-deletion-main-text").text(`Are you sure you want to delete ${deleteType} ${deleteItemName}?`);
+                        $("#confirm-deletion-main-text").removeClass("error-message");
+                    }, 2000);
                 }
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.log(errorData);
-            } else {
-                $(this).closest("form").find(".message-container").text("Success");
-                $(this).closest("form").find(".message-container").addClass("success-message");
-                setTimeout(function() {
-                    window.location.reload();
-                }, 2000);
-            }
-        } catch (error) {
-            alert("Network error: " + error.message);
+        } else {
+            $(`#edit-${deleteType}-message-container`).text(`Please select a ${deleteType}`);
+            setTimeout(function() {
+                $(`#edit-${deleteType}-message-container`).text("");
+            }, 2000);
         }
+
+
+        // const buttonId = $(this).attr('id');
+        // // Remove the delete- prefix and -button suffix
+        // const cleanedButtonId = buttonId.replace(/^delete-/, '').replace(/-button$/, '');
+        
+        // const targetId = $(`#edit_${cleanedButtonId}_selector`).val();
+        // const url = `/api/products/${deleteButtons[cleanedButtonId]}/remove/${targetId}/`;
+        // if (targetId === "") {
+        //     $(`#edit-${cleanedButtonId}-error-container`).text("Please select a category to delete");
+        //     return;
+        // }
+        // try {
+        //     const response = await fetch(url, {
+        //         method: 'DELETE',
+        //         headers: {
+        //             'X-CSRFToken': csrfToken
+        //         }
+        //     });
+        //     if (!response.ok) {
+        //         const errorData = await response.json();
+        //         console.log(errorData);
+        //     } else {
+        //         $(this).closest("form").find(".message-container").text("Success");
+        //         $(this).closest("form").find(".message-container").addClass("success-message");
+        //         setTimeout(function() {
+        //             window.location.reload();
+        //         }, 2000);
+        //     }
+        // } catch (error) {
+        //     alert("Network error: " + error.message);
+        // }
     });
 
     $("form").submit(async function (e) {
