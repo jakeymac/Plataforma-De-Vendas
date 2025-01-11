@@ -26,6 +26,9 @@ function addNewPropertyRow() {
 }
 
 function addNewImageRow(imageUrl, imageId, isInitial=false) {
+    $("#inner-images-messages-label").text("");
+    $("#inner-images-messages-label").hide();
+
     let newImageRow = `<div class="row image-row">
                             <div class="col-12 image-row-inner-container sortable-item">
                                 <div class="col-6" id="product-image-${imageId}-container">
@@ -58,7 +61,14 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
                 autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
             } else {
                 console.error("Error removing image: ", response.json());
-                // TODO add error message to page
+                $("#inner-images-messages-label").text("Error removing image");
+                $("#inner-images-messages-label").addClass("error-message-div");
+                $("#inner-images-messages-label").show();
+                setTimeout(() => {
+                    $("#inner-images-messages-label").text("");
+                    $("#inner-images-messages-label").hide();
+                }, 2000);
+                
             }
         });
     })
@@ -73,8 +83,10 @@ function loadData() {
             return response.json();
         } else {
             console.error("Error loading images: ", response.json());
-            // TODO add error message to page
             $("#initial-image-loading-icon-container").hide();
+            $("#inner-images-messages-label").text("Error loading images");
+            $("#inner-images-messages-label").addClass("error-message-div");
+            $("#inner-images-messages-label").show();
         } 
     })
     .then(data => {
@@ -82,10 +94,6 @@ function loadData() {
             let images = data.images;
             let imagesLoaded = 0;
             var totalImages = images.length;
-
-            if (!images) {
-                $("#initial-image-loading-icon-container").hide();
-            }
 
             for (let image of images) {
                 addNewImageRow(image.url, image.id, true);
@@ -115,14 +123,19 @@ function loadData() {
                 });
             }
             $("#initial-image-loading-icon-container").hide();
+        } else {
+            $("#inner-images-messages-label").text("No images found for this product");
+            $("#inner-images-messages-label").show();
         }
         $("#initial-image-loading-icon-container").hide();
 
     })
     .catch(error => {
         console.error("Error loading images: ", error);
-        // TODO add error message to page
         $("#initial-image-loading-icon-container").hide();
+        $("#inner-images-messages-label").text("Error loading images");
+        $("#inner-images-messages-label").addClass("error-message-div");
+        $("#inner-images-messages-label").show();
     })
 }
 
@@ -212,6 +225,9 @@ function loadListeners() {
         $("#upload-image-button").prop("disabled", true);
         $("#image-upload-progress").show();
 
+        $("#inner-images-messages-label").text("");
+        $("#inner-images-messages-label").hide();
+
         let formData = new FormData();
         formData.append("image", imageFile);
         formData.append("product_id", productId);
@@ -260,11 +276,16 @@ function loadListeners() {
                 } else {
                     console.error("Error uploading image: ", response);
                     // Show error message on page
+                    $("#inner-images-messages-label").text("Error uploading image");
+                    $("#inner-images-messages-label").addClass("error-message-div");
+                    $("#inner-images-messages-label").show();
                 }
             },
             error: function() {
                 console.error("Error uploading image");
-                // Show error message on page
+                $("#inner-images-messages-label").text("Error uploading image");
+                $("#inner-images-messages-label").addClass("error-message-div");
+                $("#inner-images-messages-label").show();
             },
             complete: function() {
                 uploadInProgress = false;

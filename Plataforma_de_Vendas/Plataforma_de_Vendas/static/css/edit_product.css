@@ -180,6 +180,8 @@
     text-align: center;
 }
 
+
+
 #initial-image-loading-icon {
     width: 20%;
     height: 20%;
@@ -198,6 +200,15 @@
     box-sizing: border-box;
     overflow: hidden;
     margin-right: 10px;
+}
+
+#inner-images-messages-container {
+    height: 10px;
+    text-align: center;
+}
+
+#inner-images-messages-label {
+    display: none;
 }
 
 #images-inner-container {
