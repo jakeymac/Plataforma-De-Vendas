@@ -258,7 +258,6 @@ function loadListeners() {
             success: function(response) {
                 if (response && response.url) {
                     console.log("Success");
-                    
                     addNewImageRow(response.url, response.id);
                     clearTimeout(autoSaveTimeout);
                     autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);

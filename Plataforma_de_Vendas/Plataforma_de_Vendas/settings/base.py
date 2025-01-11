@@ -134,16 +134,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'Plataforma_de_Vendas', 'static')]
 
-# AWS S3 Configurations for storing media files(product images, etc.)
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = "plataforma-de-vendas"
-AWS_S3_REGION_NAME = "us-east-2"
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -155,11 +145,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = '	plataformadevendassistema@gmail.com'
 EMAIL_HOST_PASSWORD = 'pwzg oyhu dcyr nkgl'
-
-from django.core.files.storage import default_storage
-from storages.backends.s3boto3 import S3Boto3Storage
-
-# Force reinitialization of default_storage - this is to ensure that the default storage is set to S3Boto3Storage in the production environment
-default_storage._wrapped = S3Boto3Storage()
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
