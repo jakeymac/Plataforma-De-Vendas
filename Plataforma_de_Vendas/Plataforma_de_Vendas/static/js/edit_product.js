@@ -31,7 +31,7 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
 
     let newImageRow = `<div class="row image-row">
                             <div class="col-12 image-row-inner-container sortable-item">
-                                <div class="col-6" id="product-image-${imageId}-container">
+                                <div class="col-6 product-image-container" id="product-image-${imageId}-container">
                                     <img src="${imageUrl}" alt="Product Image" class="product-image">
                                 </div>
                                 <div class="col-6 remove-image-button-container">
