@@ -38,9 +38,30 @@
             <div class="col-md-6" id="product-details-container">
                 <div class="row">
                     <div id="main-product-info-container">
+                        <dl>
+                            <dt>Product Name</dt>
+                            <dd>{{ product.product_name }}</dd>
+                            <dt>Product Description</dt>
+                            {% if product.product_description %}
+                                <dd>{{ product.product_description }}</dd>
+                            {% else %}
+                                <dd>No description available</dd>
+                            {% endif %}
+                            <dt>Subcategory</dt>
+                            <dd>{{ product.subcategory.subcategory_name }}</dd>
+                            <dt>Seller</dt>
+                            <dd>{{ product.seller.store_name }}</dd>
+                            <!-- Maybe make this horizontal line a little shorter than it is now -->
+                            <hr>
+                            <!-- TODO add information for price/quantity -->
+                            <dt>Price</dt>
+                            <dd>{{ product.price }}</dd>
+                        </dl>
                     </div>
                 </div>
-                <div class="row" id="product-properties-info-container"></div>
+                <div class="row" id="product-properties-info-container">
+                    
+                </div>
             </div>
         </div>
             
