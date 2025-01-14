@@ -22,23 +22,22 @@
 
 {% block content %}
     <div class="container" id="main-container">
+        <h2>Product Information</h2>
+
         <div class="row">
-            <div class="col-md-5" id="product-image-container">
-                <div class="col-md-3" id="image-preview-container">
-                    <div id="thumbnail-carousel">
-                        {% for image in images %}
-                            <div class="thumbnail-image-container">
-                                <img class="thumbnail-image" src="{{ image.image.url }}" alt="Product Image">
-                            </div>
-                        {% endfor %}
+            <div class="col-md-6" id="product-image-container">
+                <div class="row">
+                    <div class="col-md-3" id="image-preview-container">
+                        <div id="thumbnail-carousel"></div>
+                    </div>
+                    <div class="col-md-9" id-="image-viewer-container">
+                        <div id="main-image-container"></div>
                     </div>
                 </div>
-                <div class="col-md-9" id-="image-viewer-container"></div>
             </div>
-            <div class="col-md-7" id="product-details-container">
+            <div class="col-md-6" id="product-details-container">
                 <div class="row">
                     <div id="main-product-info-container">
-                        <h2>Product Information</h2>
                     </div>
                 </div>
                 <div class="row" id="product-properties-info-container"></div>

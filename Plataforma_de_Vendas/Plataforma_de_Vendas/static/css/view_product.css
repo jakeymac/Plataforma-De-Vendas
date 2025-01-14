@@ -9,6 +9,7 @@
     margin-top: 40px;
     padding-left: 15px;
     padding-right:15px;
+    text-align: center;
 }
 
 #image-preview-container {
@@ -36,12 +37,13 @@
   }
 
 .slick-prev::before {
-    content: '\f062'
+    content: '\f062' /* Up arrow */
 }
 
 .slick-next::before {
-    content: '\f063'
+    content: '\f063' /* Down arrow */
 }
+
 .slick-prev, .slick-next {
     background-color: black;
     border: none; 
@@ -94,3 +96,22 @@
     height: 100%;
     object-fit: contain;
  }
+
+ .thumbnail-image:hover {
+    cursor: pointer;
+ }
+
+ #main-image-container {
+    width: Calc(100% - 10px);
+    aspect-ratio: 1/1;
+    margin-top: 20%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+ }
+
+#main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
