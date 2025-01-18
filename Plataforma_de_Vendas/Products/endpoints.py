@@ -5,9 +5,12 @@ from django.contrib.auth import authenticate
 from django.db.models import Q
 from django.db import transaction
 
-from rest_framework.decorators import api_view
+from django.core.mail import send_mail
+
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -20,7 +23,7 @@ from .serializers import ProductSerializer, ProductCategorySerializer, ProductSu
 from Stores.models import Store
 
 import json
-from django.core.mail import send_mail
+
 
 @swagger_auto_schema(
     method='get',
@@ -92,68 +95,6 @@ def search_for_product_endpoint(request, store_id=None):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @swagger_auto_schema(
-    method='put',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['id', 'quantity'],
-        properties={
-            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
-            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product quantity'),
-        }
-    ),
-    responses={200: 'Updated'}
-)
-@api_view(['PUT'])
-def remove_stock_endpoint(request):
-    data = request.data
-    product_id = data.get('id')
-    try:
-        product = Product.objects.get(id=product_id)
-        if data.get('quantity') < 0:
-            return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
-        if request.user.is_authenticated:
-            if request.user.account_type == 'admin' or request.user.store == product.store:
-                if data.get('quantity') > product.quantity:
-                    return Response({"message": "You cannot remove more stock than is available"}, status=status.HTTP_400_BAD_REQUEST)
-                product.quantity -= data.get('quantity')
-                product.save()
-                check_product_quantity(product.quantity, product.minimum_quantity, product.store.id, product.id)
-                return Response({"message": "Product stock updated successfully"}, status=status.HTTP_200_OK)
-                
-        return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
-    except Product.DoesNotExist:
-        return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
-
-@swagger_auto_schema(
-    method='put',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['id', 'quantity'],
-        properties={
-            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product id'),
-            'quantity': openapi.Schema(type=openapi.TYPE_INTEGER, description='Product quantity'),
-        }
-    ),
-    responses={200: 'Updated'}
-)
-@api_view(['PUT'])
-def add_stock_endpoint(request):
-    data = request.data
-    product_id = data.get('id')
-    try:
-        product = Product.objects.get(id=product_id)
-        if data.get('quantity') < 0:
-            return Response({"message": "Quantity cannot be negative"}, status=status.HTTP_400_BAD_REQUEST)
-        if request.user.is_authenticated:
-            if request.user.account_type == 'admin' or request.user.store == product.store:
-                product.quantity += data.get('quantity')
-                product.save()
-                return Response({"message": "Product stock updated successfully"}, status=status.HTTP_200_OK)
-        return Response({"message": "You do not have permission to update this product"}, status=status.HTTP_403_FORBIDDEN)
-    except Product.DoesNotExist:
-        return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
-
-@swagger_auto_schema(
     method='delete',
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -165,10 +106,12 @@ def add_stock_endpoint(request):
     responses={200: 'Deleted'}
 )
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def remove_product_endpoint(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        if request.user.is_authenticated and request.user.account_type == 'admin':
+        # TODO add a check to see if the user is a seller and if they have permissions to delete products and if they belong to the store that owns this product
+        if request.user.groups.filter(name='Admins').exists() or request.user.store == product.store:
             initial_products = InitialProductState.objects.filter(product=product)
             with transaction.atomic():
                 for initial_product in initial_products:
@@ -200,25 +143,6 @@ def remove_product_endpoint(request, product_id):
     # except Product.DoesNotExist:
     #     return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
 
-def check_product_quantity(current_stock, minimum_stock, store_id, product_id):
-    """ Check if the current stock is below the minimum stock and send a notification if it is """
-    out_of_stock = current_stock == 0
-    if current_stock <= minimum_stock:
-        send_low_stock_notification(store_id, product_id, out_of_stock, current_stock)
-
-def send_low_stock_notification(store_id, product_id, out_of_stock, current_stock):
-    """ Send a notification to all users who have opted in to receive stock notifications. """
-    product = Product.objects.get(id=product_id)
-    product_name = product.name
-    subject = 'Product Notification'
-    message = f'The product with ID {product_id} and name {product.name} is out of stock.' if out_of_stock else f'The product with ID {product_id} and name {product.name} is running low on stock. Current stock: {current_stock}'
-    from_email = '	plataformadevendassistema@gmail.com'
-    store = Store.objects.get(id=store_id)
-    accounts_to_notify = store.customuser_set.filter(stock_notifications=True)
-    recipient_list = [account.email for account in accounts_to_notify]
-    
-    send_mail(subject, message, from_email, recipient_list)
-
 @swagger_auto_schema(
     method='get',
     responses={200: 'OK'},
@@ -249,34 +173,42 @@ def product_images_endpoint(request, product_id):
     responses={201: 'Created'}
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_product_image_endpoint(request):
+    # TODO add a check to see if the user is a seller and if they have permissions to add images and if the product bleongs to teh store the seller belongs to
     data = request.data
     product_id = data.get('product_id')
     try:
         product = Product.objects.get(id=product_id)
-        if data.get('order'):
-            order = data.get('order')
-        else:
-            last_image = ProductImage.objects.filter(product_id=product_id).order_by('-order').first()
-            if last_image:
-                order = last_image.order + 1
-            else:
-                order = 0
-    
-        image_file = request.FILES.get('image')
-        if not image_file:
-            return Response({"message": "No image file provided"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        #TODO add a checker to see if this image already exists (or with this name)
-        image = ProductImage(product=product, image=image_file, order=order)
-        image.save()
-        return Response({"message": "Image added successfully", "id": image.id, "url": image.image.url}, status=status.HTTP_201_CREATED)
 
+        if request.user.groups.filter(name='Admins').exists() or (request.user.groups.filter(name="Sellers").exists() and request.user.store == product.store):
+            if data.get('order'):
+                order = data.get('order')
+            else:
+                last_image = ProductImage.objects.filter(product_id=product_id).order_by('-order').first()
+                if last_image:
+                    order = last_image.order + 1
+                else:
+                    order = 0
+        
+            image_file = request.FILES.get('image')
+            if not image_file:
+                return Response({"message": "No image file provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            #TODO add a checker to see if this image already exists (or with this name)
+            image = ProductImage(product=product, image=image_file, order=order)
+            image.save()
+            return Response({"message": "Image added successfully", "id": image.id, "url": image.image.url}, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response({"message": "You do not have permission to add an image to this product"}, status=status.HTTP_403_FORBIDDEN)
+    
     except Product.DoesNotExist:
         return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
 
     except Exception as e:
         return Response({"message": f"An error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @swagger_auto_schema(
     method='delete',
@@ -284,13 +216,17 @@ def add_product_image_endpoint(request):
     description='Remove an image for a product by image id'
 )
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def remove_product_image_endpoint(request, image_id):
-    try:
-        image = ProductImage.objects.get(id=image_id)
-        image.delete()
-        return Response({"message": "Image removed successfully"}, status=status.HTTP_200_OK)
-    except ProductImage.DoesNotExist:
-        return Response({"message": f"Image not found with the id {image_id}"}, status=status.HTTP_404_NOT_FOUND)
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
+        try:
+            image = ProductImage.objects.get(id=image_id)
+            image.delete()
+            return Response({"message": "Image removed successfully"}, status=status.HTTP_200_OK)
+        except ProductImage.DoesNotExist:
+            return Response({"message": f"Image not found with the id {image_id}"}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response({"message": "You do not have permission to remove this image"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='get',
@@ -298,14 +234,17 @@ def remove_product_image_endpoint(request, image_id):
     description='Get all products in an order by order id'
 )
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def products_in_order_endpoint(request, order_id):
-    try:
-        order = Order.objects.get(id=order_id)
-        products = ProductInOrder.objects.filter(order=order)
-        serializer = ProductInOrderSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Order.DoesNotExist:
-        return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)
+    # TODO make this endpoint more secure since this endpoint confirms the existence of an order or not
+        try:
+            order = Order.objects.get(id=order_id)
+            if request.user.groups.filter(name='Admins').exists() or (request.user.groups.filter(name='Sellers').exists() and request.user.store == order.store) or order.user == request.user:
+                products = ProductInOrder.objects.filter(order=order)
+                serializer = ProductInOrderSerializer(products, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        except Order.DoesNotExist:
+            return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)
 
 @swagger_auto_schema(
     method='get',
@@ -401,9 +340,10 @@ def get_category_endpoint(request, category_id):
     responses={201: 'Created'}
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_subcategory_endpoint(request):
     # Use copy to allow for modification of the request data
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if equest.user.groups.filter(name='Admins').exists():
         data = request.data.copy()
         category_id = data.get('category')
         try:
@@ -433,8 +373,9 @@ def add_subcategory_endpoint(request):
     responses={201: 'Created'}
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_category_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins'):
         data = request.data
         serializer = ProductCategorySerializer(data=data)
         if serializer.is_valid():
@@ -457,8 +398,9 @@ def add_category_endpoint(request):
     responses={200: 'Updated'}
 )  
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_category_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists():
         data = request.data
         category_id = data.get('category')
         try:
@@ -488,8 +430,9 @@ def update_category_endpoint(request):
     responses={200: 'Updated'}
 )  
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_subcategory_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists():
         # Use copy to allow for modification of the request data
         data = request.data.copy()
         subcategory_id = data.get('subcategory')
@@ -514,16 +457,20 @@ def update_subcategory_endpoint(request):
     description='Remove a category by category id'
 )
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def remove_category_endpoint(request, category_id):
-    try:
-        subcategories = ProductSubcategory.objects.filter(category=category_id)
-        for subcategory in subcategories:
-            subcategory.delete()
-        category = ProductCategory.objects.get(id=category_id)
-        category.delete()
-        return Response({"message": "Category removed successfully"}, status=status.HTTP_200_OK)
-    except ProductCategory.DoesNotExist:
-        return Response({"category": f"Category not found with the id {category_id}"}, status)
+    if request.user.groups.filter(name='Admins').exists():
+        try:
+            subcategories = ProductSubcategory.objects.filter(category=category_id)
+            for subcategory in subcategories:
+                subcategory.delete()
+            category = ProductCategory.objects.get(id=category_id)
+            category.delete()
+            return Response({"message": "Category removed successfully"}, status=status.HTTP_200_OK)
+        except ProductCategory.DoesNotExist:
+            return Response({"category": f"Category not found with the id {category_id}"}, status)
+    else:
+        return Response({"message": "You do not have permission to remove this category"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='delete',
@@ -531,14 +478,17 @@ def remove_category_endpoint(request, category_id):
     description='Remove a subcategory by subcategory id'
 )
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def remove_subcategory_endpoint(request, subcategory_id):
-    try:
-        subcategory = ProductSubcategory.objects.get(id=subcategory_id)
-        subcategory.delete()
-        return Response({"message": "Subcategory removed successfully"}, status=status.HTTP_200_OK)
-    except ProductSubcategory.DoesNotExist:
-        return Response({"message": f"Subcategory not found with the id {subcategory_id}"}, status)
-
+    if request.user.groups.filter(name='Admins').exists():
+        try:
+            subcategory = ProductSubcategory.objects.get(id=subcategory_id)
+            subcategory.delete()
+            return Response({"message": "Subcategory removed successfully"}, status=status.HTTP_200_OK)
+        except ProductSubcategory.DoesNotExist:
+            return Response({"message": f"Subcategory not found with the id {subcategory_id}"}, status)
+    else:
+        return Response({"message": "You do not have permission to remove this subcategory"}, status=status.HTTP_403_FORBIDDEN)
 
 @swagger_auto_schema(
     method='GET',
@@ -567,8 +517,9 @@ def get_top_subcategories_endpoint(request, category_id=None):
     description='Update top subcategories'
 )
 @api_view(['POST'])
-def update_top_subcategories_endpoint(request):     
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+@permission_classes([IsAuthenticated])
+def update_top_subcategories_endpoint(request): 
+    if request.user.groups.filter(name='Admins').exists():    
         data = request.data
         seen = set()
         duplicates = []
@@ -602,8 +553,9 @@ def update_top_subcategories_endpoint(request):
     description='Add a new product'
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_product_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
         if Product.objects.filter(product_name=data.get('product_name')).exists():
             return Response({"message": "Product with that name already exists"}, status=status.HTTP_400_BAD_REQUEST)   
@@ -622,14 +574,18 @@ def add_product_endpoint(request):
     description='Rollback a product to a previous state'
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def rollback_product_changes_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
 
         product_not_found = False
         initial_state_not_found = False
         try:
             product = Product.objects.get(id=data.get('product_id'))
+            if not request.user.groups.filter(name='Admins').exists() or request.user.store != product.store:
+                return Response({"message": "You do not have permission to rollback this product"}, status=status.HTTP_403_FORBIDDEN)
+
         except Product.DoesNotExist:
             product_not_found = True
 
@@ -684,12 +640,16 @@ def rollback_product_changes_endpoint(request):
     description='Create an initial state for a product to rollback to'
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_initial_product_state_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
         product_id = data.get('product_id')
         try:
             product = Product.objects.get(id=product_id)
+            if not request.user.groups.filter(name='Admins').exists() or request.user.store != product.store:
+                return Response({"message": "You do not have permission to create an initial state for this product"}, status=status.HTTP_403_FORBIDDEN)
+            
             initial_state = InitialProductState(
                 product = product,
                 store = product.store,
@@ -727,13 +687,17 @@ def create_initial_product_state_endpoint(request):
     description='Autosave a product'
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def autosave_product_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
         product_id = data.get('product_id')
         try:
             # Get the product and update it with the new data
             product = Product.objects.get(id=product_id)
+            if not request.user.groups.filter(name='Admins').exists() or request.user.store != product.store:
+                return Response({"message": "You do not have permission to autosave this product"}, status=status.HTTP_403_FORBIDDEN)
+
             serializer = ProductSerializer(product, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -767,13 +731,17 @@ def autosave_product_endpoint(request):
     description='Final save a product'
 )
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def final_save_product_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
         product_id = data.get('product_id')
         try:
             # Get the product and update it with the new data
             product = Product.objects.get(id=product_id)
+            if not request.user.groups.filter(name='Admins').exists() or request.user.store != product.store:
+                return Response({"message": "You do not have permission to save this product"}, status=status.HTTP_403_FORBIDDEN)
+            
             serializer = ProductSerializer(product, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()

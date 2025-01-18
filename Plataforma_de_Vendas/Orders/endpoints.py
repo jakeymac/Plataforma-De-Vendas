@@ -1,11 +1,14 @@
 #API endpoints for orders
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group
 
 from django.db import transaction
-from rest_framework.decorators import api_view
+
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -19,8 +22,9 @@ import json
     operation_description="Get all orders",
     responses={200: OrderSerializer(many=True)})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_orders_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists():
         orders = Order.objects.all()
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -31,26 +35,29 @@ def get_orders_endpoint(request):
     operation_description="Get an order by ID",
     responses={200: OrderSerializer()})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_order_endpoint(request, order_id):
-    if request.user.is_authenticated:
-        try:
-            order = Order.objects.get(id=order_id)
-            if request.user.account_type == 'admin' or (request.user.account_type == "seller" and order.store == request.user.store) or order.user == request.user:
-                serializer = OrderSerializer(order)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response({"message": "You are not authorized to view this order"}, status=status.HTTP_401_UNAUTHORIZED)
+    try:
+        order = Order.objects.get(id=order_id)
+        if request.user.groups.filter(name='Admins').exists() or (request.user.groups.filter(name='Sellers') and order.store == request.user.store) or order.user == request.user:
+            serializer = OrderSerializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"message": "You are not authorized to view this order"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        except Order.DoesNotExist:
-            return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)
-    return Response({"message": "You are not authorized to view this order"}, status=status.HTTP_401_UNAUTHORIZED)
+    except Order.DoesNotExist:
+        return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)
 
     
+
+# TODO add an endpoint for a seller to get all their orders from a specific user
+
 @swagger_auto_schema(method='GET',
     operation_description="Get orders by user ID",
     responses={200: OrderSerializer(many=True)})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_orders_by_user_endpoint(request, user_id):
-    if request.user.is_authenticated and (request.user.account_type == 'admin' or request.user.id == user_id):
+    if request.user.groups.filter(name='Admins').exists() or request.user.id == user_id:
         try:
             user_object = CustomUser.objects.get(id=user_id)
             orders = Order.objects.filter(user=user_object)
@@ -66,8 +73,10 @@ def get_orders_by_user_endpoint(request, user_id):
     operation_description="Get orders by store ID",
     responses={200: OrderSerializer(many=True)})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_orders_by_store_endpoint(request, store_id):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    # TODO add a check to see if the user is a seller and if they have permissions to view orders ( MAYBE )
+    if request.user.groups.filter(name='Admins').exists() or (request.user.groups.filter(name='Sellers').exists() and request.user.store.id == store_id):
         try:
             store = Store.objects.get(id=store_id)
             orders = Order.objects.filter(store=store)
@@ -82,8 +91,10 @@ def get_orders_by_store_endpoint(request, store_id):
     request_body=OrderSerializer,
     responses={201: OrderSerializer()})
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_order_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == "customer" or request.user.account_type == "seller":
+    # TODO may want to change this to allow sellers to make orders for their customers as well
+    if request.user.groups.filter(name='Customers').exists():
         data = request.data
         data['user'] = request.user.id
         serializer = OrderSerializer(data=data)
@@ -98,12 +109,13 @@ def create_order_endpoint(request):
     request_body=OrderSerializer,
     responses={200: OrderSerializer()})
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_order_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == "customer" or request.user.account_type == "seller":
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists() or request.user.groups.filter(name='Customers').exists():
         data = request.data
         try:
             order = Order.objects.get(id=data['id'])
-            if request.user.account_type == 'admin' or (request.user.account_type == "seller" and order.store == request.user.store) or order.user == request.user:
+            if request.user.groups.filter(name='Admins').exists() or (request.user.groups.filter(name='Sellers').exists() and request.user.store == order.store) or order.user == request.user:
                 serializer = OrderSerializer(order, data=data)
                 if serializer.is_valid():
                     serializer.save()

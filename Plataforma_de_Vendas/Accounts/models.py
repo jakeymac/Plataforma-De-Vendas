@@ -10,15 +10,8 @@ class CustomUser(AbstractUser):
     def user_profile_picture_path(instance, filename):
         return f'profile_pictures/{instance.username}/{filename}'
 
-    ACCOUNT_TYPES = [
-        ('customer', 'Customer'),
-        ('seller', 'Seller'),
-        ('admin', 'Admin'),
-    ]
-
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
 
-    account_type = models.CharField(choices=ACCOUNT_TYPES, max_length=10, default='customer')
     store = models.ForeignKey('Stores.Store', on_delete=models.CASCADE, null=True, blank=True) # For sellers to have a store
     stock_notifications = models.BooleanField(default=True, null=True, blank=True) # For sellers to receive notifcations of their stock levels.
 
@@ -55,12 +48,12 @@ class CustomUser(AbstractUser):
         return self.username
 
     def is_customer(self):
-        return self.account_type == "customer"
+        return self.groups.filter(name="Customers").exists()
 
     def is_seller(self):
-        return self.account_type == "seller"
+        return self.groups.filter(name="Sellers").exists()
 
     def is_admin(self):
-        return self.account_type == "admin"
+        return self.groups.filter(name="Admins").exists()
 
     

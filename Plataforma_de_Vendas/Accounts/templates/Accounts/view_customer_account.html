@@ -100,7 +100,7 @@
                 <h4 class="d-flex justify-content-between align-items-center">
                     Edit Account Details
                     <div>
-                        <button class="btn btn-primary btn-sm mr-2" id="cancel-edit-account-information-button" type="button">Cancel</button>
+                        <button class="btn btn-primary btn-sm me-2" id="cancel-edit-account-information-button" type="button">Cancel</button>
                         <button class="btn btn-primary btn-sm" id="save-edited-account-information-button" type="submit">Save</button>
                     </div>
                 </h4>
@@ -152,7 +152,8 @@
                             <th scope="row">Phone Number</th>
                             <td>
                                 <div class="input-group mb-2">
-                                    <div class="input-group-prepend">
+                                    <!-- this div is needed to maintain the country code selector smaller next to the phone number input -->
+                                    <div>
                                         <select class="form-select edit-field" id="edit_country_phone_number_code" name="country_phone_number_code">
                                             <option value="55" {% if user.country_phone_number_code == 55 %}selected{% endif %}>+55</option>
                                             <option value="1" {% if user.country_phone_number_code == 1 %}selected{% endif %}>+1</option>

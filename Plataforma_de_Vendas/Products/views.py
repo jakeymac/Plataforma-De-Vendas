@@ -1,18 +1,23 @@
 from django.shortcuts import render, redirect
 from .models import Product, ProductSubcategory, InitialProductState, InitialProductImage
+from django.contrib.auth.decorators import login_required, user_passes_test
 
-
+@login_required
 def add_product_view(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Sellers').exists() or request.user.groups.filter(name='Admins').exists():
         return render(request, 'products/add_new_product.html')
     else:
         # TODO add a forbidden page to let users know what's happening
         return redirect('home')
     
+@login_required
 def edit_product_view(request, product_id):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Sellers').exists() or request.user.groups.filter(name='Admins').exists():
         try:
             product = Product.objects.get(id=product_id)
+            if product.store != request.user.store:
+                # TODO add a forbidden page to let users know what's happening
+                return redirect('home')
 
             initial_product_state = InitialProductState.objects.create(
                 product=product,

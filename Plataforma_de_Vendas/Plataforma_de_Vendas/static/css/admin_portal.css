@@ -28,9 +28,8 @@
     display:none;
 }
 
-.form-row {
+.form-container-row {
     margin-top: 30px;
-    /* gap: 5px; */
 }
 
 .form-container  {

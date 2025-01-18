@@ -3,6 +3,12 @@
 
 {% block title %} Edit Product Details {% endblock %}
 
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'css/edit_product.css' %}">
+{% endblock %}
+
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
@@ -12,12 +18,6 @@
     </script> 
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="{% static 'js/edit_product.js' %}"></script>
-{% endblock %}
-
-{% block styles %}
-    {{ block.super }}
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="{% static 'css/edit_product.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -38,18 +38,18 @@
                 <div class="col-8" id="product-details-container">
                     {% csrf_token %}
                     <input type="hidden" id="product_id" name="product_id" value="{{ product.id }}"> 
-                    <div class="row form-row">
-                        <label for="product_name">Product Name</label>
+                    <div class="row mb-3 form-container-row">
+                        <label for="product_name" class="form-label">Product Name</label>
                         <input type="text" class="form-control product-info-input" id="product_name" name="product_name" value="{{ product.product_name }}" required>    
                         <div class="error-message-div" id ="product_name_error_field"></div>
                     </div>
-                    <div class="row form-row">
-                        <label for="product_description">Product Description</label>
+                    <div class="row mb-3 form-container-row">
+                        <label for="product_description" class="form-label">Product Description</label>
                         <textarea class="form-control product-info-input" id="product_description" name="product_description">{{ product.product_description|default:"" }} </textarea>
                         <div class="error-message-div" id ="product_description_error_field"></div>
                     </div>
-                    <div class="row form-row">
-                        <label for="subcategory">Subcategory</label>
+                    <div class="row mb-3 form-container-row">
+                        <label for="subcategory" class="form-label">Subcategory</label>
                         <select class="form-select product-info-input" id="subcategory" name="subcategory" required>
                             <option value="" selected disabled>Select a Subcategory</option>
                             {% for subcategory in subcategories %}
@@ -62,12 +62,12 @@
                         {% for property_name, property_value in properties.items %}
                             <div class="row sortable-item property-row" id="property-row-{{ forloop.counter }}">
                                 <div class="col-md-5">
-                                    <label for="property-name-{{ forloop.counter }}">Property Name</label>
+                                    <label for="property-name-{{ forloop.counter }}" class="form-label">Property Name</label>
                                     <input type="text" class="form-control product-info-input property-name-input" id="property-name-{{ forloop.counter }}" name="property-name-{{ forloop.counter }}" value="{{ property_name }}" required>
                                     <div class="error-message-div property-name_error_field" id="property-name-{{ forloop.counter }}_error_field"></div>
                                 </div>
                                 <div class="col-md-5">
-                                    <label for="property-value-{{ forloop.counter }}">Property Value</label>
+                                    <label for="property-value-{{ forloop.counter }}" class="form-label">Property Value</label>
                                     <input type="text" class="form-control product-info-input property-value-input" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{ property_value}}" required>
                                     <div class="error-message-div property-value_error_field" id="property-value-{{ forloop.counter }}_error_field"></div>
                                 </div>
@@ -77,12 +77,12 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div id="add-property-button-container" class="row form-row">
+                    <div id="add-property-button-container" class="row mb-3 form-container-row">
                         <button type="button" id="add-property-button" class="btn btn-primary">Add Detail</button>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="row form-row">
+                    <div class="row mb-3 form-container-row">
                         <button type="button" class="btn btn-primary" id="upload-image-button">Upload Image</button>
                         <input type="file" id="image-input" style="display: none;" accept="image/*">
                         <div class="container" id="image-upload-progress-container" >

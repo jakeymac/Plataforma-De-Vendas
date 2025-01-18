@@ -32,7 +32,7 @@ from Stores import views as store_views, endpoints as store_endpoints
 
 # Custom admin check
 def is_admin(user):
-    return user.is_authenticated and user.account_type == 'admin'
+    return user.is_authenticated and user.groups.filter(name="Admins").exists()
 
 # Swagger schema view
 schema_view = get_schema_view(
@@ -68,14 +68,13 @@ urlpatterns = [
     path('swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
     path('api/swagger/', user_passes_test(is_admin)(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
 
-    # path('api/stores/',store_endpoints.get_stores_endpoint),
-    # path('api/stores/<int:store_id>/',store_endpoints.get_stores_endpoint),
-    # path('api/stores/add/',store_endpoints.add_store_endpoint),
-    # path('api/stores/register/', store_endpoints.register_store_endpoint),
-    # path('api/stores/update/',store_endpoints.update_store_endpoint),
+    path('api/stores/',store_endpoints.get_stores_endpoint),
+    path('api/stores/add/',store_endpoints.add_store_endpoint),
+    path('api/stores/register/', store_endpoints.register_store_endpoint),
+    path('api/stores/update/',store_endpoints.update_store_endpoint),
+    path('api/stores/<int:store_id>/',store_endpoints.get_stores_endpoint),
 
     path('api/products/', product_endpoints.get_products_endpoint),
-    
     path('api/products/search/', product_endpoints.search_for_product_endpoint),
     path('api/products/add/', product_endpoints.add_product_endpoint),
     path('api/products/add_image/', product_endpoints.add_product_image_endpoint),
@@ -116,7 +115,7 @@ urlpatterns = [
     path('api/accounts/customers/', account_endpoints.get_customers_endpoint),  
     path('api/accounts/admins/', account_endpoints.get_admins_endpoint),
     path('api/accounts/edit_user/', account_endpoints.edit_user_endpoint),
-    path('api/accounts/register/', account_endpoints.register_account_endpoint),
+    path('api/accounts/register/', account_endpoints.register_customer_account_endpoint),
     path('api/accounts/username_available/', account_endpoints.check_username_availability_endpoint),
     path('api/accounts/email_available/', account_endpoints.check_email_availability_endpoint),
     path('api/accounts/update_profile_picture/', account_endpoints.update_profile_picture_endpoint),

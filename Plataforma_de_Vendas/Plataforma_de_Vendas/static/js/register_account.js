@@ -1,8 +1,8 @@
 function load_event_listeners() {
-    document.getElementById('profile_picture').addEventListener('change', function() {
-        var fileNameSpan = document.querySelector('label[for="' + this.id + '"] span');
+    $("#profile_picture").on("change", function() {
+        var fileNameSpan = $('label[for="' + this.id + '"] span');
         var fileName = this.files.length > 0 ? this.files[0].name : 'Choose file...';
-        fileNameSpan.textContent = fileName;
+        fileNameSpan.text(fileName);
     });
 
     $("#back-button").on("click", function() {
@@ -15,8 +15,13 @@ function load_event_listeners() {
         inputField.removeClass('is-invalid').next('.invalid-feedback').empty().hide();
     });
 
+    $("#test-button").on("click", function() {
+        $("#registration-confirmation-modal").modal('show');
+    });
+
     $("#account-registration-form").submit(function(event) {
         event.preventDefault();
+        $("#registration-confirmation-modal").modal('show');
         var form_data = new FormData(this);
         form_data.append("account_type", "customer");
         fetch('/api/accounts/register/', { 

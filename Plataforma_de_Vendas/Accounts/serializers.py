@@ -11,8 +11,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         errors = {}
-
-        if data.get('account_type') == 'admin' and not self.instance.account_type == 'admin':
+        
+        if data.get('account_type') == 'admin' and not self.instance.groups.filter(name='Admins').exists():
             raise serializers.ValidationError('Only admins can create admin accounts')
             return data
 
@@ -38,8 +38,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
         if not self.is_phone_number_valid(data.get('phone_number'), data.get('country_phone_number_code')):
             errors["phone_number"] = "Invalid phone number"
 
+        if data.get('account_type') == 'seller':
+            if not data.get('store'):
+                errors["store"] = "Seller account must have a store"
+            else:
+                if not Store.objects.filter(id=data.get('store')).exists():
+                    errors["store_id"] = "Store does not exist"
+
         if errors:
             raise serializers.ValidationError(errors)
+
+    
         
         return data
 

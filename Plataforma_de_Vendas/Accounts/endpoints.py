@@ -1,13 +1,15 @@
 #API endpoints for accounts
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import Group
 
 from django.db.models import Q
 from django.db import transaction
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -26,8 +28,9 @@ logger = logging.getLogger('plataforma_de_vendas')
     operation_description="Get all users",
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_users_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists():
         users = CustomUser.objects.all()
         serializer = CustomUserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -38,8 +41,9 @@ def get_users_endpoint(request):
     operation_description="Get a user by ID",
     responses={200: CustomUserSerializer()})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_user_endpoint(request, user_id):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
+    if request.user.groups.filter(name='Admins').exists():
         try:
             user = CustomUser.objects.get(id=user_id)
             serializer = CustomUserSerializer(user)
@@ -53,9 +57,11 @@ def get_user_endpoint(request, user_id):
     operation_description="Get all customers",
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_customers_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
-        customers = CustomUser.objects.filter(account_type='customer')
+    if request.user.groups.filter(name='Admins').exists():
+        customer_group = Group.objects.get(name='Customers')
+        customers = CustomUser.objects.filter(groups=customer_group)
         serializer = CustomUserSerializer(customers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
@@ -65,9 +71,11 @@ def get_customers_endpoint(request):
     operation_description="Get all admins",
     responses={200: CustomUserSerializer(many=True)})
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_admins_endpoint(request):
-    if request.user.is_authenticated and request.user.account_type == 'admin':
-        admins = CustomUser.objects.filter(account_type='admin')
+    if request.user.groups.filter(name='Admins').exists():
+        admin_group = Group.objects.get(name='Admins')
+        admins = CustomUser.objects.filter(groups=admin_group)
         serializer = CustomUserSerializer(admins, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
@@ -84,10 +92,11 @@ def get_admins_endpoint(request):
     )
 )
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def edit_user_endpoint(request):
     data = request.data
     user = request.user
-    if request.user.is_authenticated and request.user.id == int(data.get("id")):
+    if request.user.id == int(data.get("id")) or request.user.groups.filter(name='Admins').exists():
         serializer = ExistingUserSerializer(instance=user, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -105,12 +114,11 @@ def edit_user_endpoint(request):
     responses={200: CustomUserSerializer(many=True)}
 )
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_current_user_info_endpoint(request):
     # TODO make this more secure (remove password, etc from response body)
-    if request.user.is_authenticated:
-        serializer = CustomUserSerializer(request.user)
-        return Response(serializer.data, status.HTTP_200_OK)
-    return Response({"message": "You are not logged in"}, status.HTTP_404_NOT_FOUND)
+    serializer = CustomUserSerializer(request.user)
+    return Response(serializer.data, status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
@@ -125,6 +133,7 @@ def get_current_user_info_endpoint(request):
 )
 @api_view(['POST','GET'])
 def login_endpoint(request):
+    breakpoint()
     try:
         data = request.data
         username = data.get("username")
@@ -140,6 +149,7 @@ def login_endpoint(request):
         logger.warning(f"Error logging in: {e}")
         return Response({"message": e}, status.HTTP_401_UNAUTHORIZED)
     return Response({"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED)
+
 
 @api_view(['GET'])
 def logout_endpoint(request):
@@ -170,18 +180,23 @@ def logout_endpoint(request):
     )
 )
 @api_view(['POST'])
-def register_account_endpoint(request):
+def register_customer_account_endpoint(request):
+    # TODO edit this endpoint to convert to django groups
     data = request.data
     if data.get("account_type") == "customer":
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(data.get("password"))
+            user.groups.add(Group.objects.get(name='Customers'))
             user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({"message": "Incorrect endpoint for registering admin accounts and sellers"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# TODO add an endpoint for adding new sellers to a store that's secure
 
 @swagger_auto_schema(
     method='post',
@@ -194,6 +209,7 @@ def register_account_endpoint(request):
 )
 @api_view(['POST'])
 def check_username_availability_endpoint(request):
+    # TODO this may not be entirely secure as it is possible to check all usernames
     data = request.data
     if data.get("username") in CustomUser.objects.all().values_list('username', flat=True):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
@@ -208,8 +224,9 @@ def check_username_availability_endpoint(request):
         }
     )
 )
-@api_view(['POST'])
+@api_view(['POST']) 
 def check_email_availability_endpoint(request):
+    # TODO this may not be entirely secure as it is possible to check all emails
     data = request.data
     if data.get("email") in CustomUser.objects.all().values_list('email', flat=True):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
@@ -227,9 +244,10 @@ def check_email_availability_endpoint(request):
     )
 )
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_profile_picture_endpoint(request):
     data = request.data
-    if request.user.is_authenticated and request.user.id == int(data.get("id")):
+    if request.user.id == int(data.get("id")) or request.user.groups.filter(name='Admins').exists():
         if request.user.profile_picture:
             request.user.profile_picture.delete()
         

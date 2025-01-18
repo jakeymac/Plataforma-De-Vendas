@@ -70,7 +70,7 @@
     height: 810px;
 }
 
-.form-row {
+.form-container-row {
     align-items: center;
     margin-left: auto;
     margin-right: auto;
@@ -154,7 +154,7 @@
     margin-right: auto;
 }
 
-.form-row .error-message-div {
+.form-container-row .error-message-div {
     height:30px;
 }
 

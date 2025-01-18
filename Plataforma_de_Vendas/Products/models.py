@@ -39,6 +39,12 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
+    class Meta:
+        permissions = [
+            ('edit_product', 'Can edit product'),
+            ('view_product_statistics', 'Can view product statistics'),
+        ]
+
 class InitialProductState(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
@@ -143,6 +149,9 @@ class ProductCategory(models.Model):
                 # Regenerate the id and try again
                 self.id = generate_unique_id()
 
+    def __str__(self):
+        return self.category_name
+
 class ProductSubcategory(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     category = models.ForeignKey('ProductCategory', on_delete=models.CASCADE)
@@ -162,6 +171,9 @@ class ProductSubcategory(models.Model):
                 # Regenerate the id and try again
                 self.id = generate_unique_id()
 
+    def __str__(self):
+        return self.subcategory_name
+
 
 class ProductTopSubcategory(models.Model):
     id = models.CharField(max_length=12, primary_key=True, default=generate_unique_id, editable=False, unique=True)
@@ -180,6 +192,9 @@ class ProductTopSubcategory(models.Model):
             except IntegrityError:
                 # Regenerate the id and try again
                 self.id = generate_unique_id()
+    
+    def __str__(self):
+        return f"{self.subcategory} - {self.order}"
 
     class Meta:
         ordering = ['order']  # Order by 'order' field 

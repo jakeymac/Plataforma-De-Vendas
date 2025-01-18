@@ -34,3 +34,10 @@ def slugify_name(value):
     Returns a slugified version of the value. (e.g. "Hello World" -> "hello-world")
     """
     return slugify(value)
+
+@register.filter(name='in_group')
+def in_group(user, group_name):
+    """
+    Returns True if the user is in the specified group.
+    """
+    return user.groups.filter(name=group_name).exists()

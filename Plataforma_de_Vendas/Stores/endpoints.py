@@ -1,10 +1,13 @@
 #API endpoints for stores
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import Group
 from django.db import transaction
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -14,6 +17,7 @@ from Accounts.serializers import CustomUserSerializer
 from .serializers import StoreSerializer
 
 import json
+from datetime import datetime
 
 
 @swagger_auto_schema(
@@ -71,32 +75,36 @@ def add_store_endpoint(request):
     responses={200: 'Updated'}
 )
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def update_store_endpoint(request):
-    data = request.data
-    store_id = data.get('id')
-    try:
-        store = Store.objects.get(id=store_id)
-        if request.user.is_authenticated:
+    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
+        data = request.data
+        store_id = data.get('id')
+        try:
+            store = Store.objects.get(id=store_id)
+            
+                
+            if not request.user.groups.filter(name='Admins').exists() or request.user.store.id != store.id:
+                return Response({"message": "You are not authorized to update this store"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            if request.user.account_type == 'admin' or request.user.id == store.owner.id:
-                serializer = StoreSerializer(store, data=data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=status.HTTP_200_OK)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = StoreSerializer(store, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"message": "You are not authorized to update this store"}, status=status.HTTP_401_UNAUTHORIZED)
+        except Store.DoesNotExist:
+            return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = StoreSerializer(store, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    except Store.DoesNotExist:
-        return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = StoreSerializer(store, data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"message": "You are not authorized to update stores"}, status=status.HTTP_401_UNAUTHORIZED)
 
  
 #Helper function for register store endpoint
@@ -109,6 +117,7 @@ def parse_store_registration_data(request_data, request_files):
         "last_name": request_data.get("last_name"),
         "date_of_birth": request_data.get("date_of_birth"),
         "phone_number": request_data.get("phone_number"),
+        "country_phone_number_code": request_data.get("country_phone_number_code"),
         "address": request_data.get("address"),
         "address_line_two": request_data.get("address_line_two"),
         "city": request_data.get("city"),
@@ -120,6 +129,8 @@ def parse_store_registration_data(request_data, request_files):
 
     # Format the date_of_birth to 'YYYY-MM-DD' for saving to database
     if account_data["date_of_birth"]:
+        if isinstance(account_data["date_of_birth"], str):
+            account_data["date_of_birth"] = datetime.strptime(account_data["date_of_birth"], '%Y-%m-%d')
         account_data["date_of_birth"] = account_data["date_of_birth"].strftime('%Y-%m-%d')
     else:
         account_data["date_of_birth"] = None
@@ -136,7 +147,7 @@ def parse_store_registration_data(request_data, request_files):
 def register_store_endpoint(request):
     account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
 
-    account_data["account_type"] = "seller"
+    # account_data["account_type"] = "seller" # TODO delete this later
     account_serializer = CustomUserSerializer(data=account_data)
     store_serializer = StoreSerializer(data=store_data)
     account_data_is_valid = account_serializer.is_valid()
@@ -146,6 +157,7 @@ def register_store_endpoint(request):
             with transaction.atomic():
                 account = account_serializer.save()
                 account.set_password(account_data["password"])
+                account.groups.add(Group.objects.get(name='Sellers')) # TODO add permissions to this account as owner of the store
                 account.save()
 
                 store = store_serializer.save()
