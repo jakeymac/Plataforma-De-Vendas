@@ -133,7 +133,6 @@ def get_current_user_info_endpoint(request):
 )
 @api_view(['POST','GET'])
 def login_endpoint(request):
-    breakpoint()
     try:
         data = request.data
         username = data.get("username")
