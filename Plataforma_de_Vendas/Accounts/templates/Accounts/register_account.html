@@ -18,7 +18,7 @@
         <form method="post" id="account-registration-form">
             {% csrf_token %}
             <div class="row">
-                <div class="form-column col-md-6">
+                <div class="form-column col-6">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username:</label>
                         <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
@@ -64,7 +64,7 @@
                         <div class="invalid-feedback" id="phone_number-error-div"></div>
                     </div>
                 </div>
-                <div class="form-column col-md-6">
+                <div class="form-column col-6">
                     <div class="mb-3">
                         <label for="address" class="form-label">Address:</label>
                         <input type="text" id="address" name="address" class="form-control" placeholder="Address">

@@ -61,17 +61,17 @@
                     <div id="product-properties">
                         {% for property_name, property_value in properties.items %}
                             <div class="row sortable-item property-row" id="property-row-{{ forloop.counter }}">
-                                <div class="col-md-5">
+                                <div class="col-5">
                                     <label for="property-name-{{ forloop.counter }}" class="form-label">Property Name</label>
                                     <input type="text" class="form-control product-info-input property-name-input" id="property-name-{{ forloop.counter }}" name="property-name-{{ forloop.counter }}" value="{{ property_name }}" required>
                                     <div class="error-message-div property-name_error_field" id="property-name-{{ forloop.counter }}_error_field"></div>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-5">
                                     <label for="property-value-{{ forloop.counter }}" class="form-label">Property Value</label>
                                     <input type="text" class="form-control product-info-input property-value-input" id="property-value-{{ forloop.counter }}" name="property-value-{{ forloop.counter }}" value="{{ property_value}}" required>
                                     <div class="error-message-div property-value_error_field" id="property-value-{{ forloop.counter }}_error_field"></div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-2">
                                     <button type="button" class="btn btn-danger remove-property-button">Remove</button>
                                 </div>
                             </div>

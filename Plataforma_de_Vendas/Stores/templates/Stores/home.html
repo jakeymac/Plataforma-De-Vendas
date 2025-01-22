@@ -27,7 +27,7 @@
                         <div class="container">
                             <div class="row">
                                 <!-- Container for the list of main categories -->
-                                <div id="categories-container" class="col-md-4"> 
+                                <div id="categories-container" class="col-4"> 
                                     <ul id="categories-list">
                                         <li class="categories-list-item" data-target="top-categories-list-container">Top categories <i class="bi bi-chevron-right"></i></li>
                                         {% for category in categories %}
@@ -35,7 +35,7 @@
                                         {% endfor %}
                                     </ul>
                                 </div>
-                                <div id="top-categories-list-container" class="col-md-3 sub-categories-container">
+                                <div id="top-categories-list-container" class="col-3 sub-categories-container">
                                     <ul id="top-categories-list">
                                         {% for top_subcategory in top_subcategories %}
                                             <li class="sub-categories-list-item">{{ top_subcategory.subcategory.subcategory_name }}</li>
@@ -43,7 +43,7 @@
                                     </ul>
                                 </div>
                                 {% for category_name, subcategories in categories.items %}
-                                    <div id="{{ category_name|slugify_name }}-list-container" class="col-md-3 sub-categories-container">
+                                    <div id="{{ category_name|slugify_name }}-list-container" class="col-3 sub-categories-container">
                                         <ul id="{{ category_name|slugify_name }}-list">
                                             {% for subcategory in subcategories %}
                                                 <li class="sub-categories-list-item">{{ subcategory.subcategory_name }}</li>
@@ -52,11 +52,11 @@
                                     </div>
                                 {% endfor %}
                                 <!-- Containers for the lists of sub-categories for each main category -->
-                                <!-- <div id="top-categories-list-container" class="col-md-3 sub-categories-container">
+                                <!-- <div id="top-categories-list-container" class="col-3 sub-categories-container">
                                     
 
                                 </div> -->
-                                <!-- <div id="home-decor-list-container" class="col-md-4 sub-categories-container">
+                                <!-- <div id="home-decor-list-container" class="col-4 sub-categories-container">
                                     <ul id="home-decor-list">
                                         <li class="sub-categories-list-item">Home Decor</li>
                                         <li class="sub-categories-list-item">Home Decor</li>
@@ -64,7 +64,7 @@
                                         <li class="sub-categories-list-item">Home Decor</li>
                                     </ul>
                                 </div>
-                                <div id="industrial-list-container" class="col-md-4 sub-categories-container">
+                                <div id="industrial-list-container" class="col-4 sub-categories-container">
                                     <ul id="industrial-list">
                                         <li class="sub-categories-list-item">Industrial</li>
                                         <li class="sub-categories-list-item">Industrial</li>
@@ -72,7 +72,7 @@
                                         <li class="sub-categories-list-item">Industrial</li>
                                     </ul>
                                 </div>
-                                <div id="health-personal-care-list-container" class="col-md-4 sub-categories-container">
+                                <div id="health-personal-care-list-container" class="col-4 sub-categories-container">
                                     <ul id="health-personal-care-list">
                                         <li class="sub-categories-list-item">Health & Personal Care</li>
                                         <li class="sub-categories-list-item">Health & Personal Care</li>
@@ -80,7 +80,7 @@
                                         <li class="sub-categories-list-item">Health & Personal Care</li>
                                     </ul>
                                 </div>
-                                <div id="fashion-beauty-list-container" class="col-md-4 sub-categories-container">
+                                <div id="fashion-beauty-list-container" class="col-4 sub-categories-container">
                                     <ul id="fashion-beauty-list">
                                         <li class="sub-categories-list-item">Fashion & Beauty</li>
                                         <li class="sub-categories-list-item">Fashion & Beauty</li>
@@ -88,7 +88,7 @@
                                         <li class="sub-categories-list-item">Fashion & Beauty</li>
                                     </ul>
                                 </div>
-                                <div id="sports-entertainment-list-container" class="col-md-4 sub-categories-container">
+                                <div id="sports-entertainment-list-container" class="col-4 sub-categories-container">
                                     <ul id="sports-entertainment-list">
                                         <li class="sub-categories-list-item">Sports & Entertainment</li>
                                         <li class="sub-categories-list-item">Sports & Entertainment</li>
@@ -96,7 +96,7 @@
                                         <li class="sub-categories-list-item">Sports & Entertainment</li>
                                     </ul>
                                 </div>
-                                <div id="tools-home-improvement-list-container" class="col-md-4 sub-categories-container">
+                                <div id="tools-home-improvement-list-container" class="col-4 sub-categories-container">
                                     <ul id="tools-home-improvement-list">
                                         <li class="sub-categories-list-item">Tools & Home Improvement</li>
                                         <li class="sub-categories-list-item">Tools & Home Improvement</li>
@@ -106,42 +106,42 @@
                                 </div> -->
 
                                 <!-- Containers for the product showcase areas for each sub-category -->
-                                 <div class="container col-md-5 product-showcase-container" id="tires-product-showcase-container">
+                                 <div class="container col-5 product-showcase-container" id="tires-product-showcase-container">
                                     <div class="row">
-                                        <div class="col-md-12 product-showcase-header" id="tires-product-showcase-header">Tires</div>
+                                        <div class="col-12 product-showcase-header" id="tires-product-showcase-header">Tires</div>
                                     </div>
                                     <div class="row product-showcase-row">
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
                                     </div>
                                     <div class="row product-showcase-row">
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
-                                        <div class="col-md-3 product-showcase-item">
+                                        <div class="col-3 product-showcase-item">
                                             <img src="{% static 'images/home-page-image-1.jpeg' %}" alt="Product Image" class="product-showcase-image">
                                             <div class="product-showcase-item-title">Tire item</div>
                                         </div>
@@ -197,7 +197,7 @@
             <div class="row"><h2 id="explore-header-text">Explore</h2></div>
             
             <div class="row" id="explore-inner-container">
-                <div class="col-md-6 explore-column" id="left-explore-column">
+                <div class="col-6 explore-column" id="left-explore-column">
                     <div class="row explore-image-container position-relative" id="left-explore-image-container">
                         <div class="explore-image-header-text-container position-absolute bottom-0 start-0">
                             <div class="explore-image-top-header" id="left-explore-image-top-header">Example top Text</div>
@@ -205,7 +205,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 explore-column" id="right-explore-column">
+                <div class="col-6 explore-column" id="right-explore-column">
                     <div class="row explore-image-container position-relative" id="right-explore-top-image-container">
                         <div class="explore-image-header-text-container position-absolute bottom-0 start-0">
                             <div class="explore-image-top-header" id="right-explore-top-image-top-header">Example top Text</div>

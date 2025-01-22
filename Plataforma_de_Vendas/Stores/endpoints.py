@@ -175,5 +175,5 @@ def register_store_endpoint(request):
             errors["account_errors"] = account_serializer.errors
         if store_serializer.errors:
             errors["store_errors"] = store_serializer.errors
-        return Response({"message": "Store not created", "errors": errors}, status=status.HTTP_200_OK)
+        return Response({"message": "Store not created", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
         

@@ -47,8 +47,6 @@ def get_order_endpoint(request, order_id):
     except Order.DoesNotExist:
         return Response({"message": f"Order not found with the id {order_id}"}, status=status.HTTP_404_NOT_FOUND)
 
-    
-
 # TODO add an endpoint for a seller to get all their orders from a specific user
 
 @swagger_auto_schema(method='GET',

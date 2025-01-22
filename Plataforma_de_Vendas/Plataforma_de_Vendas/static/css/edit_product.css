@@ -133,8 +133,8 @@
 }
 
 .error-input {
-    border: 2px solid red;
-    background-color: #ffe6e6;
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* red glow */
 }
 
 .error-message-div {

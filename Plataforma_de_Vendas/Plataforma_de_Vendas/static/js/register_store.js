@@ -14,9 +14,9 @@ function load_user_registration_listeners() {
 
     if ($("#username").val().trim() === "") {
         var inputField = $("#username");
-        var errorDiv = $("#username-error-div");
+        var errorDiv = $("#username_error_div");
         errorDiv.text("Username is required");
-        inputField.addClass('is-invalid');
+        inputField.addClass('error-input');
         errorDiv.show();
         foundErrors = true;
     } else {
@@ -32,9 +32,9 @@ function load_user_registration_listeners() {
             const data = await response.json();
             if (!data.is_available) {
                 var inputField = $("#username");
-                var errorDiv = $("#username-error-div");
+                var errorDiv = $("#username_error_div");
                 errorDiv.text("Username is already taken");
-                inputField.addClass('is-invalid');
+                inputField.addClass('error-input');
                 errorDiv.show();
                 foundErrors = true;
             }
@@ -46,9 +46,9 @@ function load_user_registration_listeners() {
 
     if ($("#email").val().trim() === "") {
         var inputField = $("#email");
-        var errorDiv = $("#email-error-div");
+        var errorDiv = $("#email_error_div");
         errorDiv.text("Email is required");
-        inputField.addClass('is-invalid');
+        inputField.addClass('error-input');
         errorDiv.show();
         foundErrors = true;
     } else {
@@ -64,9 +64,9 @@ function load_user_registration_listeners() {
             const data = await response.json();
             if (!data.is_available) {
                 var inputField = $("#email");
-                var errorDiv = $("#email-error-div");
+                var errorDiv = $("#email_error_div");
                 errorDiv.text("Email is already taken");
-                inputField.addClass('is-invalid');
+                inputField.addClass('error-input');
                 errorDiv.show();
                 foundErrors = true;
             }
@@ -78,26 +78,26 @@ function load_user_registration_listeners() {
     
     if ($("#password").val().length < 8) {
         passwordField = $("#password");
-        passwordErrorDiv = $("#password-error-div");
+        passwordErrorDiv = $("#password_error_div");
         passwordErrorDiv.text("Password must be at least 8 characters long");
-        passwordField.addClass('is-invalid');
+        passwordField.addClass('error-input');
         passwordErrorDiv.show();
         foundErrors = true;
     }
     if ($("#first_name").val().trim() === "") {
         var inputField = $("#first_name");
-        var errorDiv = $("#first_name-error-div");
+        var errorDiv = $("#first_name_error_div");
         errorDiv.text("First name is required");
-        inputField.addClass('is-invalid');
+        inputField.addClass('error-input');
         errorDiv.show();
         foundErrors = true;
     }
 
     if ($("#last_name").val().trim() === "") {
         var inputField = $("#last_name");
-        var errorDiv = $("#last_name-error-div");
+        var errorDiv = $("#last_name_error_div");
         errorDiv.text("Last name is required");
-        inputField.addClass('is-invalid');
+        inputField.addClass('error-input');
         errorDiv.show();
         foundErrors = true;
     }
@@ -128,36 +128,36 @@ function load_store_registration_listeners() {
         
         if ($("#store_name").val().trim() === "") {
             var inputField = $("#store_name");
-            var errorDiv = $("#store_name-error-div");
+            var errorDiv = $("#store_name_error_div");
             errorDiv.text("Store name is required");
-            inputField.addClass('is-invalid');
+            inputField.addClass('error-input');
             errorDiv.show();
             foundErrors = true;
         }
     
         if ($("#store_description").val().trim() === "") {
             var inputField = $("#store_description");
-            var errorDiv = $("#store_description-error-div");
+            var errorDiv = $("#store_description_error_div");
             errorDiv.text("Store description is required");
-            inputField.addClass('is-invalid');
+            inputField.addClass('error-input');
             errorDiv.show();
             foundErrors = true;
         }
 
         if ($("#contact_email").val().trim() === "") {
             var inputField = $("#contact_email");
-            var errorDiv = $("#contact_email-error-div");
+            var errorDiv = $("#contact_email_error_div");
             errorDiv.text("Contact email is required");
-            inputField.addClass('is-invalid');
+            inputField.addClass('error-input');
             errorDiv.show();
             foundErrors = true;
         }
         
         if ($("#store_url").val().trim() === "") {
             var inputField = $("#store_url");
-            var errorDiv = $("#store-url-error-div");
+            var errorDiv = $("#store_url_error_div");
             errorDiv.text("Store URL is required");
-            inputField.addClass('is-invalid');
+            inputField.addClass('error-input');
             errorDiv.show();
         }
 
@@ -175,15 +175,35 @@ function load_store_registration_listeners() {
                 }
             })
             .then(response => {
+                if (response.status_code === 201) {
+                    return response.json();
+                } else if (response.status_code === 400) {
+                    response.json().then(data => {
+                        Object.keys(data).forEach(key => {
+                            var inputField = $(`#${key}`);
+                            var errorDiv = $(`#${key}_error_div`);
+                            errorDiv.text(data[key]);
+                            inputField.addClass('error-input');
+                            errorDiv.show();
+                        });
+                    });
+                } else {
+                    $("#store-registration-error-text").text("An error occured");
+                    $("#store-registration-error-text").show();
+                    setTimeout(function() {
+                        $("#store-registration-error-text").hide();
+                    }, 5000);
+                }
                 if (response.ok) {
+                    // TODO change to look for status codes 201, etc...
                     return response.json();
                 } else {
                     response.json().then(data => {
                         Object.keys(data).forEach(key => {
                             var inputField = $(`#${key}`);
-                            var errorDiv = $(`#${key}-error-div`);
+                            var errorDiv = $(`#${key}_error_div`);
                             errorDiv.text(data[key]);
-                            inputField.addClass('is-invalid');
+                            inputField.addClass('error-input');
                             errorDiv.show();
                         })
                     });
@@ -191,38 +211,11 @@ function load_store_registration_listeners() {
                 }
             })
             .then(data => {
-                if (data) {
-                    console.log(data);
-                    if (data.message == "Store created successfully") {
-                        window.location.href = "/login";
-                    } else {
-                        if (data.message == "Server Error") {
-                            alert("There was an error, try again in a moment");
-                        } else {
-                            alert('Store not created');
-                            if (data.errors.account_errors) {
-                                Object.keys(data.errors.account_errors).forEach(key => {
-                                    var inputField = $(`#${key}`);
-                                    var errorDiv = $(`#${key}-error-div`);
-                                    errorDiv.text(data.errors.account_errors[key]);
-                                    inputField.addClass('is-invalid');
-                                    errorDiv.show();
-                                });
-                                $("#store-registration-container").hide();
-                                $("#account-registration-container").show();
-                            }
-                            if (data.errors.store_errors) {
-                                Object.keys(data.errors.store_errors).forEach(key => {
-                                    var inputField = $(`#${key}`);
-                                    var errorDiv = $(`#${key}-error-div`);
-                                    errorDiv.text(data.errors.store_errors[key]);
-                                    inputField.addClass('is-invalid');
-                                    errorDiv.show();
-                                });
-                            }
-                        }
-                    }
-                }
+                $("#registration-confirmation-main-text").text("Your store has been registered");
+                $("#registration-confirmation-modal").modal('show');
+                $("#registration-confirmation-modal-continue-button").on("click", function() {
+                    window.location.href = "/login";
+                });
             })
             .catch(error => {
                 console.log(error);
@@ -234,8 +227,9 @@ function load_store_registration_listeners() {
 function load_event_listeners() {
     $('input').on('input', function() {
         var inputField = $(this);
+        $(this).removeClass('error-input');
         var errorDiv = inputField.next('.invalid-feedback');
-        inputField.removeClass('is-invalid').next('.invalid-feedback').empty().hide();
+        inputField.removeClass('error-input').next('.invalid-feedback').empty().hide();
     });
 }
 

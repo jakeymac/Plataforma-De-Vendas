@@ -11,9 +11,9 @@
     transition: box-shadow 0.3s ease-in-out;  
 }
 
-.is-invalid {
-    border-color: #dc3545; /* Bootstrap's default red */
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /* Optional: Adds a red glow */
+.error-input {
+    border-color: #dc3545; 
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); /*  red glow */
 }
 
 .custom-file .custom-file-label > span {

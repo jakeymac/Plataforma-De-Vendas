@@ -7,17 +7,17 @@ let uploadInProgress = false;
 function addNewPropertyRow() {
     $("#product-properties").append(`
         <div class="row sortable-item property-row" id="property-row-${counter}">
-            <div class="col-md-5">
+            <div class="col-5">
                 <label for="property-name-${counter}" class="form-label">Property Name</label>
                 <input type="text" class="form-control product-info-input property-name-input" id="property-name-${counter}" name="property-name-${counter}">
                 <div class="error-message-div property-name_error_field" id="property-name-${counter}_error_field"></div>
             </div>
-            <div class="col-md-5">
+            <div class="col-5">
                 <label for="property-value-${counter}" class="form-label">Property Value</label>
                 <input type="text" class="form-control product-info-input property-value-input" id="property-value-${counter}" name="property-value-${counter}">
                 <div class="error-message-div property-value_error_field" id="property-value-${counter}_error_field"></div>
             </div>
-            <div class="col-md-2">
+            <div class="col-2">
                 <button type="button" class="btn btn-danger remove-property-button">Remove</button>
             </div>
         </div>`);
@@ -73,7 +73,6 @@ function addNewImageRow(imageUrl, imageId, isInitial=false) {
                     $("#inner-images-messages-label").text("");
                     $("#inner-images-messages-label").hide();
                 }, 2000);
-                
             }
         });
     })
