@@ -21,7 +21,6 @@ function load_event_listeners() {
 
     $("#account-registration-form").submit(function(event) {
         event.preventDefault();
-        $("#registration-confirmation-modal").modal('show');
         var form_data = new FormData(this);
         form_data.append("account_type", "customer");
         fetch('/api/accounts/register/', { 
@@ -29,9 +28,12 @@ function load_event_listeners() {
             body: form_data
         })
         .then(response => {
-            if (response.ok) {
+            if (response.status === 201) {
+                console.log("Success");
                 return response.json();
+
             } else {
+                console.log("Error");
                 response.json().then(data => {
                     Object.keys(data).forEach(key => {
                         var inputField = $(`#${key}`);
@@ -45,9 +47,12 @@ function load_event_listeners() {
             }
         })
         .then(data => {
-            if (data) {
+            $("#registration-confirmation-main-text").text("Your account has been registered");
+            $("#registration-confirmation-main-text").addClass("alert alert-success");
+            $("#registration-confirmation-modal").modal('show');
+            $("#registration-confirmation-modal-continue-button").on("click", function() {
                 window.location.href = "/login";
-            }
+            });
             
         });
     });

@@ -175,9 +175,9 @@ function load_store_registration_listeners() {
                 }
             })
             .then(response => {
-                if (response.status_code === 201) {
+                if (response.status === 201) {
                     return response.json();
-                } else if (response.status_code === 400) {
+                } else if (response.status === 400) {
                     response.json().then(data => {
                         Object.keys(data).forEach(key => {
                             var inputField = $(`#${key}`);
@@ -212,6 +212,7 @@ function load_store_registration_listeners() {
             })
             .then(data => {
                 $("#registration-confirmation-main-text").text("Your store has been registered");
+                $("#registration-confirmation-main-text").addClass("alert alert-success");
                 $("#registration-confirmation-modal").modal('show');
                 $("#registration-confirmation-modal-continue-button").on("click", function() {
                     window.location.href = "/login";
