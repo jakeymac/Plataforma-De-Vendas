@@ -691,7 +691,6 @@ def create_initial_product_state_endpoint(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def autosave_product_endpoint(request):
-    breakpoint()
     if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
         product_id = data.get('product_id')
