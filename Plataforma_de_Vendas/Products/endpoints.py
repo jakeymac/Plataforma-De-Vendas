@@ -612,6 +612,7 @@ def rollback_product_changes_endpoint(request):
                 product.properties = initial_state.properties
                 product.is_active = initial_state.is_active
                 product.draft = initial_state.draft
+                product.prices = initial_state.prices
                 product.save()
 
                 for image in product.productimage_set.all():
@@ -659,6 +660,7 @@ def create_initial_product_state_endpoint(request):
                 properties = product.properties,
                 is_active = product.is_active,
                 draft = product.draft,
+                prices = product.prices,
                 original_created_at=product.created_at
             )
             initial_state.save()
@@ -689,6 +691,7 @@ def create_initial_product_state_endpoint(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def autosave_product_endpoint(request):
+    breakpoint()
     if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
         data = request.data
         product_id = data.get('product_id')

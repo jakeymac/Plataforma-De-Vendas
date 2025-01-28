@@ -117,7 +117,6 @@
     margin-right: auto;
     padding: 10px;
     margin-top: 15px;
-
 }
 
 .sortable-placeholder {
@@ -200,7 +199,7 @@
 }
 
 #images-container {
-    height: 780px;
+    height: 500px;
     border-radius: 5px;
     border: 1px solid #ccc;
     box-sizing: border-box;
@@ -253,4 +252,33 @@
 .remove-image-button-container {
     display: flex;
     justify-content: end;
+}
+
+#prices-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 270px;
+    margin-right: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin-top: 10px;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.price-row-inner-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.price-row {
+    margin-right: auto;
+    margin-left: auto;
+    border-radius: 5px;
+}
+
+.price-row-inner-container {
+    padding-left: auto;
+    padding-right: auto;
 }

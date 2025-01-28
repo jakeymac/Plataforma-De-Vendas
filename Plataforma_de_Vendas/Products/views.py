@@ -28,6 +28,7 @@ def edit_product_view(request, product_id):
                 properties=product.properties,
                 is_active=product.is_active,
                 draft=product.draft,
+                prices=product.prices,
                 original_created_at=product.created_at
             )
 
@@ -43,9 +44,12 @@ def edit_product_view(request, product_id):
                 )
             
             properties = product.properties
+            prices = product.prices
             subcategories = ProductSubcategory.objects.all()
+            
             return render(request, 'products/edit_product.html', {'product': product, 'initial_product_state': initial_product_state, 
-                                                                'images': images, 'subcategories': subcategories, 'properties': properties})
+                                                                'images': images, 'subcategories': subcategories, 'properties': properties,
+                                                                'prices': prices})
         
         except Product.DoesNotExist:
             # TODO add a 404 page to let users know what's happening - that the product was not found

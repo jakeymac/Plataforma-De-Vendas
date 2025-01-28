@@ -6,23 +6,47 @@ let uploadInProgress = false;
 
 function addNewPropertyRow() {
     $("#product-properties").append(`
-        <div class="row sortable-item property-row" id="property-row-${counter}">
+        <div class="row sortable-item property-row" id="property-row-${propertyCounter}">
             <div class="col-5">
-                <label for="property-name-${counter}" class="form-label">Property Name</label>
-                <input type="text" class="form-control product-info-input property-name-input" id="property-name-${counter}" name="property-name-${counter}">
-                <div class="error-message-div property-name_error_field" id="property-name-${counter}_error_field"></div>
+                <label for="property-name-${propertyCounter}" class="form-label">Property Name</label>
+                <input type="text" class="form-control product-info-input property-name-input" id="property-name-${propertyCounter}" name="property-name-${propertyCounter}">
+                <div class="error-message-div property-name_error_field" id="property-name-${propertyCounter}_error_field"></div>
             </div>
             <div class="col-5">
-                <label for="property-value-${counter}" class="form-label">Property Value</label>
-                <input type="text" class="form-control product-info-input property-value-input" id="property-value-${counter}" name="property-value-${counter}">
-                <div class="error-message-div property-value_error_field" id="property-value-${counter}_error_field"></div>
+                <label for="property-value-${propertyCounter}" class="form-label">Property Value</label>
+                <input type="text" class="form-control product-info-input property-value-input" id="property-value-${propertyCounter}" name="property-value-${propertyCounter}">
+                <div class="error-message-div property-value_error_field" id="property-value-${propertyCounter}_error_field"></div>
             </div>
             <div class="col-2">
                 <button type="button" class="btn btn-danger remove-property-button">Remove</button>
             </div>
         </div>`);
-    counter++;
-    bindRemovalButtons();
+    propertyCounter++;
+    bindPropertyRemovalButtons();
+}
+
+function addNewPriceRow() {
+    $("#product-prices").append(`
+        <div class="row price-row">
+            <div class="col-12 price-row-inner-container sortable-item row" id="price-row-${priceCounter}">
+                <div class="col-4">
+                    <label for="price-${priceCounter}" class="form-label">Price</label>
+                    <input type="number" class="form-control product-info-input price-input" id="price-${priceCounter}" name="price-${priceCounter}">
+                    <div class="error-message-div price_error_field" id="price-${priceCounter}_error_field"></div>
+                </div>
+                <div class="col-4">
+                    <label for="quantity-${priceCounter}" class="form-label">Quantity</label>
+                    <input type="number" class="form-control product-info-input quantity-input" id="quantity-${priceCounter}" name="quantity-${priceCounter}">
+                    <div class="error-message-div quantity_error_field" id="quantity-${priceCounter}_error_field"></div>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn btn-danger remove-price-button">Remove</button>
+                </div>
+
+            </div>
+        </div>`);
+    priceCounter++;
+    bindPriceRemovalButtons();
 }
 
 function addNewImageRow(imageUrl, imageId, isInitial=false) {
@@ -158,6 +182,23 @@ function loadListeners() {
         // If there are no property rows, add one
         } else {
             addNewPropertyRow();
+        }
+    });
+
+    $("#add-price-button").on("click", function() {
+        // Grab the last price row in the form and check if it has values, otherwise don't add a new row
+        let lastPriceRow = $("#product-prices .sortable-item:last");
+        if (lastPriceRow.length > 0) {
+            let price = lastPriceRow.find(".price-input").val().trim();
+            let quantity = lastPriceRow.find(".quantity-input").val().trim();
+            if (price || quantity) {
+                addNewPriceRow();
+                clearTimeout(autoSaveTimeout);
+                autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
+            } 
+        // If there are no property rows, add one
+        } else {
+            addNewPriceRow();
         }
     });
 
@@ -345,6 +386,7 @@ function organizeFormData(data) {
     // Organize the form data into a dictionary, seperating properties into a sub-dictionary
     let organizedData = {};
     let properties = {};
+    let prices = {};
     let imageIds = [];
     
     for (let entry of data.entries()) {
@@ -355,6 +397,11 @@ function organizeFormData(data) {
             let propertyName = value;
             let propertyValue = data.get(`property-value-${propertyNumber}`);
             properties[propertyName] = propertyValue;
+        } else if (key.includes("price")) {
+            let priceNumber = key.split("-")[1];
+            let price = value;
+            let quantity = data.get(`quantity-${priceNumber}`);
+            prices[price] = quantity;
         } else if (key === "image_id") {
             imageIds.push(value);
         } else if (!key.includes("property-value")) {
@@ -362,6 +409,7 @@ function organizeFormData(data) {
         } 
     }
     organizedData["properties"] = properties;
+    organizedData["prices"] = prices;
     organizedData["image_ids"] = imageIds;
     return organizedData;
 }
@@ -437,7 +485,23 @@ async function autoSaveProductInfo() {
             readyToSubmit = false;
             row.find(".property-value-input").addClass("error-input");
         } 
-    })
+    });
+
+    $(".price-row").each(function() {
+        let row = $(this);
+        let price = row.find(".price-input").val().trim();
+        let quantity = row.find(".quantity-input").val().trim();
+
+        if (!price) {
+            readyToSubmit = false;
+            row.find(".price-input").addClass("error-input");
+        }
+
+        if (!quantity) {
+            readyToSubmit = false;
+            row.find(".quantity-input").addClass("error-input");
+        }
+    });
 
     let formData = new FormData(document.getElementById("edit_product_form"));
     console.log(formData);
@@ -588,9 +652,17 @@ async function saveProductInfo() {
 }
 
 
-function bindRemovalButtons() {
+function bindPropertyRemovalButtons() {
     $(".remove-property-button").on("click", function() {
-        
+        $(this).closest(".sortable-item").remove();
+        checkForRemainingErrors();
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
+    })
+}
+
+function bindPriceRemovalButtons() {
+    $(".remove-price-button").on("click", function() {
         $(this).closest(".sortable-item").remove();
         checkForRemainingErrors();
         clearTimeout(autoSaveTimeout);
@@ -600,7 +672,11 @@ function bindRemovalButtons() {
 $(document).ready(function() {
     loadData();
     loadListeners();
-    bindRemovalButtons(); // This is necessary to bind the removal buttons that are already present on the page at load time
+
+    // This is necessary to bind the removal buttons that are already present on the page at load time
+    bindPropertyRemovalButtons();
+    bindPriceRemovalButtons();
+
     $("#product-properties").sortable({
         placeholder: "sortable-placeholder",
         start: function (e, ui) {

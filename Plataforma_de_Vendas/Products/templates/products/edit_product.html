@@ -12,7 +12,8 @@
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
-    <script> var counter = {{ properties|length }} || 0; // Defaults to 0 if no properties are found
+    <script> var propertyCounter = {{ properties|length }} || 0; // Defaults to 0 if no properties are found
+             var priceCounter = {{ prices|length }} || 0; // Defaults to 0 if no prices are found
              var productId = "{{ product.id }}";
              var initialProductStateId = "{{ initial_product_state.id }}";
     </script> 
@@ -99,7 +100,13 @@
                                 <p id="inner-images-messages-label"></p>
                             </div>
                         </div>
-                    </div>                
+                    </div>    
+                    <div id="prices-container">
+                        <div id="product-prices"></div>
+                        <div class="row mb-3 form-container-row">
+                            <button type="button" class="btn btn-primary" id="add-price-button">Add Price</button>
+                        </div>
+                    </div>            
                 </div>
             </div>
             <div id="button-container">

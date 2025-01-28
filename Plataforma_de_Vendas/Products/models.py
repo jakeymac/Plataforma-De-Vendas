@@ -21,6 +21,8 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False) # TODO implement this
 
+    prices = models.JSONField(null=True, blank=True, default=dict)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Custom save method to generate unique id and ensure it is unique
@@ -55,6 +57,8 @@ class InitialProductState(models.Model):
     properties = models.JSONField(null=True, blank=True, default=dict)
     is_active = models.BooleanField(default=True)
     draft = models.BooleanField(default=False) # TODO implement this
+
+    prices = models.JSONField(null=True, blank=True, default=dict)
 
     created_at = models.DateTimeField(auto_now_add=True)
     original_created_at = models.DateTimeField() # The original product's creation date
