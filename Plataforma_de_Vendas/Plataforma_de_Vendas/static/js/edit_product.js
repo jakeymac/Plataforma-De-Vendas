@@ -27,22 +27,19 @@ function addNewPropertyRow() {
 
 function addNewPriceRow() {
     $("#product-prices").append(`
-        <div class="row price-row">
-            <div class="col-12 price-row-inner-container sortable-item row" id="price-row-${priceCounter}">
-                <div class="col-4">
-                    <label for="price-${priceCounter}" class="form-label">Price</label>
-                    <input type="number" class="form-control product-info-input price-input" id="price-${priceCounter}" name="price-${priceCounter}">
-                    <div class="error-message-div price_error_field" id="price-${priceCounter}_error_field"></div>
-                </div>
-                <div class="col-4">
-                    <label for="quantity-${priceCounter}" class="form-label">Quantity</label>
-                    <input type="number" class="form-control product-info-input quantity-input" id="quantity-${priceCounter}" name="quantity-${priceCounter}">
-                    <div class="error-message-div quantity_error_field" id="quantity-${priceCounter}_error_field"></div>
-                </div>
-                <div class="col-4">
-                    <button type="button" class="btn btn-danger remove-price-button">Remove</button>
-                </div>
-
+        <div class="col-12 sortable-item row price-row" id="price-row-${priceCounter}">
+            <div class="col-4">
+                <label for="price-${priceCounter}" class="form-label">Price</label>
+                <input type="number" class="form-control product-info-input price-input" id="price-${priceCounter}" name="price-${priceCounter}">
+                <div class="error-message-div price_error_field" id="price-${priceCounter}_error_field"></div>
+            </div>
+            <div class="col-4">
+                <label for="quantity-${priceCounter}" class="form-label">Quantity</label>
+                <input type="number" class="form-control product-info-input quantity-input" id="quantity-${priceCounter}" name="quantity-${priceCounter}">
+                <div class="error-message-div quantity_error_field" id="quantity-${priceCounter}_error_field"></div>
+            </div>
+            <div class="col-4">
+                <button type="button" class="btn btn-danger remove-price-button">Remove</button>
             </div>
         </div>`);
     priceCounter++;
@@ -680,7 +677,21 @@ $(document).ready(function() {
     $("#product-properties").sortable({
         placeholder: "sortable-placeholder",
         start: function (e, ui) {
-            // Optionally adjust placeholder height to match dragged element
+            ui.placeholder.height(ui.item.outerHeight());
+            ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
+            ui.placeholder.css("margin-top", ui.item.css("margin-top"));
+            ui.item.siblings(".sortable-item").each(function () {
+                $(this).css({
+                    "margin-top": $(this).css("margin-top"),
+                    "margin-bottom": $(this).css("margin-bottom")
+                });
+            });
+        }
+    });
+    $("#product-prices").sortable({
+        placeholder: "sortable-price-placeholder",
+        start: function (e, ui) {
+            console.log(ui.item.outerHeight());
             ui.placeholder.height(ui.item.outerHeight());
             ui.placeholder.css("margin-bottom", ui.item.css("margin-bottom"));
             ui.placeholder.css("margin-top", ui.item.css("margin-top"));
