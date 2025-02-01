@@ -24,7 +24,6 @@ jobs:
             cd /home/ec2-user/project_files/Plataforma-De-Vendas/Plataforma_de_Vendas
             git pull origin main
             conda activate conda_env
-            pip install -r requirements.txt
 
             echo "Checking for migration conflicts..."
             MIGRATION_OUTPUT=$(python manage.py makemigrations --dry-run 2>&1)
