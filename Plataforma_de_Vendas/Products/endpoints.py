@@ -711,14 +711,17 @@ def autosave_product_endpoint(request):
             for image_id in data.get('image_ids'):
                 try:
                     product_image = ProductImage.objects.get(id=image_id)
+                    print(f"Updating image {product_image.id} to order {order}...")
                     product_image.order = order
                     product_image.save()
+                    product_image.refresh_from_db()
+                    print(f"Saved image {product_image.id} with order {product_image.order}...")
                     order += 1
                 except ProductImage.DoesNotExist:
-                    # TODO could have this include all the images that were not found
                     ids_not_found.append(image_id)
-                if ids_not_found:
-                    return Response({"message": f"Images not found with the ids {ids_not_found}"}, status=status.HTTP_404_NOT_FOUND)                
+                    
+            if ids_not_found:
+                return Response({"message": f"Images not found with the ids {ids_not_found}"}, status=status.HTTP_404_NOT_FOUND)                
 
             return Response({"message": "Product autosaved successfully"}, status=status.HTTP_200_OK)
         except Product.DoesNotExist:

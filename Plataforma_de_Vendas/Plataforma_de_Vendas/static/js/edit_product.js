@@ -459,7 +459,6 @@ async function saveProductForm(data) {
 
 async function autoSaveProductInfo() {
     // Handle the auto-saving of the product form
-    console.log("Saving...");
     showSavingIcon();
     let readyToSubmit = true;
 

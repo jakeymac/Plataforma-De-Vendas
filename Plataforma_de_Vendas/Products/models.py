@@ -107,6 +107,8 @@ class ProductImage(models.Model):
         if self.image and not self.s3_key:
             self.s3_key = self.image.name
             super().save(update_fields=['s3_key'])
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.product.product_name} - {self.order}"
