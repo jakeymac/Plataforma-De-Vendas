@@ -61,9 +61,11 @@ def edit_product_view(request, product_id):
 def view_product(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
+        prices = product.prices
+        print(prices)
         images = product.productimage_set.all().order_by('order')
         print(images)
-        return render(request, 'products/view_product.html', {'product': product, 'images': images})
+        return render(request, 'products/view_product.html', {'product': product, 'images': images, 'prices': prices})
     except Product.DoesNotExist:
         # TODO add a 404 page to let users know what's happening - that the product was not found
         return redirect('home')

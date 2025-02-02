@@ -54,7 +54,11 @@
                             <!-- Maybe make this horizontal line a little shorter than it is now -->
                             <hr>
                             <!-- TODO add information for price/quantity -->
-                            <dt>Price</dt>
+                            <dt>Price(s)</dt>
+                                {% for price, quantity in prices.items %}
+                                    <dd>${{ price }} - {{ quantity }} units</dd>
+                                {% endfor %}
+
                             <dd>{{ product.price }}</dd>
                         </dl>
                     </div>
