@@ -36,7 +36,7 @@ from Orders.models import Order
 @swagger_auto_schema(
     method="get",
     responses={200: "OK"},
-    description= (
+    description=(
         "Get all products, all products from a specific store "
         "by store id, or a specific product by product id"
     ),
@@ -176,7 +176,7 @@ def remove_product_endpoint(request, product_id):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, 
+    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE,
     # if changed, may use PUT instead of DELETE
     # data = request.data
     # product_id = data.get('id')
@@ -243,8 +243,8 @@ def product_images_endpoint(request, product_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_product_image_endpoint(request):
-    # TODO add a check to see if the user is a seller and if they have 
-    # permissions to add images and if the product belongs to the store 
+    # TODO add a check to see if the user is a seller and if they have
+    # permissions to add images and if the product belongs to the store
     # the seller belongs to
     data = request.data
     product_id = data.get("product_id")
@@ -348,7 +348,7 @@ def remove_product_image_endpoint(request, image_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def products_in_order_endpoint(request, order_id):
-    # TODO make this endpoint more secure since this 
+    # TODO make this endpoint more secure since this
     # endpoint confirms the existence of an order or not
     try:
         order = Order.objects.get(id=order_id)
@@ -973,7 +973,7 @@ def create_initial_product_state_endpoint(request):
     )
 
 
-# This endpoint auto saves a product, without deleting the initial state of 
+# This endpoint auto saves a product, without deleting the initial state of
 # the product, and without deleting the images of the product in storage
 @swagger_auto_schema(
     method="POST", responses=(200, "OK"), description="Autosave a product"
@@ -1043,7 +1043,7 @@ def autosave_product_endpoint(request):
     )
 
 
-# This endpoint finalizes the save of a product, deleting the initial state 
+# This endpoint finalizes the save of a product, deleting the initial state
 # of the product, and deleting the images of the product in storage
 @swagger_auto_schema(
     method="POST", responses=(200, "OK"), description="Final save a product"

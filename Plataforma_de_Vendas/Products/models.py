@@ -46,7 +46,7 @@ class Product(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to 
+            # This error is caused by a non-unique id due to
             # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
@@ -96,7 +96,7 @@ class InitialProductState(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to 
+            # This error is caused by a non-unique id due to
             # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
@@ -197,7 +197,7 @@ class ProductCategory(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to 
+            # This error is caused by a non-unique id due to
             # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
@@ -227,7 +227,7 @@ class ProductSubcategory(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to 
+            # This error is caused by a non-unique id due to
             # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
@@ -256,7 +256,7 @@ class ProductTopSubcategory(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to 
+            # This error is caused by a non-unique id due to
             # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again

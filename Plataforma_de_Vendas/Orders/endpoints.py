@@ -95,7 +95,7 @@ def get_orders_by_user_endpoint(request, user_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_orders_by_store_endpoint(request, store_id):
-    # TODO add a check to see if the user is a seller and 
+    # TODO add a check to see if the user is a seller and
     # if they have permissions to view orders ( MAYBE )
     if request.user.groups.filter(name="Admins").exists() or (
         request.user.groups.filter(name="Sellers").exists()
@@ -123,7 +123,7 @@ def get_orders_by_store_endpoint(request, store_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_order_endpoint(request):
-    # TODO may want to change this to allow sellers to 
+    # TODO may want to change this to allow sellers to
     # make orders for their customers as well
     if request.user.groups.filter(name="Customers").exists():
         data = request.data

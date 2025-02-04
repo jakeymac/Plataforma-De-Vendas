@@ -74,7 +74,7 @@ def edit_product_view(request, product_id):
             )
 
         except Product.DoesNotExist:
-            # TODO add a 404 page to let users know what's 
+            # TODO add a 404 page to let users know what's
             # happening - that the product was not found
             return redirect("home")
     else:
@@ -95,6 +95,6 @@ def view_product(request, product_id):
             {"product": product, "images": images, "prices": prices},
         )
     except Product.DoesNotExist:
-        # TODO add a 404 page to let users know what's 
+        # TODO add a 404 page to let users know what's
         # happening - that the product was not found
         return redirect("home")

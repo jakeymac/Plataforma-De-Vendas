@@ -48,10 +48,8 @@ def admin_portal(request):
 
 
 def logout_view(request):
-    logout(
-        request
-    )  
-    # TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO 
+    logout(request)
+    # TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO
     # MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
     return redirect("/")
 
@@ -80,6 +78,3 @@ def view_account(request):
         return render(request, "Accounts/view_seller_account.html")
     elif request.user.groups.filter(name="Admins").exists():
         return render(request, "Accounts/view_admin_account.html")
-
-
-

@@ -26,7 +26,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from Accounts import views as account_views, endpoints as account_endpoints
-from Orders import views as endpoints as order_endpoints
+from Orders import endpoints as order_endpoints
 from Products import views as product_views, endpoints as product_endpoints
 from Stores import views as store_views, endpoints as store_endpoints
 

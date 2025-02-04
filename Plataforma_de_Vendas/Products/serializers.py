@@ -22,7 +22,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 {"quantity": "Quantity cannot be negative"}
             )
 
-        # TODO possibly update this check to allow for the 
+        # TODO possibly update this check to allow for the
         # same product name in different stores
         if self.instance:
             if (
@@ -81,7 +81,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
                 {
                     "category_name": (
                         "Category with this name already exists as a subcategory"
-                    ) 
+                    )
                 }
             )
         return data

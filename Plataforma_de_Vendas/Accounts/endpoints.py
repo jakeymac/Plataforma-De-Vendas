@@ -334,7 +334,7 @@ def update_profile_picture_endpoint(request):
     return Response(
         {"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED
     )
-    
+
 
 # TODO convert this view to an endpoint using s3 bucket:
 @login_required
