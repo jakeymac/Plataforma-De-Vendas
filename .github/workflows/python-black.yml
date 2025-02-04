@@ -30,6 +30,6 @@ jobs:
           pip install black
 
       - name: Run Black Check
-        run: black -- check .
+        run: black --check .
 
       
