@@ -337,28 +337,28 @@ def update_profile_picture_endpoint(request):
 
 
 # TODO convert this view to an endpoint using s3 bucket:
-@login_required
-def retrieve_profile_picture(request, username):
-    if request.user.is_authenticated:
-        if (
-            request.user.groups.filter(name="Admins").exists()
-            or request.user.username == username
-        ):
-            user = CustomUser.objects.get(username=username)
-            if user.profile_picture:
-                file_path = os.path.join(
-                    settings.MEDIA_ROOT, "profile_pictures", user.profile_picture
-                )
-                if os.path.exists(file_path):
-                    with open(file_path, "rb") as file:
-                        response = HttpResponse(file.read(), content_type="image")
-                        response["Content-Disposition"] = (
-                            "inline; filename=" + os.path.basename(file_path)
-                        )
-                        response["status"] = 200
-                        return response
-                return HttpResponse(
-                    {"error": "Issue retreiving profile picture."}, status=404
-                )
-            return HttpResponse({"error": "No profile picture specified"}, status=400)
-    return HttpResponse({"error": "Unauthorized"}, status=400)
+# @login_required
+# def retrieve_profile_picture(request, username):
+#     if request.user.is_authenticated:
+#         if (
+#             request.user.groups.filter(name="Admins").exists()
+#             or request.user.username == username
+#         ):
+#             user = CustomUser.objects.get(username=username)
+#             if user.profile_picture:
+#                 file_path = os.path.join(
+#                     settings.MEDIA_ROOT, "profile_pictures", user.profile_picture
+#                 )
+#                 if os.path.exists(file_path):
+#                     with open(file_path, "rb") as file:
+#                         response = HttpResponse(file.read(), content_type="image")
+#                         response["Content-Disposition"] = (
+#                             "inline; filename=" + os.path.basename(file_path)
+#                         )
+#                         response["status"] = 200
+#                         return response
+#                 return HttpResponse(
+#                     {"error": "Issue retreiving profile picture."}, status=404
+#                 )
+#             return HttpResponse({"error": "No profile picture specified"}, status=400)
+#     return HttpResponse({"error": "Unauthorized"}, status=400)

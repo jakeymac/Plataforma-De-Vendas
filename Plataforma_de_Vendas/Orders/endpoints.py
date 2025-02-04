@@ -10,7 +10,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .models import Order
 from .serializers import OrderSerializer
 from Stores.models import Store
-from Accounts.models import Customuser
+from Accounts.models import CustomUser
 
 
 @swagger_auto_schema(

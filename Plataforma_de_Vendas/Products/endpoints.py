@@ -784,7 +784,7 @@ def add_product_endpoint(request):
         else:
             product_serializer = ProductSerializer(data=data, partial=True)
             if product_serializer.is_valid():
-                new_product = product_serializer.save()
+                product_serializer.save()
             return Response(
                 product_serializer.data,
                 status=status.HTTP_201_CREATED,
