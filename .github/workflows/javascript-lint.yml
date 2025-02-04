@@ -6,7 +6,7 @@ on:
       - main
       - dev
   pull_request:
-    branche:
+    branches:
       - main
       - dev
 
@@ -29,4 +29,4 @@ jobs:
           npm install -g eslint @eslint/js globals
 
       - name: Run ESLint
-        run: npx eslint
+        run: npx eslint .
