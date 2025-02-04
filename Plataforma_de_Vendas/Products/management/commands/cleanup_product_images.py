@@ -30,14 +30,18 @@ class Command(BaseCommand):
         self.stdout.write("Retreiving all image paths in the database...")
         db_images = list(ProductImage.objects.values_list("s3_key", flat=True))
 
-        # Get all initial image paths in the database that are less than 24 hours old - TODO could possibly remove this with the cleanup initial product states and images script
+        # Get all initial image paths in the database that are less than 24 hours 
+        # old - TODO could possibly remove this with the cleanup initial product 
+        # states and images script
         self.stdout.write("Retreiving all initial image paths in the database...")
         initial_db_images = InitialProductImage.objects.filter(
             created_at__gte=timezone.now() - timedelta(days=1)
         )
         initial_db_images = list(initial_db_images.values_list("s3_key", flat=True))
 
-        # Find orphaned images - this includes images that still exist as files in the S3 bucket but are not in the database, meaning the user has deleted this product image
+        # Find orphaned images - this includes images that still exist as files in the 
+        # S3 bucket but are not in the database, meaning the user has deleted this 
+        # product image
         self.stdout.write("Finding orphaned images...")
         orphaned_images = [
             image

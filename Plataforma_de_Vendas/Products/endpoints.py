@@ -1,11 +1,8 @@
 # API endpoints for products
 from django.http import JsonResponse
-from django.contrib.auth import authenticate
 
 from django.db.models import Q
 from django.db import transaction
-
-from django.core.mail import send_mail
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -29,17 +26,20 @@ from .serializers import (
     ProductSerializer,
     ProductCategorySerializer,
     ProductSubcategorySerializer,
+    ProductInOrderSerializer,
     ProductTopSubcategorySerializer,
 )
 from Stores.models import Store
-
-import json
+from Orders.models import Order
 
 
 @swagger_auto_schema(
     method="get",
     responses={200: "OK"},
-    description="Get all products, all products from a specific store by store id,  or a specific product by product id",
+    description= (
+        "Get all products, all products from a specific store "
+        "by store id, or a specific product by product id"
+    ),
 )
 @api_view(["GET"])
 def get_products_endpoint(request, store_id=None, product_id=None):
@@ -139,7 +139,8 @@ def search_for_product_endpoint(request, store_id=None):
 def remove_product_endpoint(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        # TODO add a check to see if the user is a seller and if they have permissions to delete products and if they belong to the store that owns this product
+        # TODO add a check to see if the user is a seller and if they have permissions
+        # to delete products and if they belong to the store that owns this product
         if (
             request.user.groups.filter(name="Admins").exists()
             or request.user.store == product.store
@@ -175,19 +176,32 @@ def remove_product_endpoint(request, product_id):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, if changed, may use PUT instead of DELETE
+    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE, 
+    # if changed, may use PUT instead of DELETE
     # data = request.data
     # product_id = data.get('id')
     # try:
     #     product = Product.objects.get(id=product_id)
     #     if request.user.is_authenticated:
-    #         if request.user.account_type == 'admin' or request.user.store == product.store:
+    #         if (
+    #             request.user.account_type == "admin"
+    #             or request.user.store == product.store
+    #         ):
     #             product.is_active = False
     #             product.save()
-    #             return Response({"message": "Product deactivated successfully"}, status=status.HTTP_200_OK)
-    #     return Response({"message": "You do not have permission to delete this product"}, status=status.HTTP_403_FORBIDDEN)
+    #             return Response(
+    #                 {"message": "Product deactivated successfully"},
+    #                 status=status.HTTP_200_OK,
+    #             )
+    #     return Response(
+    #         {"message": "You do not have permission to delete this product"},
+    #         status=status.HTTP_403_FORBIDDEN,
+    #     )
     # except Product.DoesNotExist:
-    #     return Response({"message": f"Product not found with the id {product_id}"}, status=status.HTTP_404_NOT_FOUND)
+    #     return Response(
+    #         {"message": f"Product not found with the id {product_id}"},
+    #         status=status.HTTP_404_NOT_FOUND,
+    #     )
 
 
 @swagger_auto_schema(
@@ -200,7 +214,6 @@ def product_images_endpoint(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
         images = ProductImage.objects.filter(product=product)
-        urls = [image.image.url for image in images]
         images = product.productimage_set.all().order_by("order")
         images_data = [{"id": image.id, "url": image.image.url} for image in images]
         return JsonResponse(
@@ -230,7 +243,9 @@ def product_images_endpoint(request, product_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_product_image_endpoint(request):
-    # TODO add a check to see if the user is a seller and if they have permissions to add images and if the product bleongs to teh store the seller belongs to
+    # TODO add a check to see if the user is a seller and if they have 
+    # permissions to add images and if the product belongs to the store 
+    # the seller belongs to
     data = request.data
     product_id = data.get("product_id")
     try:
@@ -275,7 +290,9 @@ def add_product_image_endpoint(request):
         else:
             return Response(
                 {
-                    "message": "You do not have permission to add an image to this product"
+                    "message": (
+                        "You do not have permission to add an image to this product"
+                    )
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -331,7 +348,8 @@ def remove_product_image_endpoint(request, image_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def products_in_order_endpoint(request, order_id):
-    # TODO make this endpoint more secure since this endpoint confirms the existence of an order or not
+    # TODO make this endpoint more secure since this 
+    # endpoint confirms the existence of an order or not
     try:
         order = Order.objects.get(id=order_id)
         if (
@@ -461,7 +479,7 @@ def get_category_endpoint(request, category_id):
 @permission_classes([IsAuthenticated])
 def add_subcategory_endpoint(request):
     # Use copy to allow for modification of the request data
-    if equest.user.groups.filter(name="Admins").exists():
+    if request.user.groups.filter(name="Admins").exists():
         data = request.data.copy()
         category_id = data.get("category")
         try:
@@ -676,7 +694,9 @@ def remove_subcategory_endpoint(request, subcategory_id):
 @swagger_auto_schema(
     method="GET",
     responses={200: "OK"},
-    description="Get all top subcategories or get all top subcategories by category id.",
+    description=(
+        "Get all top subcategories or get all top subcategories by category id."
+    ),
 )
 @api_view(["GET"])
 def get_top_subcategories_endpoint(request, category_id=None):
@@ -685,7 +705,7 @@ def get_top_subcategories_endpoint(request, category_id=None):
             category = ProductCategory.objects.get(id=category_id)
             top_subcategories = []
             for id in category.top_subcategory_ids:
-                top_subcategories.append(TopSubCategory.objects.get(id=id))
+                top_subcategories.append(ProductTopSubcategory.objects.get(id=id))
 
             return JsonResponse({})
         except ProductCategory.DoesNotExist:
@@ -764,10 +784,9 @@ def add_product_endpoint(request):
         else:
             product_serializer = ProductSerializer(data=data, partial=True)
             if product_serializer.is_valid():
-                product_serializer.save()
-                return Response(product_serializer.data, status=status.HTTP_201_CREATED)
+                new_product = product_serializer.save()
             return Response(
-                {"message": "Product added successfully", "id": new_product.id},
+                product_serializer.data,
                 status=status.HTTP_201_CREATED,
             )
 
@@ -817,7 +836,10 @@ def rollback_product_changes_endpoint(request):
         if product_not_found and initial_state_not_found:
             return Response(
                 {
-                    "message": f"Product with id {data.get('id')} and initial state with {data.get('id')} not found"
+                    "message": (
+                        f"Product with id {data.get('id')} and initial state with "
+                        f"{data.get('id')} not found"
+                    )
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -831,7 +853,10 @@ def rollback_product_changes_endpoint(request):
         elif initial_state_not_found:
             return Response(
                 {
-                    "message": f"Initial state with id {data.get('initial_state_id')} not found"
+                    "message": (
+                        f"Initial state with id {data.get('initial_state_id')} "
+                        "not found"
+                    )
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -900,7 +925,10 @@ def create_initial_product_state_endpoint(request):
             ):
                 return Response(
                     {
-                        "message": "You do not have permission to create an initial state for this product"
+                        "message": (
+                            "You do not have permission to create an initial state "
+                            "for this product"
+                        )
                     },
                     status=status.HTTP_403_FORBIDDEN,
                 )
@@ -945,7 +973,8 @@ def create_initial_product_state_endpoint(request):
     )
 
 
-# This endpoint auto saves a product, without deleting the initial state of the product, and without deleting the images of the product in storage
+# This endpoint auto saves a product, without deleting the initial state of 
+# the product, and without deleting the images of the product in storage
 @swagger_auto_schema(
     method="POST", responses=(200, "OK"), description="Autosave a product"
 )
@@ -986,7 +1015,8 @@ def autosave_product_endpoint(request):
                     product_image.save()
                     product_image.refresh_from_db()
                     print(
-                        f"Saved image {product_image.id} with order {product_image.order}..."
+                        f"Saved image {product_image.id} with order "
+                        f"{product_image.order}..."
                     )
                     order += 1
                 except ProductImage.DoesNotExist:
@@ -1013,7 +1043,8 @@ def autosave_product_endpoint(request):
     )
 
 
-# This endpoint finalizes the save of a product, deleting the initial state of the product, and deleting the images of the product in storage
+# This endpoint finalizes the save of a product, deleting the initial state 
+# of the product, and deleting the images of the product in storage
 @swagger_auto_schema(
     method="POST", responses=(200, "OK"), description="Final save a product"
 )

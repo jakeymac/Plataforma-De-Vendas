@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
 from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.

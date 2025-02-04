@@ -1,12 +1,10 @@
 # API endpoints for stores
-from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from django.db import transaction
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.utils import swagger_auto_schema
@@ -16,7 +14,6 @@ from .models import Store
 from Accounts.serializers import CustomUserSerializer
 from .serializers import StoreSerializer
 
-import json
 from datetime import datetime
 
 

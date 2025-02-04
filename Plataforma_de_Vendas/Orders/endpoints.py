@@ -1,9 +1,4 @@
 # API endpoints for orders
-from django.http import JsonResponse
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import Group
-
-from django.db import transaction
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -11,12 +6,11 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
 from .models import Order
 from .serializers import OrderSerializer
-
-import json
+from Stores.models import Store
+from Accounts.models import Customuser
 
 
 @swagger_auto_schema(
@@ -101,7 +95,8 @@ def get_orders_by_user_endpoint(request, user_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_orders_by_store_endpoint(request, store_id):
-    # TODO add a check to see if the user is a seller and if they have permissions to view orders ( MAYBE )
+    # TODO add a check to see if the user is a seller and 
+    # if they have permissions to view orders ( MAYBE )
     if request.user.groups.filter(name="Admins").exists() or (
         request.user.groups.filter(name="Sellers").exists()
         and request.user.store.id == store_id
@@ -128,7 +123,8 @@ def get_orders_by_store_endpoint(request, store_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_order_endpoint(request):
-    # TODO may want to change this to allow sellers to make orders for their customers as well
+    # TODO may want to change this to allow sellers to 
+    # make orders for their customers as well
     if request.user.groups.filter(name="Customers").exists():
         data = request.data
         data["user"] = request.user.id

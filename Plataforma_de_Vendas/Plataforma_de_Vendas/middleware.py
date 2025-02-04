@@ -10,7 +10,8 @@ class InactivityTimeoutMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Get the timeout setting from the settings file, or use default of 30 minutes (1800 seconds)
+        # Get the timeout setting from the settings file, 
+        # or use default of 30 minutes (1800 seconds)
         timeout = getattr(settings, "session_inactivity_timeout", 1800)
 
         # If the user is actually logged in, check for inactivity

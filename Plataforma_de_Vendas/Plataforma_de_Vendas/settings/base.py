@@ -5,9 +5,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# DEPLOYMENT ROOT
-# BASE_DIR = Path('/home/ec2-user/project_files/Plataforma-de-Vendas/Plataforma_de_Vendas/Plataforma_de_Vendas')
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -49,7 +46,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "Plataforma_de_Vendas.middleware.InactivityTimeoutMiddleware",  # Custom middleware for logging out users after a period of inactivity
+    "Plataforma_de_Vendas.middleware.InactivityTimeoutMiddleware",
 ]
 
 ROOT_URLCONF = "Plataforma_de_Vendas.urls"
@@ -88,7 +85,9 @@ LOGIN_URL = "login"
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        )
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",

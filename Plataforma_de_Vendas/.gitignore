@@ -1,0 +1,4 @@
+db.sqlite3
+__pycache__/
+*.pyc
+Plataforma_de_Vendas/settings/production.py

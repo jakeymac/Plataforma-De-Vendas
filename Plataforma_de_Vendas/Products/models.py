@@ -46,7 +46,8 @@ class Product(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            # This error is caused by a non-unique id due to 
+            # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
                 self.id = generate_unique_id()
@@ -95,10 +96,11 @@ class InitialProductState(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            # This error is caused by a non-unique id due to 
+            # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
-                self.id = generate_unique
+                self.id = generate_unique_id()
 
     def __str__(self):
         return f"Initial State of {self.product_name}"
@@ -195,7 +197,8 @@ class ProductCategory(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            # This error is caused by a non-unique id due to 
+            # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
                 self.id = generate_unique_id()
@@ -224,7 +227,8 @@ class ProductSubcategory(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            # This error is caused by a non-unique id due to 
+            # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
                 self.id = generate_unique_id()
@@ -252,7 +256,8 @@ class ProductTopSubcategory(models.Model):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            # This error is caused by a non-unique id due to 
+            # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
                 self.id = generate_unique_id()

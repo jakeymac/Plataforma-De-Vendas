@@ -1,10 +1,6 @@
 # API endpoints for accounts
-from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
-
-from django.db.models import Q
-from django.db import transaction
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -16,9 +12,6 @@ from drf_yasg import openapi
 
 from .models import CustomUser
 from .serializers import CustomUserSerializer, ExistingUserSerializer
-from Stores.models import Store
-
-import json
 
 import logging
 
@@ -256,7 +249,9 @@ def register_customer_account_endpoint(request):
     else:
         return Response(
             {
-                "message": "Incorrect endpoint for registering admin accounts and sellers"
+                "message": (
+                    "Incorrect endpoint for registering admin accounts and sellers"
+                )
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
@@ -307,6 +302,7 @@ def check_email_availability_endpoint(request):
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 
 
+# TODO update this endpoint to use s3 bucket and upload file
 @swagger_auto_schema(
     method="put",
     request_body=openapi.Schema(
@@ -338,4 +334,31 @@ def update_profile_picture_endpoint(request):
     return Response(
         {"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED
     )
-    l
+    
+
+# TODO convert this view to an endpoint using s3 bucket:
+@login_required
+def retrieve_profile_picture(request, username):
+    if request.user.is_authenticated:
+        if (
+            request.user.groups.filter(name="Admins").exists()
+            or request.user.username == username
+        ):
+            user = CustomUser.objects.get(username=username)
+            if user.profile_picture:
+                file_path = os.path.join(
+                    settings.MEDIA_ROOT, "profile_pictures", user.profile_picture
+                )
+                if os.path.exists(file_path):
+                    with open(file_path, "rb") as file:
+                        response = HttpResponse(file.read(), content_type="image")
+                        response["Content-Disposition"] = (
+                            "inline; filename=" + os.path.basename(file_path)
+                        )
+                        response["status"] = 200
+                        return response
+                return HttpResponse(
+                    {"error": "Issue retreiving profile picture."}, status=404
+                )
+            return HttpResponse({"error": "No profile picture specified"}, status=400)
+    return HttpResponse({"error": "Unauthorized"}, status=400)

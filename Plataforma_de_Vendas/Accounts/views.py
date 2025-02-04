@@ -1,8 +1,7 @@
 from django.shortcuts import render
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect
-from django.contrib.auth.forms import AuthenticationForm
 
 from Products.models import (
     Product,
@@ -51,7 +50,9 @@ def admin_portal(request):
 def logout_view(request):
     logout(
         request
-    )  # TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
+    )  
+    # TODO UPDATE THIS TO SEND A REQUEST TO THE API TO LOGOUT TO 
+    # MAINTAIN UNIFORMITY ACROSS THIS PLATFORM AND FUTURE APPS
     return redirect("/")
 
 
@@ -81,28 +82,4 @@ def view_account(request):
         return render(request, "Accounts/view_admin_account.html")
 
 
-@login_required
-def retrieve_profile_picture(request, username):
-    if request.user.is_authenticated:
-        if (
-            request.user.groups.filter(name="Admins").exists()
-            or request.user.username == username
-        ):
-            user = CustomUser.objects.get(username=username)
-            if user.profile_picture:
-                file_path = os.path.join(
-                    settings.MEDIA_ROOT, "profile_pictures", user.profile_picture
-                )
-                if os.path.exists(file_path):
-                    with open(file_path, "rb") as file:
-                        response = HttpResponse(file.read(), content_type="image")
-                        response["Content-Disposition"] = (
-                            "inline; filename=" + os.path.basename(file_path)
-                        )
-                        response["status"] = 200
-                        return response
-                return HttpResponse(
-                    {"error": "Issue retreiving profile picture."}, status=404
-                )
-            return HttpResponse({"error": "No profile picture specified"}, status=400)
-    return HttpResponse({"error": "Unauthorized"}, status=400)
+

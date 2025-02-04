@@ -20,14 +20,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import user_passes_test
-from django.utils.decorators import method_decorator
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 from Accounts import views as account_views, endpoints as account_endpoints
-from Orders import views as order_views, endpoints as order_endpoints
+from Orders import views as endpoints as order_endpoints
 from Products import views as product_views, endpoints as product_endpoints
 from Stores import views as store_views, endpoints as store_endpoints
 
@@ -42,9 +41,9 @@ schema_view = get_schema_view(
     openapi.Info(
         title="NAME HERE API Documentation",
         default_version="v1",
-        description="""This API provides seamless access to the NAME HERE system's 
-        functionalities for managing products, inventory, orders, and user accounts 
-        of both store owners and customers.""",
+        description="""This API provides seamless access to the NAME HERE system's
+         functionalities for managing products, inventory, orders, and user accounts
+         of both store owners and customers.""",
         contact=openapi.Contact(email="jmjohnson1578@gmail.com"),
     ),
     public=False,  # Swagger is not public; authentication required

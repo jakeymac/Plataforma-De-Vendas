@@ -1,7 +1,6 @@
-from django.db import models
+from django.db import models, IntegrityError
 from django.contrib.auth.models import AbstractUser
 from nanoid import generate
-
 
 def generate_unique_id():
     return generate(size=12)
@@ -53,7 +52,8 @@ class CustomUser(AbstractUser):
             try:
                 super().save(*args, **kwargs)
                 break
-            # This error is caused by a non-unique id due to the 'unique=True' constraint on the id field
+            # This error is caused by a non-unique id due to 
+            # the 'unique=True' constraint on the id field
             except IntegrityError:
                 # Regenerate the id and try again
                 self.id = generate_unique_id()

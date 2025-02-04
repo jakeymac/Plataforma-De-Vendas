@@ -22,7 +22,8 @@ class ProductSerializer(serializers.ModelSerializer):
                 {"quantity": "Quantity cannot be negative"}
             )
 
-        # TODO possibly update this check to allow for the same product name in different stores
+        # TODO possibly update this check to allow for the 
+        # same product name in different stores
         if self.instance:
             if (
                 Product.objects.filter(product_name=product_name)
@@ -78,7 +79,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         if ProductSubcategory.objects.filter(subcategory_name=name).exists():
             raise serializers.ValidationError(
                 {
-                    "category_name": "Category with this name already exists as a subcategory"
+                    "category_name": (
+                        "Category with this name already exists as a subcategory"
+                    ) 
                 }
             )
         return data
@@ -98,7 +101,9 @@ class ProductSubcategorySerializer(serializers.ModelSerializer):
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError(
                 {
-                    "subcategory_name": "Subcategory with this name already exists as a category"
+                    "subcategory_name": (
+                        "Subcategory with this name already exists as a category"
+                    )
                 }
             )
         if self.instance:
