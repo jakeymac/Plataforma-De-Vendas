@@ -1,4 +1,4 @@
-#API endpoints for stores
+# API endpoints for stores
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Group
 from django.db import transaction
@@ -21,38 +21,46 @@ from datetime import datetime
 
 
 @swagger_auto_schema(
-    method='get',
-    responses={200: 'OK'},
-    description='Get all stores or a specific store by id'
+    method="get",
+    responses={200: "OK"},
+    description="Get all stores or a specific store by id",
 )
-@api_view(['GET'])
-def get_stores_endpoint(request,store_id=None):
+@api_view(["GET"])
+def get_stores_endpoint(request, store_id=None):
     if store_id is not None:
         try:
             store = Store.objects.get(id=store_id)
             serializer = StoreSerializer(store)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Store.DoesNotExist:
-            return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
-    else:   
+            return Response(
+                {"message": f"Store not found with the id {store_id}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+    else:
         stores = Store.objects.all()
         serializer = StoreSerializer(stores, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @swagger_auto_schema(
-    method='post',
+    method="post",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['name', 'description'],
+        required=["name", "description"],
         properties={
-            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Product name'),
-            'description': openapi.Schema(type=openapi.TYPE_STRING, description='Product description'),
+            "name": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Product name"
+            ),
+            "description": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Product description"
+            ),
             # Add other fields as needed
-        }
+        },
     ),
-    responses={200: 'Created'}
+    responses={200: "Created"},
 )
-@api_view(['POST'])
+@api_view(["POST"])
 def add_store_endpoint(request):
     data = request.data
     serializer = StoreSerializer(data=data)
@@ -61,31 +69,42 @@ def add_store_endpoint(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @swagger_auto_schema(
-    method='put',
+    method="put",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['id'],
+        required=["id"],
         properties={
-            'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='Store id'),
-            'name': openapi.Schema(type=openapi.TYPE_STRING, description='Store name'),
-            'description': openapi.Schema(type=openapi.TYPE_STRING, description='Store description'),
-        }
+            "id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Store id"),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Store name"),
+            "description": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Store description"
+            ),
+        },
     ),
-    responses={200: 'Updated'}
+    responses={200: "Updated"},
 )
-@api_view(['PUT'])
+@api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_store_endpoint(request):
-    if request.user.groups.filter(name='Admins').exists() or request.user.groups.filter(name='Sellers').exists():
+    if (
+        request.user.groups.filter(name="Admins").exists()
+        or request.user.groups.filter(name="Sellers").exists()
+    ):
         data = request.data
-        store_id = data.get('id')
+        store_id = data.get("id")
         try:
             store = Store.objects.get(id=store_id)
-            
-                
-            if not request.user.groups.filter(name='Admins').exists() or request.user.store.id != store.id:
-                return Response({"message": "You are not authorized to update this store"}, status=status.HTTP_401_UNAUTHORIZED)
+
+            if (
+                not request.user.groups.filter(name="Admins").exists()
+                or request.user.store.id != store.id
+            ):
+                return Response(
+                    {"message": "You are not authorized to update this store"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
 
             serializer = StoreSerializer(store, data=data)
             if serializer.is_valid():
@@ -95,8 +114,11 @@ def update_store_endpoint(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Store.DoesNotExist:
-            return Response({"message": f"Store not found with the id {store_id}"}, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response(
+                {"message": f"Store not found with the id {store_id}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         serializer = StoreSerializer(store, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -104,10 +126,13 @@ def update_store_endpoint(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({"message": "You are not authorized to update stores"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(
+        {"message": "You are not authorized to update stores"},
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
 
- 
-#Helper function for register store endpoint
+
+# Helper function for register store endpoint
 def parse_store_registration_data(request_data, request_files):
     account_data = {
         "username": request_data.get("username"),
@@ -124,14 +149,18 @@ def parse_store_registration_data(request_data, request_files):
         "state": request_data.get("state"),
         "country": request_data.get("country"),
         "zip_code": request_data.get("zip_code"),
-        "profile_picture": request_files.get("profile_picture")
+        "profile_picture": request_files.get("profile_picture"),
     }
 
     # Format the date_of_birth to 'YYYY-MM-DD' for saving to database
     if account_data["date_of_birth"]:
         if isinstance(account_data["date_of_birth"], str):
-            account_data["date_of_birth"] = datetime.strptime(account_data["date_of_birth"], '%Y-%m-%d')
-        account_data["date_of_birth"] = account_data["date_of_birth"].strftime('%Y-%m-%d')
+            account_data["date_of_birth"] = datetime.strptime(
+                account_data["date_of_birth"], "%Y-%m-%d"
+            )
+        account_data["date_of_birth"] = account_data["date_of_birth"].strftime(
+            "%Y-%m-%d"
+        )
     else:
         account_data["date_of_birth"] = None
 
@@ -139,13 +168,16 @@ def parse_store_registration_data(request_data, request_files):
         "store_name": request_data.get("store_name"),
         "store_description": request_data.get("store_description"),
         "store_url": request_data.get("store_url"),
-        "store_logo": request_files.get("store_logo")
+        "store_logo": request_files.get("store_logo"),
     }
     return account_data, store_data
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 def register_store_endpoint(request):
-    account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
+    account_data, store_data = parse_store_registration_data(
+        request.POST, request.FILES
+    )
 
     # account_data["account_type"] = "seller" # TODO delete this later
     account_serializer = CustomUserSerializer(data=account_data)
@@ -157,17 +189,25 @@ def register_store_endpoint(request):
             with transaction.atomic():
                 account = account_serializer.save()
                 account.set_password(account_data["password"])
-                account.groups.add(Group.objects.get(name='Sellers')) # TODO add permissions to this account as owner of the store
+                account.groups.add(
+                    Group.objects.get(name="Sellers")
+                )  # TODO add permissions to this account as owner of the store
                 account.save()
 
                 store = store_serializer.save()
                 account.store = store
                 account.save()
 
-            return Response({"message": "Store created successfully"}, status=status.HTTP_201_CREATED)
-            
+            return Response(
+                {"message": "Store created successfully"},
+                status=status.HTTP_201_CREATED,
+            )
+
         except Exception as e:
-            return Response({"message": "An error occurred", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"message": "An error occurred", "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     else:
         errors = {}
@@ -175,5 +215,7 @@ def register_store_endpoint(request):
             errors["account_errors"] = account_serializer.errors
         if store_serializer.errors:
             errors["store_errors"] = store_serializer.errors
-        return Response({"message": "Store not created", "errors": errors}, status=status.HTTP_400_BAD_REQUEST)
-        
+        return Response(
+            {"message": "Store not created", "errors": errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

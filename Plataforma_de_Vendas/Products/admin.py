@@ -1,6 +1,14 @@
 from django.contrib import admin
-from .models import (Product, ProductImage, InitialProductImage, InitialProductState,
-                    ProductInOrder, ProductCategory, ProductSubcategory, ProductTopSubcategory )
+from .models import (
+    Product,
+    ProductImage,
+    InitialProductImage,
+    InitialProductState,
+    ProductInOrder,
+    ProductCategory,
+    ProductSubcategory,
+    ProductTopSubcategory,
+)
 
 # Register your models here.
 admin.site.register(Product)
