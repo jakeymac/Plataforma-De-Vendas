@@ -1,36 +1,35 @@
-name: Python Lint Check
+name: Python Black Formatting Check
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - dev
   pull_request:
     branches:
-      - main 
+      - main
       - dev
 
 jobs:
-  lint:
-    name: Run Python Linters
+  format:
+    name: Run Black Format Check
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
-      - name: Install Dependencies (Flake and isort)
+        
+      - name: Install Black
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 isort
+          pip install black
 
-      - name: Run Flake
-        run: flake8 .
+      - name: Run Black Check
+        run: black -- check .
 
-      - name: Run isort
-        run: iisort --check-only --diff .
+      
