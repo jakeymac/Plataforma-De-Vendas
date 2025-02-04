@@ -1,11 +1,12 @@
 from django.contrib import admin
+
 from .models import (
-    Product,
-    ProductImage,
     InitialProductImage,
     InitialProductState,
-    ProductInOrder,
+    Product,
     ProductCategory,
+    ProductImage,
+    ProductInOrder,
     ProductSubcategory,
     ProductTopSubcategory,
 )

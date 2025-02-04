@@ -1,36 +1,33 @@
 # API endpoints for products
-from django.http import JsonResponse
-
-from django.db.models import Q
 from django.db import transaction
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-
-from drf_yasg.utils import swagger_auto_schema
+from django.db.models import Q
+from django.http import JsonResponse
 from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from Orders.models import Order
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from Stores.models import Store
 
 from .models import (
+    InitialProductImage,
+    InitialProductState,
     Product,
+    ProductCategory,
     ProductImage,
     ProductInOrder,
-    ProductCategory,
     ProductSubcategory,
     ProductTopSubcategory,
-    InitialProductState,
-    InitialProductImage,
 )
 from .serializers import (
-    ProductSerializer,
     ProductCategorySerializer,
-    ProductSubcategorySerializer,
     ProductInOrderSerializer,
+    ProductSerializer,
+    ProductSubcategorySerializer,
     ProductTopSubcategorySerializer,
 )
-from Stores.models import Store
-from Orders.models import Order
 
 
 @swagger_auto_schema(

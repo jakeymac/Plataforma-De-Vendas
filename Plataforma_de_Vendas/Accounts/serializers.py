@@ -1,7 +1,9 @@
-from rest_framework import serializers
-from .models import CustomUser
-from Stores.models import Store
 import re
+
+from rest_framework import serializers
+from Stores.models import Store
+
+from .models import CustomUser
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

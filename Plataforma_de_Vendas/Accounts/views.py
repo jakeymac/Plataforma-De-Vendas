@@ -1,16 +1,14 @@
-from django.shortcuts import render
+import json
+
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import redirect
-
+from django.shortcuts import redirect, render
 from Products.models import (
     Product,
     ProductCategory,
     ProductSubcategory,
     ProductTopSubcategory,
 )
-
-import json
 
 
 def is_admin(user):

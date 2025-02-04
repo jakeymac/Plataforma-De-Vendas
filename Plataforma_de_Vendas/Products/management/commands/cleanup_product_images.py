@@ -1,10 +1,10 @@
-import boto3
-from django.core.management.base import BaseCommand
-from Products.models import ProductImage, InitialProductImage
-from django.conf import settings
-
 from datetime import timedelta
+
+import boto3
+from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.utils import timezone
+from Products.models import InitialProductImage, ProductImage
 
 
 class Command(BaseCommand):
