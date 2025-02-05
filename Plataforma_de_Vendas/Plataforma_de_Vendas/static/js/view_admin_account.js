@@ -19,34 +19,34 @@ function load_data() {
     .then(data => {
         console.log(data);
         if (data.username) {
-            $("#username-label").text(`Username: ${data.username}`);
+            $('#username-label').text(`Username: ${data.username}`);
         } else {
-            $("#username-label").text("No username found");
+            $('#username-label').text('No username found');
         }
 
         if (data.email) {
-            $("#email-label").text(`Email: ${data.email}`);
+            $('#email-label').text(`Email: ${data.email}`);
         } else {
-            $("#email-label").text("No email found");
+            $('#email-label').text('No email found');
         }
 
         if (data.first_name) {
-            $("#first-name-label").text(`First name: ${data.first_name}`);
+            $('#first-name-label').text(`First name: ${data.first_name}`);
         } else {
-            $("#first-name-label").text("No first name found");
+            $('#first-name-label').text('No first name found');
         }
 
         if (data.last_name) {
-            $("#last-name-label").text(`Last name: ${data.last_name}`);
+            $('#last-name-label').text(`Last name: ${data.last_name}`);
         } else {
-            $("#last-name-label").text("No last name found");
+            $('#last-name-label').text('No last name found');
         }
 
         
     }); 
 }
 
-$(document).ready(function() {
+$(document).ready(() => {
     load_event_listeners();
     load_data();
 });

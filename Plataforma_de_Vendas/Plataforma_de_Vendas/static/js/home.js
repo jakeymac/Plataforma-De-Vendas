@@ -27,7 +27,7 @@ function load_data() {
                                 <a href="view_product/${product.id}"><h2 class="product-name-link">${product.name}</h2></a>
                                 <p>$${product.price}</p>`);
         });
-    })
+    });
 }
 
 function load_listeners() {
@@ -35,7 +35,7 @@ function load_listeners() {
         // Hide all categories' sub-category containers, then show the one being hovered over
         $('.sub-categories-container').hide();
         var targetDivId = $(this).data('target');
-        $("#" + targetDivId).show();
+        $('#' + targetDivId).show();
         
         // Hide all product show case contaienrs
         $('.product-showcase-container').hide();
@@ -53,7 +53,7 @@ function load_listeners() {
         // Hide all sub-categories' product containers, then show the one being hovered over
         $('.product-showcase-container').hide();
         var targetDivId = $(this).data('target');
-        $("#" + targetDivId).show();
+        $('#' + targetDivId).show();
 
         // Update styling of all sub-categories, then update the one being hovered over
         $('.sub-categories-list-item').css('color', 'black');
@@ -64,13 +64,13 @@ function load_listeners() {
         // Hide all product show case contaienrs
         $('.product-showcase-container').hide();
         var targetDiv = $(this).data('target');
-        $("#" + targetDiv).show();
-    })
+        $('#' + targetDiv).show();
+    });
     
 }
 
-$(document).ready(function() {
-    $("#top-categories-list-container").show(); // Show the default categories list
+$(document).ready(() => {
+    $('#top-categories-list-container').show(); // Show the default categories list
     load_data();    
     load_listeners();
 });
