@@ -1,6 +1,6 @@
 import os
 
-from .base import BASE_DIR
+from .base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

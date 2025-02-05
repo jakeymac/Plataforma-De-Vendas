@@ -35,14 +35,23 @@
     width: 40px;
 }
 
-#saving-status-icon-container img, #saving-icon-container .bi {
-    width: 40px;
-    height: 40px;
+#product-saving-icon-container {
+    display: none;
 }
 
-#product-saving-icon-container {
-    color: rgb(57,217,158);
-    display: none;
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgb(25, 187, 128); 
+    border-top: 3px solid rgb(57,217,158);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 #product-saved-icon-container {
@@ -89,7 +98,6 @@
 
 #button-container {
     text-align: center;
-
 }
 
 #extra-message-div {

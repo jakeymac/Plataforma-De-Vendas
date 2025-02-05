@@ -206,10 +206,6 @@ urlpatterns = [
     path(
         "api/orders/store/<int:store_id>/", order_endpoints.get_orders_by_store_endpoint
     ),
-    path(
-        "retrieve_profile_picture/<str:username>",
-        account_views.retrieve_profile_picture,
-    ),
 ]
 
 if settings.DEBUG:
