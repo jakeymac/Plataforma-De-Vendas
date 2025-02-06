@@ -17,13 +17,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         product_name = data.get("product_name")
-        # TODO possibly remove this entirely
-        if data.get("quantity") and data.get("quantity") < 0:
-            raise serializers.ValidationError(
-                {"quantity": "Quantity cannot be negative"}
-            )
-
-        # TODO possibly update this check to allow for the
+        # TODO update this check to allow for the
         # same product name in different stores
         if self.instance:
             if (

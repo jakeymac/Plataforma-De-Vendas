@@ -58,7 +58,7 @@ function loadData() {
     })
     .catch(error => {
         console.error('Error loading images: ', error);
-        // $("#initial-image-loading-icon-container").hide();
+        // $("#initial-image-loading-container").hide();
         // $("#inner-images-messages-label").text("Error loading images");
         // $("#inner-images-messages-label").addClass("error-message-div");
         // $("#inner-images-messages-label").show();
