@@ -28,7 +28,7 @@
             <div class="col-12" id="header-container">
                 <h2 id="header-title">Edit Product</h2>
                 <div id="saving-status-icon-container">
-                    <div id="product-saving-icon-container"><div class="spinner"></div></div>
+                    <div id="product-saving-icon-container"><div class="spinner" id="product-saving-spinner"></div></div>
                     <div id="product-saved-icon-container"><i class="bi bi-check product-save-successful" id="product-saved-icon" width="40"></i></div>
                     <div id="product-save-error-icon-container"><i class="bi bi-x-circle product-save-error" id="product-save-error-icon" width="40"></i></div>
                 </div>
@@ -93,7 +93,9 @@
                     <div id="images-container">
                         <div id="images-inner-container">
                             <div id="initial-image-loading-icon-container">
-                                <img src="{% static 'images/edit-product-images-loading-animation.gif' %}" alt="Loading Images" id="initial-image-loading-icon">
+                                <div id="initial-image-loading-spinner-container">
+                                    <div class="spinner" id="initial-image-loading-spinner"></div>
+                                </div>
                                 <p id="initial-image-loading-text">Loading Product Images</p>
                             </div>
                             <div id="inner-images-messages-container">

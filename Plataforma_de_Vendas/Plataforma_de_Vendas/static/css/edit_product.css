@@ -28,6 +28,18 @@
     margin: 0;
 }
 
+.spinner {
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    border-right: 3px solid transparent;
+    display: block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 #saving-status-icon-container {
     display: flex;
     align-items: center;
@@ -39,19 +51,11 @@
     display: none;
 }
 
-.spinner {
-    width: 40px;
-    height: 40px;
+#product-saving-spinner {
     border: 3px solid rgb(25, 187, 128); 
     border-top: 3px solid rgb(57,217,158);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    display: block;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    width: 40px;
+    height: 40px;
 }
 
 #product-saved-icon-container {
@@ -193,14 +197,22 @@
     margin-top: 50px;
     color: rgb(50, 50, 255);
     text-align: center;
+    align-items: center;
 }
 
-#initial-image-loading-icon {
-    width: 20%;
-    height: 20%;
-    margin-left: 40%;
-    margin-right: 40%;
+#initial-image-loading-spinner-container {
+    width: 40px;
+    height: 40px; /* May need to adjust this for mobile */
+    margin-left: auto;
+    margin-right: auto;
 }
+
+#initial-image-loading-spinner {
+    border: 3px solid rgb(50, 50, 255); 
+    border-top: 3px solid rgb(100, 100, 247);
+    width: 40px;
+    height: 40px;
+} 
 
 #initial-image-loading-text {
     margin-top: 20px;
@@ -231,7 +243,9 @@
 }
 
 .image-row {
-    display: none; /* Hide the image row by default until the image is actually loaded in when loading the page with all images */
+    /* Hide the image row by default until the image is actually 
+    loaded in when loading the page with all images */
+    display: none; 
     margin-right: auto;
     margin-left: auto;
     margin-bottom: 30px;
