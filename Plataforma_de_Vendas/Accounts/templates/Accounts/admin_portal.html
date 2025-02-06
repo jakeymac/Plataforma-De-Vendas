@@ -36,7 +36,7 @@
             <div class="col-6 form-container">
                 <h2>Edit Product</h2>
                 <input type="text" id="product-search" class="form-control" placeholder="Search for products">
-                <select class="form-select mt-3" id="edit-product-selector">
+                <select class="form-select mt-3" id="product-selector">
                     <option value="">Select a product</option>
                     {% if products %}
                         {% for product in products %}
@@ -46,7 +46,7 @@
                         <option value="">No products found</option>
                     {% endif %}
                 </select>
-                <div class="message-container" id="edit-product-message-container"></div>
+                <div class="message-container" id="product-message-container"></div>
                 <div class="button-container">
                     <button class="btn btn-primary mt-2" id="edit-product-button">Edit Product</button>
                     <button class="btn btn-success mt-2" id="view-product-button">View Product</button>

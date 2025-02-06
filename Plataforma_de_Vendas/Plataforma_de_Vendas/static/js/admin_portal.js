@@ -8,13 +8,13 @@ const apiUrls = {
 };
 
 function update_product_selector(products) {
-    $('#edit-product-selector').empty();
+    $('#product-selector').empty();
     if (products.length === 0) {
-        $('#edit-product-selector').append('<option value="">No products found</option>');
+        $('#product-selector').append('<option value="">No products found</option>');
     } else {
-        $('#edit-product-selector').append('<option value="">Select a product</option>');
+        $('#product-selector').append('<option value="">Select a product</option>');
         products.forEach(product => {
-            $('#edit-product-selector').append(`<option value="${product.id}">${product.product_name}</option>`);
+            $('#product-selector').append(`<option value="${product.id}">${product.product_name}</option>`);
         });
     }
 }
@@ -134,10 +134,10 @@ function load_listeners() {
     });    
 
     $('#edit-product-button').on('click', () => {
-        let productId = $('#edit-product-selector').val();
+        let productId = $('#product-selector').val();
         if (productId == '') {
-            $('#edit-product-message-container').removeClass('error-message');
-            $('#edit-product-message-container').text('Please select a product to edit');
+            $('#product-message-container').removeClass('error-message');
+            $('#product-message-container').text('Please select a product to edit');
         } else {
             // Check for product's existence to avoid errors
             fetch(`/api/products/${productId}/`, {
@@ -149,11 +149,11 @@ function load_listeners() {
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) {
-                        $('#edit-product-message-container').addClass('error-message');
-                        $('#edit-product-message-container').text('Product not found');
+                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').text('Product not found');
                     } else {
-                        $('#edit-product-message-container').addClass('error-message');
-                        $('#edit-product-message-container').text('An error occurred');
+                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').text('An error occurred');
                     }
                 } else {
                     window.location.href = '/edit_product/' + productId;
@@ -163,10 +163,10 @@ function load_listeners() {
     });
 
     $('#view-product-button').on('click', () => {
-        let productId = $('#edit-product-selector').val();
+        let productId = $('#product-selector').val();
         if (productId == '') {
-            $('#edit-product-message-container').removeClass('error-message');
-            $('#edit-product-message-container').text('Please select a product to view');
+            $('#product-message-container').removeClass('error-message');
+            $('#product-message-container').text('Please select a product to view');
         } else {
             // Check for product's existence to avoid errors
             fetch(`/api/products/${productId}/`, {
@@ -178,11 +178,11 @@ function load_listeners() {
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) {
-                        $('#edit-product-message-container').addClass('error-message');
-                        $('#edit-product-message-container').text('Product not found');
+                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').text('Product not found');
                     } else {
-                        $('#edit-product-message-container').addClass('error-message');
-                        $('#edit-product-message-container').text('An error occurred');
+                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').text('An error occurred');
                     }
                 } else {
                     window.location.href = '/view_product/' + productId;
