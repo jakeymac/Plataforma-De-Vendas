@@ -102,7 +102,7 @@
 
 /* Container for image with 'about' button and product search bar */
 #top-image-container {
-  background-image: url("/static/images/home-page-image-1.jpeg");
+  background-image: url("/static/stores/images/home-page-image-1.jpeg");
   height: 350px; 
   background-size: cover; 
   background-position: center;
@@ -165,7 +165,7 @@
 }
 
 #left-explore-image-container {
-  background-image: url("/static/images/tires-stacked-in-warehouse.jpg");
+  background-image: url("/static/stores/images/tires-stacked-in-warehouse.jpg");
   background-size: cover;
   background-position: center; 
   width: 100%;
@@ -177,7 +177,7 @@
   margin-left:0;
 }
 #right-explore-top-image-container {
-  background-image: url("/static/images/iphone-image.jpg");
+  background-image: url("/static/stores/images/iphone-image.jpg");
   background-size: cover;
   background-position: top;
   width: 100%;
@@ -186,7 +186,7 @@
 }
 
 #right-explore-bottom-image-container {
-  background-image: url("/static/images/field_equipment.jpeg");
+  background-image: url("/static/stores/images/field_equipment.jpeg");
   background-size: cover;
   background-position: center;
   width: 100%;
