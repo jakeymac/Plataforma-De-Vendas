@@ -6,12 +6,12 @@
 {% block scripts %}
     {{ block.super }}
     <script> var csrfToken = "{{ csrf_token }}"; </script>
-    <script src="{% static 'js/add_new_product.js' %}"></script>
+    <script src="{% static 'products/js/add_new_product.js' %}"></script>
 {% endblock %}
 
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/add_new_product.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/add_new_product.css' %}">
 {% endblock %}
 
 {% block content %}

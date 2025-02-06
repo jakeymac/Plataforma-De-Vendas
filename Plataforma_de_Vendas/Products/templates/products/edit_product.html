@@ -6,7 +6,7 @@
 {% block styles %}
     {{ block.super }}
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="{% static 'css/edit_product.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/edit_product.css' %}">
 {% endblock %}
 
 {% block scripts %}
@@ -18,7 +18,7 @@
              var initialProductStateId = "{{ initial_product_state.id }}";
     </script> 
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-    <script src="{% static 'js/edit_product.js' %}"></script>
+    <script src="{% static 'products/js/edit_product.js' %}"></script>
 {% endblock %}
 
 {% block content %}

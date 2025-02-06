@@ -5,7 +5,12 @@
 
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/view_admin_account.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/view_admin_account.css' %}">
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'accounts/js/view_admin_account.js' %}"></script>
 {% endblock %}
 
 {% block content%}
@@ -23,8 +28,4 @@
     </div>
 {% endblock %}
 
-{% block scripts %}
-    {{ block.super }}
-    <script src="{% static 'js/view_admin_account.js' %}"></script>
-{% endblock %}
 
