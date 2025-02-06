@@ -161,6 +161,35 @@ function load_listeners() {
             });
         }
     });
+
+    $('#view-product-button').on('click', () => {
+        let productId = $('#edit-product-selector').val();
+        if (productId == '') {
+            $('#edit-product-message-container').removeClass('error-message');
+            $('#edit-product-message-container').text('Please select a product to view');
+        } else {
+            // Check for product's existence to avoid errors
+            fetch(`/api/products/${productId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        $('#edit-product-message-container').addClass('error-message');
+                        $('#edit-product-message-container').text('Product not found');
+                    } else {
+                        $('#edit-product-message-container').addClass('error-message');
+                        $('#edit-product-message-container').text('An error occurred');
+                    }
+                } else {
+                    window.location.href = '/view_product/' + productId;
+                }
+            });
+        }
+    });
     
     $('#edit_category_selector').change(function () {
         let category = categories.find(cat=> cat.id == $(this).val()); // Uses the categories object pulled from the context in a script in the template
