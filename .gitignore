@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 Plataforma_de_Vendas/Plataforma_de_Vendas/settings/production.py
 Plataforma_de_Vendas/Plataforma_de_Vendas/media/product_images
+Plataforma_de_Vendas/Plataforma_de_Vendas/static

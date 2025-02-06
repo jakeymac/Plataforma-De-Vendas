@@ -9,12 +9,12 @@
     {{ block.super }}
     <script> var userId = "{{ user.id }}"; </script>
     <script> var csrfToken = "{{ csrf_token }}"; </script>
-    <script src="{% static 'js/view_customer_account.js' %}"></script>
+    <script src="{% static 'accounts/js/view_customer_account.js' %}"></script>
 {% endblock %}
 
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/view_customer_account.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/view_customer_account.css' %}">
 {% endblock %}
 
 {% block content %}

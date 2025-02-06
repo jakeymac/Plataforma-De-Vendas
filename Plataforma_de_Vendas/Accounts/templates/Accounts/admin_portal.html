@@ -11,12 +11,12 @@
         var subcategories = JSON.parse('{{ subcategories_json|escapejs }}');
         var products = JSON.parse('{{ products_json|escapejs }}');
     </script>
-    <script src="{% static 'js/admin_portal.js' %}"></script>
+    <script src="{% static 'accounts/js/admin_portal.js' %}"></script>
 {% endblock %}
 
 {% block styles %}
     {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/admin_portal.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/admin_portal.css' %}">
 {% endblock %}
 
 {% block content %}
