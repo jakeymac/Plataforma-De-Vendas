@@ -33,37 +33,34 @@ from .serializers import (
 @swagger_auto_schema(
     method="get",
     responses={200: "OK"},
-    description=(
-        "Get all products, all products from a specific store "
-        "by store id, or a specific product by product id"
-    ),
+    description="Get all products by store id",
 )
 @api_view(["GET"])
-def get_products_endpoint(request, store_id=None, product_id=None):
-    if store_id and product_id:
+def get_products_by_store_endpoint(request, store_id):
+    try:
+        store = Store.objects.get(id=store_id)
+        products = Product.objects.filter(store=store)
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Store.DoesNotExist:
         return Response(
-            {"message": "You cannot specify both a store id and a product id"},
-            status=status.HTTP_400_BAD_REQUEST,
+            {"message": f"Store not found with the id {store_id}"},
+            status=status.HTTP_404_NOT_FOUND,
         )
+    return Response(
+        {"message": "There was an error retreiving the products"},
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
 
-    if store_id is not None:
-        try:
-            store = Store.objects.get(id=store_id)
-            products = Product.objects.filter(store=store)
-            serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except Store.DoesNotExist:
-            return Response(
-                {"message": f"Store not found with the id {store_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        except Product.DoesNotExist:
-            return Response(
-                {"message": f"Product not found with the id {product_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
 
-    elif product_id is not None:
+@swagger_auto_schema(
+    method="get",
+    responses={200: "OK"},
+    description=("Get all products, or a specific product by product id"),
+)
+@api_view(["GET"])
+def get_products_endpoint(request, product_id=None):
+    if product_id is not None:
         try:
             product = Product.objects.get(id=product_id)
             serializer = ProductSerializer(product)
@@ -763,7 +760,13 @@ def update_top_subcategories_endpoint(request):
 
 
 @swagger_auto_schema(
-    method="POST", responses=(200, "OK"), description="Add a new product"
+    method="post",
+    responses={
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
+    },
+    description="Add a new product",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -795,7 +798,11 @@ def add_product_endpoint(request):
 
 @swagger_auto_schema(
     method="POST",
-    responses=(200, "OK"),
+    responses={
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
+    },
     description="Rollback a product to a previous state",
 )
 @api_view(["POST"])
@@ -902,7 +909,11 @@ def rollback_product_changes_endpoint(request):
 
 @swagger_auto_schema(
     method="POST",
-    responses=(200, "OK"),
+    responses={
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
+    },
     description="Create an initial state for a product to rollback to",
 )
 @api_view(["POST"])
@@ -973,7 +984,13 @@ def create_initial_product_state_endpoint(request):
 # This endpoint auto saves a product, without deleting the initial state of
 # the product, and without deleting the images of the product in storage
 @swagger_auto_schema(
-    method="POST", responses=(200, "OK"), description="Autosave a product"
+    method="post",
+    responses={
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
+    },
+    description="Autosave a product",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -1043,7 +1060,13 @@ def autosave_product_endpoint(request):
 # This endpoint finalizes the save of a product, deleting the initial state
 # of the product, and deleting the images of the product in storage
 @swagger_auto_schema(
-    method="POST", responses=(200, "OK"), description="Final save a product"
+    method="post",
+    responses={
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
+    },
+    description="Final save a product",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
