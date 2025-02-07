@@ -29,6 +29,7 @@ from .serializers import (
     ProductTopSubcategorySerializer,
 )
 
+
 @swagger_auto_schema(
     method="get",
     responses={200: "OK"},
@@ -51,12 +52,11 @@ def get_products_by_store_endpoint(request, store_id):
         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )
 
+
 @swagger_auto_schema(
     method="get",
     responses={200: "OK"},
-    description=(
-        "Get all products, or a specific product by product id"
-    ),
+    description=("Get all products, or a specific product by product id"),
 )
 @api_view(["GET"])
 def get_products_endpoint(request, product_id=None):
@@ -758,12 +758,15 @@ def update_top_subcategories_endpoint(request):
             status=status.HTTP_403_FORBIDDEN,
         )
 
+
 @swagger_auto_schema(
-    method="post", 
-    responses= {
-        200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))
+    method="post",
+    responses={
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
     },
-    description="Add a new product"
+    description="Add a new product",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -796,7 +799,9 @@ def add_product_endpoint(request):
 @swagger_auto_schema(
     method="POST",
     responses={
-        200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
     },
     description="Rollback a product to a previous state",
 )
@@ -905,7 +910,9 @@ def rollback_product_changes_endpoint(request):
 @swagger_auto_schema(
     method="POST",
     responses={
-        200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
     },
     description="Create an initial state for a product to rollback to",
 )
@@ -979,9 +986,11 @@ def create_initial_product_state_endpoint(request):
 @swagger_auto_schema(
     method="post",
     responses={
-        200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
     },
-    description="Autosave a product"
+    description="Autosave a product",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -1053,9 +1062,11 @@ def autosave_product_endpoint(request):
 @swagger_auto_schema(
     method="post",
     responses={
-        200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))
+        200: openapi.Response(
+            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
+        )
     },
-    description="Final save a product"
+    description="Final save a product",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])

@@ -104,7 +104,10 @@ urlpatterns = [
         "api/products/final_save_product/",
         product_endpoints.final_save_product_endpoint,
     ),
-    path("api/products/store/<int:store_id>/", product_endpoints.get_products_by_store_endpoint),
+    path(
+        "api/products/store/<int:store_id>/",
+        product_endpoints.get_products_by_store_endpoint,
+    ),
     path("api/products/<str:product_id>/", product_endpoints.get_products_endpoint),
     path(
         "api/products/search/<int:store_id>/",
