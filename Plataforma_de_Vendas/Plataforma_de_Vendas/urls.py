@@ -92,7 +92,6 @@ urlpatterns = [
     path("api/stores/update/", store_endpoints.update_store_endpoint),
     path("api/stores/<int:store_id>/", store_endpoints.get_stores_endpoint),
     path("api/products/", product_endpoints.get_products_endpoint),
-    path("api/products/search/", product_endpoints.search_for_product_endpoint),
     path("api/products/add/", product_endpoints.add_product_endpoint),
     path("api/products/add_image/", product_endpoints.add_product_image_endpoint),
     path("api/products/search/", product_endpoints.search_for_product_endpoint),
@@ -105,9 +104,8 @@ urlpatterns = [
         "api/products/final_save_product/",
         product_endpoints.final_save_product_endpoint,
     ),
-    path("api/products/store/<int:store_id>/", product_endpoints.get_products_endpoint),
+    path("api/products/store/<int:store_id>/", product_endpoints.get_products_by_store_endpoint),
     path("api/products/<str:product_id>/", product_endpoints.get_products_endpoint),
-    path("api/products/store/<int:store_id>/", product_endpoints.get_products_endpoint),
     path(
         "api/products/search/<int:store_id>/",
         product_endpoints.search_for_product_endpoint,
