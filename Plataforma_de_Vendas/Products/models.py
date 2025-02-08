@@ -22,9 +22,7 @@ class Product(models.Model):
         editable=False,
         unique=True,
     )
-    store = models.ForeignKey(
-        "Stores.Store", on_delete=models.CASCADE, null=True, blank=True
-    )
+    store = models.ForeignKey("Stores.Store", on_delete=models.CASCADE, null=True, blank=True)
     subcategory = models.ForeignKey(
         "ProductSubcategory", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -71,9 +69,7 @@ class InitialProductState(models.Model):
         unique=True,
     )
     product = models.ForeignKey("Product", on_delete=models.CASCADE)
-    store = models.ForeignKey(
-        "Stores.Store", on_delete=models.CASCADE, null=True, blank=True
-    )
+    store = models.ForeignKey("Stores.Store", on_delete=models.CASCADE, null=True, blank=True)
     subcategory = models.ForeignKey(
         "ProductSubcategory", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -115,9 +111,7 @@ class ProductImage(models.Model):
         unique=True,
     )
     product = models.ForeignKey("Product", on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to=product_image_upload_path, null=True, blank=True
-    )
+    image = models.ImageField(upload_to=product_image_upload_path, null=True, blank=True)
     order = models.PositiveIntegerField(default=0)
     s3_key = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -155,9 +149,7 @@ class InitialProductImage(models.Model):
     order = models.PositiveIntegerField(default=0)
     s3_key = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    original_created_at = (
-        models.DateTimeField()
-    )  # The original product image's creation date
+    original_created_at = models.DateTimeField()  # The original product image's creation date
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

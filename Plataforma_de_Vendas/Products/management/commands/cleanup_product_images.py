@@ -55,9 +55,7 @@ class Command(BaseCommand):
             for image in orphaned_images:
                 bucket.Object(image).delete()
                 self.stdout.write(f"Deleted {image}")
-            self.stdout.write(
-                self.style.SUCCESS("Orphaned images deleted successfully")
-            )
+            self.stdout.write(self.style.SUCCESS("Orphaned images deleted successfully"))
         else:
             self.stdout.write(self.style.SUCCESS("No orphaned images found"))
 

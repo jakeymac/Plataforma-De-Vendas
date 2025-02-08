@@ -46,9 +46,7 @@ def get_user_endpoint(request, user_id):
             serializer = CustomUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
-            return Response(
-                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -93,9 +91,7 @@ def get_admins_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "first_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's first name"
-            )
+            "first_name": openapi.Schema(type=openapi.TYPE_STRING, description="User's first name")
         },
     ),
 )
@@ -104,10 +100,7 @@ def get_admins_endpoint(request):
 def edit_user_endpoint(request):
     data = request.data
     user = request.user
-    if (
-        request.user.id == int(data.get("id"))
-        or request.user.groups.filter(name="Admins").exists()
-    ):
+    if request.user.id == int(data.get("id")) or request.user.groups.filter(name="Admins").exists():
         serializer = ExistingUserSerializer(instance=user, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -141,12 +134,8 @@ def get_current_user_info_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "username": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's username"
-            ),
-            "password": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's password"
-            ),
+            "username": openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+            "password": openapi.Schema(type=openapi.TYPE_STRING, description="User's password"),
         },
     ),
 )
@@ -169,9 +158,7 @@ def login_endpoint(request):
     except Exception as e:
         logger.warning(f"Error logging in: {e}")
         return Response({"message": e}, status.HTTP_401_UNAUTHORIZED)
-    return Response(
-        {"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED
-    )
+    return Response({"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(["GET"])
@@ -185,43 +172,25 @@ def logout_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "username": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's username"
-            ),
-            "password": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's password"
-            ),
-            "email": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's email"
-            ),
-            "first_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's first name"
-            ),
-            "last_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's last name"
-            ),
+            "username": openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+            "password": openapi.Schema(type=openapi.TYPE_STRING, description="User's password"),
+            "email": openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
+            "first_name": openapi.Schema(type=openapi.TYPE_STRING, description="User's first name"),
+            "last_name": openapi.Schema(type=openapi.TYPE_STRING, description="User's last name"),
             "date_of_birth": openapi.Schema(
                 type=openapi.TYPE_STRING, description="User's date of birth"
             ),
             "phone_number": openapi.Schema(
                 type=openapi.TYPE_STRING, description="User's phone number"
             ),
-            "address": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's address"
-            ),
+            "address": openapi.Schema(type=openapi.TYPE_STRING, description="User's address"),
             "address_line_two": openapi.Schema(
                 type=openapi.TYPE_STRING, description="User's address line two"
             ),
             "city": openapi.Schema(type=openapi.TYPE_STRING, description="User's city"),
-            "state": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's state"
-            ),
-            "zip_code": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's zip code"
-            ),
-            "country": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's country"
-            ),
+            "state": openapi.Schema(type=openapi.TYPE_STRING, description="User's state"),
+            "zip_code": openapi.Schema(type=openapi.TYPE_STRING, description="User's zip code"),
+            "country": openapi.Schema(type=openapi.TYPE_STRING, description="User's country"),
             "profile_picture": openapi.Schema(
                 type=openapi.TYPE_FILE, description="User's profile picture"
             ),
@@ -246,11 +215,7 @@ def register_customer_account_endpoint(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(
-            {
-                "message": (
-                    "Incorrect endpoint for registering admin accounts and sellers"
-                )
-            },
+            {"message": ("Incorrect endpoint for registering admin accounts and sellers")},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -263,9 +228,7 @@ def register_customer_account_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "username": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's username"
-            ),
+            "username": openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
         },
     ),
 )
@@ -273,9 +236,7 @@ def register_customer_account_endpoint(request):
 def check_username_availability_endpoint(request):
     # TODO this may not be entirely secure as it is possible to check all usernames
     data = request.data
-    if data.get("username") in CustomUser.objects.all().values_list(
-        "username", flat=True
-    ):
+    if data.get("username") in CustomUser.objects.all().values_list("username", flat=True):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 
@@ -285,9 +246,7 @@ def check_username_availability_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "email": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's email"
-            ),
+            "email": openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
         },
     ),
 )
@@ -317,21 +276,14 @@ def check_email_availability_endpoint(request):
 @permission_classes([IsAuthenticated])
 def update_profile_picture_endpoint(request):
     data = request.data
-    if (
-        request.user.id == int(data.get("id"))
-        or request.user.groups.filter(name="Admins").exists()
-    ):
+    if request.user.id == int(data.get("id")) or request.user.groups.filter(name="Admins").exists():
         if request.user.profile_picture:
             request.user.profile_picture.delete()
 
         request.user.profile_picture = data.get("profile_picture")
         request.user.save()
-        return Response(
-            {"message": "Profile picture updated"}, status=status.HTTP_200_OK
-        )
-    return Response(
-        {"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED
-    )
+        return Response({"message": "Profile picture updated"}, status=status.HTTP_200_OK)
+    return Response({"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # TODO convert this view to an endpoint using s3 bucket:

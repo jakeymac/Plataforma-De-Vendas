@@ -44,9 +44,7 @@ def get_stores_endpoint(request, store_id=None):
         type=openapi.TYPE_OBJECT,
         required=["name", "description"],
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Product name"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Product name"),
             "description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Product description"
             ),
@@ -153,9 +151,7 @@ def parse_store_registration_data(request_data, request_files):
             account_data["date_of_birth"] = datetime.strptime(
                 account_data["date_of_birth"], "%Y-%m-%d"
             )
-        account_data["date_of_birth"] = account_data["date_of_birth"].strftime(
-            "%Y-%m-%d"
-        )
+        account_data["date_of_birth"] = account_data["date_of_birth"].strftime("%Y-%m-%d")
     else:
         account_data["date_of_birth"] = None
 
@@ -170,9 +166,7 @@ def parse_store_registration_data(request_data, request_files):
 
 @api_view(["POST"])
 def register_store_endpoint(request):
-    account_data, store_data = parse_store_registration_data(
-        request.POST, request.FILES
-    )
+    account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
 
     # account_data["account_type"] = "seller" # TODO delete this later
     account_serializer = CustomUserSerializer(data=account_data)

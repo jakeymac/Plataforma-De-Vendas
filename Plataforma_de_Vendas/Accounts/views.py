@@ -24,9 +24,7 @@ def admin_portal(request):
     subcategories_json = list(ProductSubcategory.objects.values())
     top_subcategories_query = ProductTopSubcategory.objects.all()
     products = Product.objects.all().order_by("product_name")
-    products_json = list(
-        Product.objects.values("id", "product_name", "product_description")
-    )
+    products_json = list(Product.objects.values("id", "product_name", "product_description"))
 
     context = {
         "categories": categories,
@@ -38,9 +36,7 @@ def admin_portal(request):
     }
 
     for top_subcategory in top_subcategories_query:
-        context[f"top_subcategory_{top_subcategory.order}"] = (
-            top_subcategory.subcategory.id
-        )
+        context[f"top_subcategory_{top_subcategory.order}"] = top_subcategory.subcategory.id
 
     return render(request, "Accounts/admin_portal.html", context=context)
 

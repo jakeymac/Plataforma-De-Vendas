@@ -121,9 +121,7 @@ def search_for_product_endpoint(request, store_id=None):
         type=openapi.TYPE_OBJECT,
         required=["id"],
         properties={
-            "product_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="Product id"
-            ),
+            "product_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Product id"),
         },
     ),
     responses={200: "Deleted"},
@@ -142,9 +140,7 @@ def remove_product_endpoint(request, product_id):
             initial_products = InitialProductState.objects.filter(product=product)
             with transaction.atomic():
                 for initial_product in initial_products:
-                    for (
-                        initial_product_image
-                    ) in initial_product.initialproductimage_set.all():
+                    for initial_product_image in initial_product.initialproductimage_set.all():
                         initial_product_image.delete()
                     initial_product.delete()
                 product.delete()
@@ -226,9 +222,7 @@ def product_images_endpoint(request, product_id):
         type=openapi.TYPE_OBJECT,
         required=["product_id", "image"],
         properties={
-            "product_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="Product id"
-            ),
+            "product_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Product id"),
             "image": openapi.Schema(type=openapi.TYPE_FILE, description="Image file"),
         },
     ),
@@ -253,9 +247,7 @@ def add_product_image_endpoint(request):
                 order = data.get("order")
             else:
                 last_image = (
-                    ProductImage.objects.filter(product_id=product_id)
-                    .order_by("-order")
-                    .first()
+                    ProductImage.objects.filter(product_id=product_id).order_by("-order").first()
                 )
                 if last_image:
                     order = last_image.order + 1
@@ -283,11 +275,7 @@ def add_product_image_endpoint(request):
 
         else:
             return Response(
-                {
-                    "message": (
-                        "You do not have permission to add an image to this product"
-                    )
-                },
+                {"message": ("You do not have permission to add an image to this product")},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -319,9 +307,7 @@ def remove_product_image_endpoint(request, image_id):
         try:
             image = ProductImage.objects.get(id=image_id)
             image.delete()
-            return Response(
-                {"message": "Image removed successfully"}, status=status.HTTP_200_OK
-            )
+            return Response({"message": "Image removed successfully"}, status=status.HTTP_200_OK)
         except ProductImage.DoesNotExist:
             return Response(
                 {"message": f"Image not found with the id {image_id}"},
@@ -383,9 +369,7 @@ def find_products_in_category_endpoint(request, category_id):
         )
 
 
-@swagger_auto_schema(
-    method="get", responses={200: "OK"}, description="Get all subcategories"
-)
+@swagger_auto_schema(method="get", responses={200: "OK"}, description="Get all subcategories")
 @api_view(["GET"])
 def get_subcategories_endpoint(request):
     subcategories = ProductSubcategory.objects.all()
@@ -420,14 +404,10 @@ def get_subcategories_by_category_endpoint(request, category_id):
         serializer = ProductSubcategorySerializer(subcategories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
-        return Response(
-            {"message": f"Category not found with the id {category_id}"}, status
-        )
+        return Response({"message": f"Category not found with the id {category_id}"}, status)
 
 
-@swagger_auto_schema(
-    method="get", responses={200: "OK"}, description="Get all categories"
-)
+@swagger_auto_schema(method="get", responses={200: "OK"}, description="Get all categories")
 @api_view(["GET"])
 def get_categories_endpoint(request):
     categories = ProductCategory.objects.all()
@@ -445,9 +425,7 @@ def get_category_endpoint(request, category_id):
         serializer = ProductCategorySerializer(category)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
-        return Response(
-            {"message": f"Category not found with the id {category_id}"}, status
-        )
+        return Response({"message": f"Category not found with the id {category_id}"}, status)
 
 
 @swagger_auto_schema(
@@ -456,12 +434,8 @@ def get_category_endpoint(request, category_id):
         type=openapi.TYPE_OBJECT,
         required=["name", "category_id"],
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Subcategory name"
-            ),
-            "category_id": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="Category id"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Subcategory name"),
+            "category_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Category id"),
             "subcategory_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory description"
             ),
@@ -486,9 +460,7 @@ def add_subcategory_endpoint(request):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ProductCategory.DoesNotExist:
-            return Response(
-                {"message": f"Category not found with the id {category_id}"}, status
-            )
+            return Response({"message": f"Category not found with the id {category_id}"}, status)
     else:
         return Response(
             {"message": "You do not have permission to add a subcategory"},
@@ -502,9 +474,7 @@ def add_subcategory_endpoint(request):
         type=openapi.TYPE_OBJECT,
         required=["name"],
         properties={
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Category name"
-            ),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Category name"),
             "category_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Category description"
             ),
@@ -535,12 +505,8 @@ def add_category_endpoint(request):
         type=openapi.TYPE_OBJECT,
         required=["category", "name"],
         properties={
-            "category": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="Category id"
-            ),
-            "name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Category name"
-            ),
+            "category": openapi.Schema(type=openapi.TYPE_INTEGER, description="Category id"),
+            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Category name"),
             "category_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Category description"
             ),
@@ -583,18 +549,14 @@ def update_category_endpoint(request):
             "subcategory_description" "category",
         ],
         properties={
-            "subcategory": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="Subcategory id"
-            ),
+            "subcategory": openapi.Schema(type=openapi.TYPE_INTEGER, description="Subcategory id"),
             "subcategory_name": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory name"
             ),
             "subcategory_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory description"
             ),
-            "category": openapi.Schema(
-                type=openapi.TYPE_INTEGER, description="Category id"
-            ),
+            "category": openapi.Schema(type=openapi.TYPE_INTEGER, description="Category id"),
         },
     ),
     responses={200: "Updated"},
@@ -643,13 +605,9 @@ def remove_category_endpoint(request, category_id):
                 subcategory.delete()
             category = ProductCategory.objects.get(id=category_id)
             category.delete()
-            return Response(
-                {"message": "Category removed successfully"}, status=status.HTTP_200_OK
-            )
+            return Response({"message": "Category removed successfully"}, status=status.HTTP_200_OK)
         except ProductCategory.DoesNotExist:
-            return Response(
-                {"category": f"Category not found with the id {category_id}"}, status
-            )
+            return Response({"category": f"Category not found with the id {category_id}"}, status)
     else:
         return Response(
             {"message": "You do not have permission to remove this category"},
@@ -688,9 +646,7 @@ def remove_subcategory_endpoint(request, subcategory_id):
 @swagger_auto_schema(
     method="GET",
     responses={200: "OK"},
-    description=(
-        "Get all top subcategories or get all top subcategories by category id."
-    ),
+    description=("Get all top subcategories or get all top subcategories by category id."),
 )
 @api_view(["GET"])
 def get_top_subcategories_endpoint(request, category_id=None):
@@ -703,17 +659,13 @@ def get_top_subcategories_endpoint(request, category_id=None):
 
             return JsonResponse({})
         except ProductCategory.DoesNotExist:
-            return Response(
-                {"message": f"Category not found with the id {category_id}"}, status
-            )
+            return Response({"message": f"Category not found with the id {category_id}"}, status)
     categories = ProductCategory.objects.all()
     for category in categories:
         pass
 
 
-@swagger_auto_schema(
-    method="POST", responses={200: "OK"}, description="Update top subcategories"
-)
+@swagger_auto_schema(method="POST", responses={200: "OK"}, description="Update top subcategories")
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def update_top_subcategories_endpoint(request):
@@ -745,9 +697,7 @@ def update_top_subcategories_endpoint(request):
         if serializer.is_valid():
             # Delete the top subcategories that are being updated
             for subcategory in organized_data:
-                ProductTopSubcategory.objects.filter(
-                    order=subcategory.get("order")
-                ).delete()
+                ProductTopSubcategory.objects.filter(order=subcategory.get("order")).delete()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
@@ -761,11 +711,7 @@ def update_top_subcategories_endpoint(request):
 
 @swagger_auto_schema(
     method="post",
-    responses={
-        200: openapi.Response(
-            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
-        )
-    },
+    responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
     description="Add a new product",
 )
 @api_view(["POST"])
@@ -798,11 +744,7 @@ def add_product_endpoint(request):
 
 @swagger_auto_schema(
     method="POST",
-    responses={
-        200: openapi.Response(
-            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
-        )
-    },
+    responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
     description="Rollback a product to a previous state",
 )
 @api_view(["POST"])
@@ -831,9 +773,7 @@ def rollback_product_changes_endpoint(request):
             product_not_found = True
 
         try:
-            initial_state = InitialProductState.objects.get(
-                id=data.get("initial_product_state_id")
-            )
+            initial_state = InitialProductState.objects.get(id=data.get("initial_product_state_id"))
         except InitialProductState.DoesNotExist:
             initial_state_not_found = True
 
@@ -856,12 +796,7 @@ def rollback_product_changes_endpoint(request):
 
         elif initial_state_not_found:
             return Response(
-                {
-                    "message": (
-                        f"Initial state with id {data.get('initial_state_id')} "
-                        "not found"
-                    )
-                },
+                {"message": (f"Initial state with id {data.get('initial_state_id')} " "not found")},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -909,11 +844,7 @@ def rollback_product_changes_endpoint(request):
 
 @swagger_auto_schema(
     method="POST",
-    responses={
-        200: openapi.Response(
-            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
-        )
-    },
+    responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
     description="Create an initial state for a product to rollback to",
 )
 @api_view(["POST"])
@@ -985,11 +916,7 @@ def create_initial_product_state_endpoint(request):
 # the product, and without deleting the images of the product in storage
 @swagger_auto_schema(
     method="post",
-    responses={
-        200: openapi.Response(
-            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
-        )
-    },
+    responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
     description="Autosave a product",
 )
 @api_view(["POST"])
@@ -1028,10 +955,7 @@ def autosave_product_endpoint(request):
                     product_image.order = order
                     product_image.save()
                     product_image.refresh_from_db()
-                    print(
-                        f"Saved image {product_image.id} with order "
-                        f"{product_image.order}..."
-                    )
+                    print(f"Saved image {product_image.id} with order " f"{product_image.order}...")
                     order += 1
                 except ProductImage.DoesNotExist:
                     ids_not_found.append(image_id)
@@ -1061,11 +985,7 @@ def autosave_product_endpoint(request):
 # of the product, and deleting the images of the product in storage
 @swagger_auto_schema(
     method="post",
-    responses={
-        200: openapi.Response(
-            "Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT)
-        )
-    },
+    responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
     description="Final save a product",
 )
 @api_view(["POST"])
@@ -1117,9 +1037,7 @@ def final_save_product_endpoint(request):
                     image.delete()
                 initial_state.delete()
 
-            return Response(
-                {"message": "Product saved successfully"}, status=status.HTTP_200_OK
-            )
+            return Response({"message": "Product saved successfully"}, status=status.HTTP_200_OK)
 
         except Product.DoesNotExist:
             return Response(

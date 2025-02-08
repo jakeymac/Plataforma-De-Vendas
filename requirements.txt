@@ -7,3 +7,6 @@ django-phonenumber-field==8.0.0
 django-background-tasks==1.2.8
 django-compat==1.0.15
 django-storages==1.14.4
+pytest
+pytest-django
+pytest-cov

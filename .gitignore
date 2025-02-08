@@ -4,3 +4,4 @@ __pycache__/
 Plataforma_de_Vendas/Plataforma_de_Vendas/settings/production.py
 Plataforma_de_Vendas/Plataforma_de_Vendas/media/product_images
 Plataforma_de_Vendas/Plataforma_de_Vendas/static
+.coverage

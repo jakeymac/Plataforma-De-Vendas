@@ -159,6 +159,4 @@ class ExistingUserSerializer(CustomUserSerializer):
             return data
 
         else:
-            raise serializers.ValidationError(
-                "Serializer only to be used for existing users"
-            )
+            raise serializers.ValidationError("Serializer only to be used for existing users")
