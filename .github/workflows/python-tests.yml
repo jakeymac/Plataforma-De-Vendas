@@ -51,7 +51,9 @@ jobs:
           pytest --cov=Accounts --cov=Products --cov=Orders --cov=Stores --cov-report=html
 
       - name: Upload coverage report
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: htmlcov/
+          path: Plataforma_de_Vendas/htmlcov/
+          if-no-files-found: error
