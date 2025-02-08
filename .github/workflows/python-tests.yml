@@ -41,10 +41,12 @@ jobs:
       - name: Run migrations
         env: 
           DATABASE_URL: postgres://test_user:test_password@localhost:5432/test_db
+        working-directory: Plataforma_de_Vendas
         run: |
           python manage.py migrate
 
       - name: Run tests with coverage
+        working-directory: Plataforma_de_Vendas 
         run: |
           pytest --cov=Accounts --cov=Products --cov=Orders --cov=Stores --cov-report=term-missing
 
