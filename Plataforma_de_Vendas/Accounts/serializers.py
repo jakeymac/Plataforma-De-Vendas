@@ -46,10 +46,16 @@ class CustomUserSerializer(serializers.ModelSerializer):
         if data.get("zip_code") and not re.match(pattern, data.get("zip_code")):
             errors["zip_code"] = "Invalid zip code"
 
-        if not self.is_phone_number_valid(
-            data.get("phone_number"), data.get("country_phone_number_code")
-        ):
-            errors["phone_number"] = "Invalid phone number"
+        print("Testing output...")
+        print("Phone number: ", data.get("phone_number"))
+        print("Country code: ", data.get("country_phone_number_code"))
+
+        if data.get("phone_number") and data.get("country_phone_number_code"):
+            if not self.is_phone_number_valid(
+                data.get("phone_number"), data.get("country_phone_number_code")
+            ):
+                errors["phone_number"] = "Invalid phone number"
+        
 
         if data.get("account_type") == "seller":
             if not data.get("store"):
@@ -94,10 +100,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
             return f"({numbers[:3]}) {numbers[3:6]}-{numbers[6:]}"
 
     def create(self, validated_data):
-        validated_data["phone_number"] = self.format_phone_number(
-            validated_data.get("country_phone_number_code"),
-            validated_data.get("phone_number"),
-        )
+        if validated_data.get("country_phone_number_code") and validated_data.get("phone_number"):
+            validated_data["phone_number"] = self.format_phone_number(
+                validated_data.get("country_phone_number_code"),
+                validated_data.get("phone_number"),
+            )
         password = validated_data.pop("password", None)
         user = super().create(validated_data)
         if password:
@@ -108,10 +115,12 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        validated_data["phone_number"] = self.format_phone_number(
-            validated_data.get("country_phone_number_code"),
-            validated_data.get("phone_number"),
-        )
+        if validated_data.get("country_phone_number_code") and validated_data.get("phone_number"):
+            validated_data["phone_number"] = self.format_phone_number(
+                validated_data.get("country_phone_number_code"),
+                validated_data.get("phone_number"),
+            )
+        
         if validated_data.get("password", None):
             password = validated_data.pop("password")
             instance.set_password(password)
@@ -148,10 +157,12 @@ class ExistingUserSerializer(CustomUserSerializer):
             if data.get("zip_code") and not re.match(pattern, data.get("zip_code")):
                 errors["zip_code"] = "Invalid zip code"
 
-            if not self.is_phone_number_valid(
-                data.get("phone_number"), data.get("country_phone_number_code")
-            ):
-                errors["phone_number"] = "Invalid phone number"
+            if data.get("phone_number") and data.get("country_phone_number_code"):
+                if not self.is_phone_number_valid(
+                    data.get("phone_number"), data.get("country_phone_number_code")
+                ):
+                    errors["phone_number"] = "Invalid phone number"
+
 
             if errors:
                 raise serializers.ValidationError(errors)

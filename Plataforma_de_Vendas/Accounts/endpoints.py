@@ -47,6 +47,11 @@ def get_user_endpoint(request, user_id):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    # TODO may want to look at this, but for now this is the behavior of this endpoint
+    elif request.user.id == user_id:
+        user = CustomUser.objects.get(id=user_id)
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -85,6 +90,12 @@ def get_admins_endpoint(request):
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+# TODO add an endpoint for getting all sellers
+
+# TODO add an endpoint to create a new account
+# MUST USE SERIALIZER
+
+
 # TODO add schema info here.
 @swagger_auto_schema(
     method="put",
@@ -99,8 +110,11 @@ def get_admins_endpoint(request):
 @permission_classes([IsAuthenticated])
 def edit_user_endpoint(request):
     data = request.data
-    user = request.user
-    if request.user.id == int(data.get("id")) or request.user.groups.filter(name="Admins").exists():
+    if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
+        try: 
+            user = CustomUser.objects.get(id=data.get("id"))
+        except CustomUser.DoesNotExist:
+            return Response({"message": "User not found"}, status.HTTP_404_NOT_FOUND)
         serializer = ExistingUserSerializer(instance=user, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -139,7 +153,7 @@ def get_current_user_info_endpoint(request):
         },
     ),
 )
-@api_view(["POST", "GET"])
+@api_view(["POST", "GET"])  # TODO remove GET method
 def login_endpoint(request):
     try:
         data = request.data
