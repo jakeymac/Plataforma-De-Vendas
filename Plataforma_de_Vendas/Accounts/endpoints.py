@@ -46,9 +46,12 @@ def get_user_endpoint(request, user_id):
             serializer = CustomUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
-            return Response(
-                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    # TODO may want to look at this, but for now this is the behavior of this endpoint
+    elif request.user.id == user_id:
+        user = CustomUser.objects.get(id=user_id)
+        serializer = CustomUserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -87,15 +90,19 @@ def get_admins_endpoint(request):
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+# TODO add an endpoint for getting all sellers
+
+# TODO add an endpoint to create a new account
+# MUST USE SERIALIZER
+
+
 # TODO add schema info here.
 @swagger_auto_schema(
     method="put",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "first_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's first name"
-            )
+            "first_name": openapi.Schema(type=openapi.TYPE_STRING, description="User's first name")
         },
     ),
 )
@@ -103,11 +110,11 @@ def get_admins_endpoint(request):
 @permission_classes([IsAuthenticated])
 def edit_user_endpoint(request):
     data = request.data
-    user = request.user
-    if (
-        request.user.id == int(data.get("id"))
-        or request.user.groups.filter(name="Admins").exists()
-    ):
+    if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
+        try:
+            user = CustomUser.objects.get(id=data.get("id"))
+        except CustomUser.DoesNotExist:
+            return Response({"message": "User not found"}, status.HTTP_404_NOT_FOUND)
         serializer = ExistingUserSerializer(instance=user, data=data)
         if serializer.is_valid():
             serializer.save()
@@ -141,37 +148,37 @@ def get_current_user_info_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "username": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's username"
-            ),
-            "password": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's password"
-            ),
+            "username": openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+            "password": openapi.Schema(type=openapi.TYPE_STRING, description="User's password"),
         },
     ),
 )
-@api_view(["POST", "GET"])
+@api_view(["POST", "GET"])  # TODO remove GET method
 def login_endpoint(request):
-    try:
-        data = request.data
-        username = data.get("username")
-        password = data.get("password")
+    data = request.data
+    username = data.get("username")
+    password = data.get("password")
 
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return Response({"message": "Logged in"}, status.HTTP_200_OK)
-        else:
-            return Response(
-                {"message": "Username or password is incorrect"},
-                status.HTTP_401_UNAUTHORIZED,
-            )
-    except Exception as e:
-        logger.warning(f"Error logging in: {e}")
-        return Response({"message": e}, status.HTTP_401_UNAUTHORIZED)
-    return Response(
-        {"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED
-    )
+    if username is None and password is None:
+        return Response(
+            {"message": "Username and password are required"}, status.HTTP_400_BAD_REQUEST
+        )
+
+    if username is None:
+        return Response({"message": "Username is required"}, status.HTTP_400_BAD_REQUEST)
+
+    if password is None:
+        return Response({"message": "Password is required"}, status.HTTP_400_BAD_REQUEST)
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return Response({"message": "Logged in"}, status.HTTP_200_OK)
+    else:
+        return Response(
+            {"message": "Username or password is incorrect"},
+            status.HTTP_401_UNAUTHORIZED,
+        )
 
 
 @api_view(["GET"])
@@ -185,43 +192,25 @@ def logout_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "username": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's username"
-            ),
-            "password": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's password"
-            ),
-            "email": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's email"
-            ),
-            "first_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's first name"
-            ),
-            "last_name": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's last name"
-            ),
+            "username": openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
+            "password": openapi.Schema(type=openapi.TYPE_STRING, description="User's password"),
+            "email": openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
+            "first_name": openapi.Schema(type=openapi.TYPE_STRING, description="User's first name"),
+            "last_name": openapi.Schema(type=openapi.TYPE_STRING, description="User's last name"),
             "date_of_birth": openapi.Schema(
                 type=openapi.TYPE_STRING, description="User's date of birth"
             ),
             "phone_number": openapi.Schema(
                 type=openapi.TYPE_STRING, description="User's phone number"
             ),
-            "address": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's address"
-            ),
+            "address": openapi.Schema(type=openapi.TYPE_STRING, description="User's address"),
             "address_line_two": openapi.Schema(
                 type=openapi.TYPE_STRING, description="User's address line two"
             ),
             "city": openapi.Schema(type=openapi.TYPE_STRING, description="User's city"),
-            "state": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's state"
-            ),
-            "zip_code": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's zip code"
-            ),
-            "country": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's country"
-            ),
+            "state": openapi.Schema(type=openapi.TYPE_STRING, description="User's state"),
+            "zip_code": openapi.Schema(type=openapi.TYPE_STRING, description="User's zip code"),
+            "country": openapi.Schema(type=openapi.TYPE_STRING, description="User's country"),
             "profile_picture": openapi.Schema(
                 type=openapi.TYPE_FILE, description="User's profile picture"
             ),
@@ -233,8 +222,8 @@ def logout_endpoint(request):
 )
 @api_view(["POST"])
 def register_customer_account_endpoint(request):
-    # TODO edit this endpoint to convert to django groups
     data = request.data
+    # TODO may want to remove this check, just have all accounts sent to this endpoint be customers
     if data.get("account_type") == "customer":
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
@@ -246,11 +235,7 @@ def register_customer_account_endpoint(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(
-            {
-                "message": (
-                    "Incorrect endpoint for registering admin accounts and sellers"
-                )
-            },
+            {"message": ("Incorrect endpoint for registering admin accounts and sellers")},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -263,9 +248,7 @@ def register_customer_account_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "username": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's username"
-            ),
+            "username": openapi.Schema(type=openapi.TYPE_STRING, description="User's username"),
         },
     ),
 )
@@ -273,9 +256,7 @@ def register_customer_account_endpoint(request):
 def check_username_availability_endpoint(request):
     # TODO this may not be entirely secure as it is possible to check all usernames
     data = request.data
-    if data.get("username") in CustomUser.objects.all().values_list(
-        "username", flat=True
-    ):
+    if data.get("username") in CustomUser.objects.all().values_list("username", flat=True):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 
@@ -285,15 +266,16 @@ def check_username_availability_endpoint(request):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
-            "email": openapi.Schema(
-                type=openapi.TYPE_STRING, description="User's email"
-            ),
+            "email": openapi.Schema(type=openapi.TYPE_STRING, description="User's email"),
         },
     ),
 )
 @api_view(["POST"])
 def check_email_availability_endpoint(request):
     # TODO this may not be entirely secure as it is possible to check all emails
+
+    # TODO could update this endpoint to check if the provided email
+    # is even an actual email address in the first place
     data = request.data
     if data.get("email") in CustomUser.objects.all().values_list("email", flat=True):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
@@ -317,20 +299,16 @@ def check_email_availability_endpoint(request):
 @permission_classes([IsAuthenticated])
 def update_profile_picture_endpoint(request):
     data = request.data
-    if (
-        request.user.id == int(data.get("id"))
-        or request.user.groups.filter(name="Admins").exists()
-    ):
+    if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
         if request.user.profile_picture:
             request.user.profile_picture.delete()
 
         request.user.profile_picture = data.get("profile_picture")
         request.user.save()
-        return Response(
-            {"message": "Profile picture updated"}, status=status.HTTP_200_OK
-        )
+        return Response({"message": "Profile picture updated."}, status=status.HTTP_200_OK)
     return Response(
-        {"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED
+        {"message": "You are not authorized to update this account's profile picture."},
+        status=status.HTTP_401_UNAUTHORIZED,
     )
 
 

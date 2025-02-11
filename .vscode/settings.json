@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "Plataforma_de_Vendas"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

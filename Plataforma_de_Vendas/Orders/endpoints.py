@@ -40,10 +40,7 @@ def get_order_endpoint(request, order_id):
         order = Order.objects.get(id=order_id)
         if (
             request.user.groups.filter(name="Admins").exists()
-            or (
-                request.user.groups.filter(name="Sellers")
-                and order.store == request.user.store
-            )
+            or (request.user.groups.filter(name="Sellers") and order.store == request.user.store)
             or order.user == request.user
         ):
             serializer = OrderSerializer(order)
@@ -97,8 +94,7 @@ def get_orders_by_store_endpoint(request, store_id):
     # TODO add a check to see if the user is a seller and
     # if they have permissions to view orders ( MAYBE )
     if request.user.groups.filter(name="Admins").exists() or (
-        request.user.groups.filter(name="Sellers").exists()
-        and request.user.store.id == store_id
+        request.user.groups.filter(name="Sellers").exists() and request.user.store.id == store_id
     ):
         try:
             store = Store.objects.get(id=store_id)

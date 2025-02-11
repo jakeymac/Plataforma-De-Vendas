@@ -73,11 +73,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
         if ProductSubcategory.objects.filter(subcategory_name=name).exists():
             raise serializers.ValidationError(
-                {
-                    "category_name": (
-                        "Category with this name already exists as a subcategory"
-                    )
-                }
+                {"category_name": ("Category with this name already exists as a subcategory")}
             )
         return data
 
@@ -95,11 +91,7 @@ class ProductSubcategorySerializer(serializers.ModelSerializer):
         name = data.get("subcategory_name")
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError(
-                {
-                    "subcategory_name": (
-                        "Subcategory with this name already exists as a category"
-                    )
-                }
+                {"subcategory_name": ("Subcategory with this name already exists as a category")}
             )
         if self.instance:
             if (
@@ -126,8 +118,6 @@ class ProductTopSubcategorySerializer(serializers.ModelSerializer):
     def validate(self, data):
         order = data.get("order")
         if order < 1 or order > 6:
-            raise serializers.ValidationError(
-                {"order": "Order must be between 1 and 6"}
-            )
+            raise serializers.ValidationError({"order": "Order must be between 1 and 6"})
 
         return data
