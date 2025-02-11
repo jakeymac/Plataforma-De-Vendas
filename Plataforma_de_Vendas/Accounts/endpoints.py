@@ -155,25 +155,28 @@ def get_current_user_info_endpoint(request):
 )
 @api_view(["POST", "GET"])  # TODO remove GET method
 def login_endpoint(request):
-    try:
-        data = request.data
-        username = data.get("username")
-        password = data.get("password")
+    data = request.data
+    username = data.get("username")
+    password = data.get("password")
 
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return Response({"message": "Logged in"}, status.HTTP_200_OK)
-        else:
-            return Response(
-                {"message": "Username or password is incorrect"},
-                status.HTTP_401_UNAUTHORIZED,
-            )
-    except Exception as e:
-        logger.warning(f"Error logging in: {e}")
-        return Response({"message": e}, status.HTTP_401_UNAUTHORIZED)
-    return Response({"message": "Username or password is incorrect"}, status.HTTP_401_UNAUTHORIZED)
+    if username is None and password is None:
+        return Response({"message": "Username and password are required"}, status.HTTP_400_BAD_REQUEST)
 
+    if username is None:
+        return Response({"message": "Username is required"}, status.HTTP_400_BAD_REQUEST)
+
+    if password is None:
+        return Response({"message": "Password is required"}, status.HTTP_400_BAD_REQUEST)
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        login(request, user)
+        return Response({"message": "Logged in"}, status.HTTP_200_OK)
+    else:
+        return Response(
+            {"message": "Username or password is incorrect"},
+            status.HTTP_401_UNAUTHORIZED,
+        )
 
 @api_view(["GET"])
 def logout_endpoint(request):
@@ -216,8 +219,8 @@ def logout_endpoint(request):
 )
 @api_view(["POST"])
 def register_customer_account_endpoint(request):
-    # TODO edit this endpoint to convert to django groups
     data = request.data
+    # TODO may want to remove this check, just have all accounts sent to this endpoint be customers
     if data.get("account_type") == "customer":
         serializer = CustomUserSerializer(data=data)
         if serializer.is_valid():
@@ -267,6 +270,9 @@ def check_username_availability_endpoint(request):
 @api_view(["POST"])
 def check_email_availability_endpoint(request):
     # TODO this may not be entirely secure as it is possible to check all emails
+
+    # TODO could update this endpoint to check if the provided email 
+    # is even an actual email address in the first place
     data = request.data
     if data.get("email") in CustomUser.objects.all().values_list("email", flat=True):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
@@ -290,14 +296,14 @@ def check_email_availability_endpoint(request):
 @permission_classes([IsAuthenticated])
 def update_profile_picture_endpoint(request):
     data = request.data
-    if request.user.id == int(data.get("id")) or request.user.groups.filter(name="Admins").exists():
+    if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
         if request.user.profile_picture:
             request.user.profile_picture.delete()
 
         request.user.profile_picture = data.get("profile_picture")
         request.user.save()
-        return Response({"message": "Profile picture updated"}, status=status.HTTP_200_OK)
-    return Response({"message": "You are not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({"message": "Profile picture updated."}, status=status.HTTP_200_OK)
+    return Response({"message": "You are not authorized to update this account's profile picture."}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # TODO convert this view to an endpoint using s3 bucket:
