@@ -55,7 +55,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 data.get("phone_number"), data.get("country_phone_number_code")
             ):
                 errors["phone_number"] = "Invalid phone number"
-        
 
         if data.get("account_type") == "seller":
             if not data.get("store"):
@@ -120,7 +119,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
                 validated_data.get("country_phone_number_code"),
                 validated_data.get("phone_number"),
             )
-        
+
         if validated_data.get("password", None):
             password = validated_data.pop("password")
             instance.set_password(password)
@@ -162,7 +161,6 @@ class ExistingUserSerializer(CustomUserSerializer):
                     data.get("phone_number"), data.get("country_phone_number_code")
                 ):
                     errors["phone_number"] = "Invalid phone number"
-
 
             if errors:
                 raise serializers.ValidationError(errors)

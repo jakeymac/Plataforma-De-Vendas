@@ -111,7 +111,7 @@ def get_admins_endpoint(request):
 def edit_user_endpoint(request):
     data = request.data
     if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
-        try: 
+        try:
             user = CustomUser.objects.get(id=data.get("id"))
         except CustomUser.DoesNotExist:
             return Response({"message": "User not found"}, status.HTTP_404_NOT_FOUND)
@@ -160,7 +160,9 @@ def login_endpoint(request):
     password = data.get("password")
 
     if username is None and password is None:
-        return Response({"message": "Username and password are required"}, status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"message": "Username and password are required"}, status.HTTP_400_BAD_REQUEST
+        )
 
     if username is None:
         return Response({"message": "Username is required"}, status.HTTP_400_BAD_REQUEST)
@@ -177,6 +179,7 @@ def login_endpoint(request):
             {"message": "Username or password is incorrect"},
             status.HTTP_401_UNAUTHORIZED,
         )
+
 
 @api_view(["GET"])
 def logout_endpoint(request):
@@ -271,7 +274,7 @@ def check_username_availability_endpoint(request):
 def check_email_availability_endpoint(request):
     # TODO this may not be entirely secure as it is possible to check all emails
 
-    # TODO could update this endpoint to check if the provided email 
+    # TODO could update this endpoint to check if the provided email
     # is even an actual email address in the first place
     data = request.data
     if data.get("email") in CustomUser.objects.all().values_list("email", flat=True):
@@ -303,7 +306,10 @@ def update_profile_picture_endpoint(request):
         request.user.profile_picture = data.get("profile_picture")
         request.user.save()
         return Response({"message": "Profile picture updated."}, status=status.HTTP_200_OK)
-    return Response({"message": "You are not authorized to update this account's profile picture."}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(
+        {"message": "You are not authorized to update this account's profile picture."},
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
 
 
 # TODO convert this view to an endpoint using s3 bucket:

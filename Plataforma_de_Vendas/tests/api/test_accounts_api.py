@@ -1,9 +1,10 @@
-import pytest
-from rest_framework.test import APIClient
-from rest_framework import status
-from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
 from unittest.mock import patch
+
+import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -240,7 +241,7 @@ class TestEditUserEndpoint:
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 400
-    
+
     def test_nonexistent_user_id(self, admin_fixture):
         """Should return a 404 Not Found response."""
         admin_user, admin_client = admin_fixture
@@ -255,8 +256,8 @@ class TestEditUserEndpoint:
 
 
 class TestLoginEndpoint:
-    """ Tests the login_endpoint - api/accounts/login/ - login-endpoint """
-    
+    """Tests the login_endpoint - api/accounts/login/ - login-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = reverse("login-endpoint")
@@ -313,7 +314,7 @@ class TestLoginEndpoint:
 
 
 class TestLogoutEndpoint:
-    """ Tests the logout_endpoint - api/accounts/logout/ - logout-endpoint """
+    """Tests the logout_endpoint - api/accounts/logout/ - logout-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -326,9 +327,10 @@ class TestLogoutEndpoint:
         response = customer_client.get(url)
         assert response.status_code == 200
 
+
 class TestRegisterCustomerEndpoint:
-    """ Tests the register_customer_account_endpoint - api/accounts/register/ - 
-    register-customer-endpoint """
+    """Tests the register_customer_account_endpoint - api/accounts/register/ -
+    register-customer-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self, customer_group, seller_group):
@@ -344,7 +346,7 @@ class TestRegisterCustomerEndpoint:
             "password": "password123",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = anonymous_client.post(url, data, format="json")
         assert response.status_code == 201
@@ -356,11 +358,11 @@ class TestRegisterCustomerEndpoint:
             "username": "new_customer",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = anonymous_client.post(url, data, format="json")
         assert response.status_code == 400
-        assert response.json()['password'][0] == "This field is required."
+        assert response.json()["password"][0] == "This field is required."
 
     def test_already_existing_username(self, anonymous_client, customer_fixture):
         """Should return a 400 Bad Request response."""
@@ -371,12 +373,12 @@ class TestRegisterCustomerEndpoint:
             "password": "password123",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = anonymous_client.post(url, data, format="json")
         assert response.status_code == 400
-        assert response.json()['username'][0] == "A user with that username already exists."
-        
+        assert response.json()["username"][0] == "A user with that username already exists."
+
     def test_seller_account_creation(self, anonymous_client):
         """Should return a 400 Bad Request response."""
         url = reverse("register-customer-endpoint")
@@ -385,14 +387,15 @@ class TestRegisterCustomerEndpoint:
             "password": "password123",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "account_type": "seller"
+            "account_type": "seller",
         }
         response = anonymous_client.post(url, data, format="json")
         assert response.status_code == 400
 
+
 class TestCheckUsernameAvailabilityEndpoint:
-    """ Tests the check_username_availability_endpoint - api/accounts/username_available/ - 
-    username-availability-endpoint """
+    """Tests the check_username_availability_endpoint - api/accounts/username_available/ -
+    username-availability-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -400,10 +403,9 @@ class TestCheckUsernameAvailabilityEndpoint:
 
     def test_valid_username(self, anonymous_client, customer_fixture):
         """Should return a 200 OK response."""
-        customer_user, _ = customer_fixture # Ensure we have a user in the database
+        customer_user, _ = customer_fixture  # Ensure we have a user in the database
         data = {"username": "new_username"}
         response = anonymous_client.post(self.url, data, format="json")
-        print(response.json())
         assert response.status_code == 200
         assert response.json()["is_available"] == True
 
@@ -415,9 +417,10 @@ class TestCheckUsernameAvailabilityEndpoint:
         assert response.status_code == 200
         assert response.json()["is_available"] == False
 
+
 class TestCheckEmailAvailabilityEndpoint:
-    """ Tests the check_email_availability_endpoint - api/accounts/email_available/ - 
-    email-availability-endpoint """
+    """Tests the check_email_availability_endpoint - api/accounts/email_available/ -
+    email-availability-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -425,7 +428,7 @@ class TestCheckEmailAvailabilityEndpoint:
 
     def test_valid_email(self, anonymous_client, seller_fixture):
         """Should return a 200 OK response."""
-        seller_user, _ = seller_fixture # Ensure we have a user in the database
+        seller_user, _ = seller_fixture  # Ensure we have a user in the database
         data = {"email": "new_email@gmail.com"}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
@@ -439,9 +442,10 @@ class TestCheckEmailAvailabilityEndpoint:
         assert response.status_code == 200
         assert response.json()["is_available"] == False
 
+
 class TestUpdateProfilePictureEndpoint:
-    """ Tests the update_profile_picture_endpoint - api/accounts/update_profile_picture/ - 
-    update-profile-picture-endpoint """
+    """Tests the update_profile_picture_endpoint - api/accounts/update_profile_picture/ -
+    update-profile-picture-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -459,15 +463,17 @@ class TestUpdateProfilePictureEndpoint:
     def test_existing_picture_is_deleted(self, mock_delete, customer_fixture):
         """Test that an existing profile picture is deleted before a new one is uploaded."""
         customer_user, customer_client = customer_fixture
-        customer_user.profile_picture = SimpleUploadedFile("old.jpg", b"old_content", content_type="image/jpeg")
+        customer_user.profile_picture = SimpleUploadedFile(
+            "old.jpg", b"old_content", content_type="image/jpeg"
+        )
         customer_user.save()
-        
+
         image = SimpleUploadedFile("new.jpg", b"new_content", content_type="image/jpeg")
         data = {"id": str(customer_user.id), "profile_picture": image}
         response = customer_client.put(self.url, data, format="multipart")
         assert response.status_code == status.HTTP_200_OK
         # Ensure delete() was called to delete the old profile picture
-        mock_delete.assert_called_once()  
+        mock_delete.assert_called_once()
 
     def test_valid_admin_profile_picture(self, admin_fixture, customer_fixture):
         """Should return a 200 OK response."""
@@ -486,7 +492,10 @@ class TestUpdateProfilePictureEndpoint:
         data = {"id": customer_user.id, "profile_picture": image}
         response = seller_client.put(self.url, data, format="multipart")
         assert response.status_code == 401
-        assert response.json()["message"] == "You are not authorized to update this account's profile picture."
+        assert (
+            response.json()["message"]
+            == "You are not authorized to update this account's profile picture."
+        )
 
     def test_unauthenticated_profile_picture(self, anonymous_client, customer_fixture):
         """Should return a 403 Forbidden response."""

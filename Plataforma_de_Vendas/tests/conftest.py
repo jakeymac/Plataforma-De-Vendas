@@ -1,7 +1,8 @@
 import pytest
-from rest_framework.test import APIClient
 from Accounts.models import CustomUser
 from django.contrib.auth.models import Group
+from rest_framework.test import APIClient
+
 
 @pytest.fixture(scope="function")
 def admin_group(db):
@@ -28,9 +29,7 @@ def customer_group(db):
 def admin_fixture(db):
     admin_group, _ = Group.objects.get_or_create(name="Admins")
     admin_user = CustomUser.objects.create_superuser(
-        username="pytest_admin", 
-        password="password123", 
-         email="admin_email_123@gmail.com"
+        username="pytest_admin", password="password123", email="admin_email_123@gmail.com"
     )
     admin_user.groups.add(Group.objects.get(name="Admins"))
     admin_user.save()
@@ -43,9 +42,7 @@ def admin_fixture(db):
 def seller_fixture(db):
     seller_group, _ = Group.objects.get_or_create(name="Sellers")
     seller_user = CustomUser.objects.create_user(
-        username="pytest_seller", 
-        password="password123", 
-        email="seller_email_123@gmail.com"
+        username="pytest_seller", password="password123", email="seller_email_123@gmail.com"
     )
     seller_user.groups.add(Group.objects.get(name="Sellers"))
     seller_user.save()
@@ -58,9 +55,7 @@ def seller_fixture(db):
 def customer_fixture(db):
     customer_group, created = Group.objects.get_or_create(name="Customers")
     customer_user = CustomUser.objects.create_user(
-        username="pytest_customer", 
-        password="password123",
-        email="customer_email_123@gmail.com"
+        username="pytest_customer", password="password123", email="customer_email_123@gmail.com"
     )
     customer_user.groups.add(Group.objects.get(name="Customers"))
     customer_user.save()
