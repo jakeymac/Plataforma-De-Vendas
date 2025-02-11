@@ -4,7 +4,6 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -151,7 +150,8 @@ class TestGetAdminsEndpoint:
 
 @pytest.mark.django_db
 class TestGetCurrentUserInfoEndpoint:
-    """Tests the get_current_user_info_endpoint - api/accounts/current-user/ - current-user-endpoint"""
+    """Tests the get_current_user_info_endpoint - api/accounts/current-user/ -
+    current-user-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -407,7 +407,7 @@ class TestCheckUsernameAvailabilityEndpoint:
         data = {"username": "new_username"}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
-        assert response.json()["is_available"] == True
+        assert response.json()["is_available"]
 
     def test_invalid_username(self, anonymous_client, seller_fixture):
         """Should return a 200 OK response."""
@@ -415,7 +415,7 @@ class TestCheckUsernameAvailabilityEndpoint:
         data = {"username": seller_user.username}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
-        assert response.json()["is_available"] == False
+        assert not response.json()["is_available"]
 
 
 class TestCheckEmailAvailabilityEndpoint:
@@ -432,7 +432,7 @@ class TestCheckEmailAvailabilityEndpoint:
         data = {"email": "new_email@gmail.com"}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
-        assert response.json()["is_available"] == True
+        assert response.json()["is_available"]
 
     def test_invalid_email(self, anonymous_client, customer_fixture):
         """Should return a 200 OK response."""
@@ -440,7 +440,7 @@ class TestCheckEmailAvailabilityEndpoint:
         data = {"email": customer_user.email}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
-        assert response.json()["is_available"] == False
+        assert not response.json()["is_available"]
 
 
 class TestUpdateProfilePictureEndpoint:

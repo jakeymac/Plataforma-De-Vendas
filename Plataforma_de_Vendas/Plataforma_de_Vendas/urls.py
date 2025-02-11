@@ -148,8 +148,9 @@ urlpatterns = [
         product_endpoints.get_products_endpoint,
         name="product-by-id-endpoint",
     ),
+    # This may get replaced by a proper search endpoint with multiple filters
     path(
-        "api/products/search/<int:store_id>/",  # This may get replaced by a proper search endpoint with multiple filters
+        "api/products/search/<int:store_id>/",
         product_endpoints.search_for_product_endpoint,
         name="search-product-by-store-endpoint",
     ),
