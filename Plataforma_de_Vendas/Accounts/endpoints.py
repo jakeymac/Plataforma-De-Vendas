@@ -299,13 +299,20 @@ def check_email_availability_endpoint(request):
 @permission_classes([IsAuthenticated])
 def update_profile_picture_endpoint(request):
     data = request.data
-    if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
-        if request.user.profile_picture:
-            request.user.profile_picture.delete()
+    new_profile_picture = request.FILES.get("profile_picture")
 
-        request.user.profile_picture = data.get("profile_picture")
-        request.user.save()
-        return Response({"message": "Profile picture updated."}, status=status.HTTP_200_OK)
+    if request.user.id == str(data.get("id")) or request.user.groups.filter(name="Admins").exists():
+        user = CustomUser.objects.get(id=data.get("id"))
+        if user.profile_picture and new_profile_picture:
+            user.profile_picture.delete()
+
+        if new_profile_picture:
+            user.profile_picture = new_profile_picture
+            user.save()
+            return Response({"message": "Profile picture updated."}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "No profile picture provided."}, status=status.HTTP_400_BAD_REQUEST
+        )
     return Response(
         {"message": "You are not authorized to update this account's profile picture."},
         status=status.HTTP_401_UNAUTHORIZED,
