@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import IntegrityError, models
+from django.db import IntegrityError, transaction, models
 from nanoid import generate
 
 
@@ -20,6 +20,7 @@ class CustomUser(AbstractUser):
         unique=True,
     )
 
+    
     store = models.ForeignKey(
         "Stores.Store", on_delete=models.CASCADE, null=True, blank=True
     )  # For sellers to have a store
@@ -29,6 +30,7 @@ class CustomUser(AbstractUser):
 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
 
     address = models.TextField(null=True, blank=True)
     address_two = models.TextField(null=True, blank=True)
@@ -45,17 +47,27 @@ class CustomUser(AbstractUser):
 
     # Custom save method to generate unique id and ensure it is unique
     def save(self, *args, **kwargs):
-        if not self.id:
-            self.id = generate_unique_id()
-        while True:
+        # Prevent infinite loops
+        attempts = 0
+        max_attempts = 5
+        while attempts < max_attempts:
             try:
-                super().save(*args, **kwargs)
-                break
-            # This error is caused by a non-unique id due to
-            # the 'unique=True' constraint on the id field
-            except IntegrityError:
-                # Regenerate the id and try again
-                self.id = generate_unique_id()
+                with transaction.atomic():
+                    super().save(*args, **kwargs)
+                return
+
+            except IntegrityError as e:
+                if "id" in str(e):
+                    self.id=generate_unique_id()
+                    attempts += 1
+                elif "username" in str(e):
+                    raise IntegrityError(f"Username '{self.username}' is already taken.")
+                elif "email" in str(e):
+                    raise IntegrityError(f"Email '{self.email}' is already taken.")
+
+        raise IntegrityError(
+            f"Could not generate a unique id after {max_attempts} attempts"
+        )
 
     def __str__(self):
         return self.username

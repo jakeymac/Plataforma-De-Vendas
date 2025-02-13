@@ -186,6 +186,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com"
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -201,6 +202,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com"
         }
         response = customer_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -215,6 +217,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com"
         }
         response = anonymous_client.put(self.url, data, format="json")
         assert response.status_code == 403
@@ -227,6 +230,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com"
         }
         response = seller_client.put(self.url, data, format="json")
         assert response.status_code == 401
@@ -239,6 +243,7 @@ class TestEditUserEndpoint:
             "username": admin_user.username,
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com"
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 400
@@ -251,6 +256,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com"
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 404
@@ -347,6 +353,7 @@ class TestRegisterCustomerEndpoint:
             "password": "password123",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "anonymous_email@example.com",
             "account_type": "customer",
         }
         response = anonymous_client.post(url, data, format="json")
@@ -430,7 +437,7 @@ class TestCheckEmailAvailabilityEndpoint:
     def test_valid_email(self, anonymous_client, seller_fixture):
         """Should return a 200 OK response."""
         seller_user, _ = seller_fixture  # Ensure we have a user in the database
-        data = {"email": "new_email@gmail.com"}
+        data = {"email": "new_email@example.com"}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
         assert response.json()["is_available"]
@@ -528,7 +535,6 @@ class TestUpdateProfilePictureEndpoint:
 
     def teardown_method(self, method):
         """Delete the uploaded files after each test."""
-        print("Deleting now...")
         for file_path in self.uploaded_files:
             if os.path.exists(file_path):
                 os.remove(file_path)

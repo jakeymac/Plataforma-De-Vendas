@@ -46,10 +46,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         if data.get("zip_code") and not re.match(pattern, data.get("zip_code")):
             errors["zip_code"] = "Invalid zip code"
 
-        print("Testing output...")
-        print("Phone number: ", data.get("phone_number"))
-        print("Country code: ", data.get("country_phone_number_code"))
-
         if data.get("phone_number") and data.get("country_phone_number_code"):
             if not self.is_phone_number_valid(
                 data.get("phone_number"), data.get("country_phone_number_code")
