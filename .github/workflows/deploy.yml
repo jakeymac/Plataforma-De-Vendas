@@ -34,6 +34,17 @@ jobs:
               echo "No migration conflicts detected..."
             fi
 
-            python manage.py migrate
-            python manage.py collectstatic --noinput
+            echo "Validating migration integrity..."
+            python manage.py sqlmigrate Accounts 0001 > /dev/null
+            if [ $? -ne 0 ]; then
+              echo "Migration integrity check failed! Fix the migrations before deploying."
+              exit 1
+            fi
+            
+            echo "Applying migrations..."
+            python manage.py migrate || { echo "Migration failed! Aborting deployment."; exit 1; }
+
+            echo "Collecting static files..."
+            python manage.py collectstatic --noinput || { echo "Static files collection failed!"; exit 1; }
+
             reload_server
