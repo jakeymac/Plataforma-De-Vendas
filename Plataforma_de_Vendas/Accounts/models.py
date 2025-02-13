@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import IntegrityError, transaction, models
+from django.db import IntegrityError, models, transaction
 from nanoid import generate
 
 
@@ -20,7 +20,6 @@ class CustomUser(AbstractUser):
         unique=True,
     )
 
-    
     store = models.ForeignKey(
         "Stores.Store", on_delete=models.CASCADE, null=True, blank=True
     )  # For sellers to have a store
@@ -58,16 +57,14 @@ class CustomUser(AbstractUser):
 
             except IntegrityError as e:
                 if "id" in str(e):
-                    self.id=generate_unique_id()
+                    self.id = generate_unique_id()
                     attempts += 1
                 elif "username" in str(e):
                     raise IntegrityError(f"Username '{self.username}' is already taken.")
                 elif "email" in str(e):
                     raise IntegrityError(f"Email '{self.email}' is already taken.")
 
-        raise IntegrityError(
-            f"Could not generate a unique id after {max_attempts} attempts"
-        )
+        raise IntegrityError(f"Could not generate a unique id after {max_attempts} attempts")
 
     def __str__(self):
         return self.username

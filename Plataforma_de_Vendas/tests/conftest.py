@@ -72,5 +72,7 @@ def anonymous_client(db):
 
 @pytest.fixture
 def random_user(db):
-    user = CustomUser.objects.create_user(username="pytest_random_user", password="password123", email="random_user_@example.com")
+    user = CustomUser.objects.create_user(
+        username="pytest_random_user", password="password123", email="random_user_@example.com"
+    )
     return user

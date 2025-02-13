@@ -186,7 +186,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "email": "new_email@example.com"
+            "email": "new_email@example.com",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -202,7 +202,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "email": "new_email@example.com"
+            "email": "new_email@example.com",
         }
         response = customer_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -217,7 +217,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "email": "new_email@example.com"
+            "email": "new_email@example.com",
         }
         response = anonymous_client.put(self.url, data, format="json")
         assert response.status_code == 403
@@ -230,7 +230,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "email": "new_email@example.com"
+            "email": "new_email@example.com",
         }
         response = seller_client.put(self.url, data, format="json")
         assert response.status_code == 401
@@ -243,7 +243,7 @@ class TestEditUserEndpoint:
             "username": admin_user.username,
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "email": "new_email@example.com"
+            "email": "new_email@example.com",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 400
@@ -256,7 +256,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
-            "email": "new_email@example.com"
+            "email": "new_email@example.com",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 404
