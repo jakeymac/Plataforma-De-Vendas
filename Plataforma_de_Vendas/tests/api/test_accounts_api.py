@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch
 
 import pytest
@@ -185,6 +186,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -200,6 +202,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com",
         }
         response = customer_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -214,6 +217,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com",
         }
         response = anonymous_client.put(self.url, data, format="json")
         assert response.status_code == 403
@@ -226,6 +230,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com",
         }
         response = seller_client.put(self.url, data, format="json")
         assert response.status_code == 401
@@ -238,6 +243,7 @@ class TestEditUserEndpoint:
             "username": admin_user.username,
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 400
@@ -250,6 +256,7 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "new_email@example.com",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 404
@@ -346,6 +353,7 @@ class TestRegisterCustomerEndpoint:
             "password": "password123",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "email": "anonymous_email@example.com",
             "account_type": "customer",
         }
         response = anonymous_client.post(url, data, format="json")
@@ -429,7 +437,7 @@ class TestCheckEmailAvailabilityEndpoint:
     def test_valid_email(self, anonymous_client, seller_fixture):
         """Should return a 200 OK response."""
         seller_user, _ = seller_fixture  # Ensure we have a user in the database
-        data = {"email": "new_email@gmail.com"}
+        data = {"email": "new_email@example.com"}
         response = anonymous_client.post(self.url, data, format="json")
         assert response.status_code == 200
         assert response.json()["is_available"]
@@ -450,14 +458,20 @@ class TestUpdateProfilePictureEndpoint:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = reverse("update-profile-picture-endpoint")
+        self.uploaded_files = []
 
     def test_valid_profile_picture(self, customer_fixture):
         """Should return a 200 OK response."""
         customer_user, customer_client = customer_fixture
         image = SimpleUploadedFile("image.jpg", b"file_content", content_type="image/jpeg")
+
         data = {"id": customer_user.id, "profile_picture": image}
-        response = customer_client.put(self.url, data, format="multipart")
+
+        response = customer_client.put(self.url, data)
         assert response.status_code == 200
+
+        customer_user.refresh_from_db()
+        self.uploaded_files.append(customer_user.profile_picture.path)
 
     @patch("django.db.models.fields.files.FieldFile.delete")  # Mock profile picture deletion
     def test_existing_picture_is_deleted(self, mock_delete, customer_fixture):
@@ -467,22 +481,28 @@ class TestUpdateProfilePictureEndpoint:
             "old.jpg", b"old_content", content_type="image/jpeg"
         )
         customer_user.save()
+        customer_user.refresh_from_db()
+        self.uploaded_files.append(customer_user.profile_picture.path)
 
         image = SimpleUploadedFile("new.jpg", b"new_content", content_type="image/jpeg")
-        data = {"id": str(customer_user.id), "profile_picture": image}
-        response = customer_client.put(self.url, data, format="multipart")
+        data = {"id": customer_user.id, "profile_picture": image}
+        response = customer_client.put(self.url, data)
         assert response.status_code == status.HTTP_200_OK
-        # Ensure delete() was called to delete the old profile picture
+
         mock_delete.assert_called_once()
+        customer_user.refresh_from_db()
+        self.uploaded_files.append(customer_user.profile_picture.path)
 
     def test_valid_admin_profile_picture(self, admin_fixture, customer_fixture):
         """Should return a 200 OK response."""
         admin_user, admin_client = admin_fixture
         customer_user, _ = customer_fixture
-        image = SimpleUploadedFile("image.jpg", b"file_content", content_type="image/jpeg")
+        image = SimpleUploadedFile("new.jpg", b"new_content", content_type="image/jpeg")
         data = {"id": customer_user.id, "profile_picture": image}
-        response = admin_client.put(self.url, data, format="multipart")
+        response = admin_client.put(self.url, data)
         assert response.status_code == 200
+        customer_user.refresh_from_db()
+        self.uploaded_files.append(customer_user.profile_picture.path)
 
     def test_invalid_customer_profile_picture(self, seller_fixture, customer_fixture):
         """Should return a 401 Unauthorized response."""
@@ -490,7 +510,7 @@ class TestUpdateProfilePictureEndpoint:
         customer_user, _ = customer_fixture
         image = SimpleUploadedFile("image.jpg", b"file_content", content_type="image/jpeg")
         data = {"id": customer_user.id, "profile_picture": image}
-        response = seller_client.put(self.url, data, format="multipart")
+        response = seller_client.put(self.url, data)
         assert response.status_code == 401
         assert (
             response.json()["message"]
@@ -502,5 +522,19 @@ class TestUpdateProfilePictureEndpoint:
         customer_user, _ = customer_fixture
         image = SimpleUploadedFile("image.jpg", b"file_content", content_type="image/jpeg")
         data = {"id": customer_user.id, "profile_picture": image}
-        response = anonymous_client.put(self.url, data, format="multipart")
+        response = anonymous_client.put(self.url, data)
         assert response.status_code == 403
+
+    def test_no_profile_picture(self, customer_fixture):
+        """Should return a 400 Bad Request response."""
+        customer_user, customer_client = customer_fixture
+        data = {"id": customer_user.id}
+        response = customer_client.put(self.url, data)
+        assert response.status_code == 400
+        assert response.json()["message"] == "No profile picture provided."
+
+    def teardown_method(self, method):
+        """Delete the uploaded files after each test."""
+        for file_path in self.uploaded_files:
+            if os.path.exists(file_path):
+                os.remove(file_path)

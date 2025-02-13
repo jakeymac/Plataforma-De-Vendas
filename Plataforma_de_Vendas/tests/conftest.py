@@ -29,7 +29,7 @@ def customer_group(db):
 def admin_fixture(db):
     admin_group, _ = Group.objects.get_or_create(name="Admins")
     admin_user = CustomUser.objects.create_superuser(
-        username="pytest_admin", password="password123", email="admin_email_123@gmail.com"
+        username="pytest_admin", password="password123", email="admin_email_123@example.com"
     )
     admin_user.groups.add(Group.objects.get(name="Admins"))
     admin_user.save()
@@ -42,7 +42,7 @@ def admin_fixture(db):
 def seller_fixture(db):
     seller_group, _ = Group.objects.get_or_create(name="Sellers")
     seller_user = CustomUser.objects.create_user(
-        username="pytest_seller", password="password123", email="seller_email_123@gmail.com"
+        username="pytest_seller", password="password123", email="seller_email_123@example.com"
     )
     seller_user.groups.add(Group.objects.get(name="Sellers"))
     seller_user.save()
@@ -55,7 +55,7 @@ def seller_fixture(db):
 def customer_fixture(db):
     customer_group, created = Group.objects.get_or_create(name="Customers")
     customer_user = CustomUser.objects.create_user(
-        username="pytest_customer", password="password123", email="customer_email_123@gmail.com"
+        username="pytest_customer", password="password123", email="customer_email_123@example.com"
     )
     customer_user.groups.add(Group.objects.get(name="Customers"))
     customer_user.save()
@@ -72,5 +72,7 @@ def anonymous_client(db):
 
 @pytest.fixture
 def random_user(db):
-    user = CustomUser.objects.create_user(username="pytest_random_user", password="password123")
+    user = CustomUser.objects.create_user(
+        username="pytest_random_user", password="password123", email="random_user_@example.com"
+    )
     return user
