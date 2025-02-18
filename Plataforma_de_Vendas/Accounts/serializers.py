@@ -1,12 +1,10 @@
 import re
 
+from django.contrib.auth.models import Group
 from rest_framework import serializers
 from Stores.models import Store
 
 from .models import CustomUser
-from django.contrib.auth.models import Group
-
-
 
 # Account types for the CustomUser model to add to groups
 account_types = {
@@ -14,6 +12,7 @@ account_types = {
     "seller": "Sellers",
     "customer": "Customers",
 }
+
 
 def is_phone_number_valid(phone_number, country_code):
     # TODO have this check for correct placement of the hyphens, not just number of hyphens
@@ -33,8 +32,10 @@ def is_phone_number_valid(phone_number, country_code):
     elif str(country_code) == "1":
         return len(numbers) == 10
 
+
 def is_country_code_valid(country_code):
     return str(country_code) in ["1", "55"]
+
 
 def format_phone_number(country, phone_number):
     numbers = re.sub(r"\D", "", phone_number)
@@ -49,14 +50,15 @@ def format_phone_number(country, phone_number):
     elif str(country) == "1":
         return f"({numbers[:3]}) {numbers[3:6]}-{numbers[6:]}"
 
+
 class CustomUserSerializer(serializers.ModelSerializer):
     account_type = serializers.CharField(write_only=True, required=False)
 
     # This allows for a custom error message for non-existent store ids
     store = serializers.PrimaryKeyRelatedField(
-        queryset=Store.objects.all(), 
-        required=False, 
-        error_messages={"does_not_exist": "Store does not exist"} 
+        queryset=Store.objects.all(),
+        required=False,
+        error_messages={"does_not_exist": "Store does not exist"},
     )
 
     class Meta:
@@ -76,7 +78,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         if data.get("account_type") and data.get("account_type") not in account_types:
             errors["account_type"] = "Invalid account type"
 
-        if data.get("account_type") == "admin" and not requesting_user.groups.filter(name="Admins").exists():
+        if (
+            data.get("account_type") == "admin"
+            and not requesting_user.groups.filter(name="Admins").exists()
+        ):
             raise serializers.ValidationError("Only admins can create admin accounts")
             return data
 
@@ -115,11 +120,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
         account_type = validated_data.pop("account_type", None)
         user = super().create(validated_data)
 
-        
         if account_type:
             group = Group.objects.get(name=account_types[account_type])
             user.groups.add(group)
-    
+
         if password:
             user.set_password(password)
 
@@ -146,7 +150,10 @@ class ExistingUserSerializer(CustomUserSerializer):
             raise serializers.ValidationError("Request context is required for security purposes")
             return data
 
-        if data.get("account_type") == "admin" and not requesting_user.groups.filter(name="Admins").exists():
+        if (
+            data.get("account_type") == "admin"
+            and not requesting_user.groups.filter(name="Admins").exists()
+        ):
             raise serializers.ValidationError("Only admins can create admin accounts")
             return data
 

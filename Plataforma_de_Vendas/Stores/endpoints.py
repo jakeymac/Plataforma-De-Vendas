@@ -181,7 +181,7 @@ def register_store_endpoint(request):
 
                 # TODO add permissions to this account as owner of the store
                 account.save()
-                
+
                 store = store_serializer.save()
                 account.store = store
                 account.save()

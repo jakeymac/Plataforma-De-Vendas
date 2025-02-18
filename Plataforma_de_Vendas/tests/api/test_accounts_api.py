@@ -205,7 +205,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = customer_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -221,7 +221,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = anonymous_client.put(self.url, data, format="json")
         assert response.status_code == 403
@@ -235,7 +235,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = seller_client.put(self.url, data, format="json")
         assert response.status_code == 401
@@ -249,7 +249,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
-            "account_type": "customer"
+            "account_type": "customer",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 400

@@ -1,6 +1,12 @@
 import pytest
 from Accounts.models import CustomUser
-from Accounts.serializers import is_phone_number_valid, is_country_code_valid, format_phone_number, CustomUserSerializer, ExistingUserSerializer
+from Accounts.serializers import (
+    CustomUserSerializer,
+    ExistingUserSerializer,
+    format_phone_number,
+    is_country_code_valid,
+    is_phone_number_valid,
+)
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIRequestFactory
@@ -8,37 +14,38 @@ from rest_framework.test import APIRequestFactory
 
 @pytest.mark.django_db
 class TestHelperFunctions:
-    """ Test the helper functions for the CustomUser Serializers. """
+    """Test the helper functions for the CustomUser Serializers."""
+
     def test_invalid_brasil_phone_number_by_hyphens(self):
-        """ Test that the function returns False for an invalid Brasil phone number by amount of hyphens. """
+        """Test that the function returns False for an invalid Brasil phone number by amount of hyphens."""
         phone_number = "1-23-45-67890"
         country_code = "55"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_usa_phone_number_by_hyphens(self):
-        """ Test that the function returns False for an invalid USA phone number by amount of hyphens. """
+        """Test that the function returns False for an invalid USA phone number by amount of hyphens."""
         phone_number = "123-456-7-8-90"
         country_code = "1"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_brasil_number_by_amount(self):
-        """ Test that the function returns False for an invalid Brasil phone number by amount of numbers. """
+        """Test that the function returns False for an invalid Brasil phone number by amount of numbers."""
         phone_number = "123456789"
         country_code = "55"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_usa_number_by_amount(self):
-        """ Test that the function returns False for an invalid USA phone number by amount of numbers. """
+        """Test that the function returns False for an invalid USA phone number by amount of numbers."""
         phone_number = "123456789"
         country_code = "1"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_valid_brasil_phone_number(self):
-        """ Test that the function returns True for a valid Brasil phone number. """
+        """Test that the function returns True for a valid Brasil phone number."""
         phone_number = "12-3456-7890"
         country_code = "55"
 
@@ -49,7 +56,7 @@ class TestHelperFunctions:
         assert is_phone_number_valid(phone_number, country_code)
 
     def test_valid_usa_phone_number(self):
-        """ Test that the function returns True for a valid USA phone number. """
+        """Test that the function returns True for a valid USA phone number."""
         phone_number = "123-456-7890"
         country_code = "1"
 
@@ -60,13 +67,13 @@ class TestHelperFunctions:
         assert is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_country_code(self):
-        """ Test that the function returns False for an invalid country code. """
+        """Test that the function returns False for an invalid country code."""
         country_code = "123"
 
         assert not is_country_code_valid(country_code)
 
     def test_valid_country_codes(self):
-        """ Test that the function returns True for valid country codes. """
+        """Test that the function returns True for valid country codes."""
         country_code = "1"
         assert is_country_code_valid(country_code)
 
@@ -74,32 +81,33 @@ class TestHelperFunctions:
         assert is_country_code_valid(country_code)
 
     def test_format_brasil_phone_number_10_digits(self):
-        """ Test that the function formats a Brasil phone number with 10 digits. """
+        """Test that the function formats a Brasil phone number with 10 digits."""
         phone_number = "1234567890"
         country_code = "55"
 
         assert format_phone_number(country_code, phone_number) == "(12) 3456-7890"
 
     def test_format_brasil_phone_number_11_digits(self):
-        """ Test that the function formats a Brasil phone number with 11 digits. """
+        """Test that the function formats a Brasil phone number with 11 digits."""
         phone_number = "12345678901"
         country_code = "55"
 
         assert format_phone_number(country_code, phone_number) == "(12) 34567-8901"
 
     def test_format_usa_phone_number(self):
-        """ Test that the function formats a USA phone number. """
+        """Test that the function formats a USA phone number."""
         phone_number = "1234567890"
         country_code = "1"
 
         assert format_phone_number(country_code, phone_number) == "(123) 456-7890"
 
+
 @pytest.mark.django_db
 class TestCustomUserValidate:
-    """ Test the validate method of the CustomUserSerializer. """
+    """Test the validate method of the CustomUserSerializer."""
 
     def test_no_request_context(self):
-        """ Test that the method raises an error if there is no request context. """
+        """Test that the method raises an error if there is no request context."""
         data = {
             "first_name": "Test_Name",
             "last_name": "Test_Last_Name",
@@ -113,11 +121,11 @@ class TestCustomUserValidate:
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        
+
         assert "Request context is required for security purposes" in str(serializer.errors)
-    
+
     def test_invalid_account_type(self):
-        """ Test that the account type must be valid. """
+        """Test that the account type must be valid."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -136,7 +144,7 @@ class TestCustomUserValidate:
         assert "Invalid account type" in str(serializer.errors)
 
     def test_invalid_admin_creation(self):
-        """ Test that only admins can create admin accounts. """
+        """Test that only admins can create admin accounts."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -154,11 +162,11 @@ class TestCustomUserValidate:
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        
+
         assert "Only admins can create admin accounts" in str(serializer.errors)
 
     def test_username_already_exists(self, admin_fixture):
-        """ Test that the username must be unique. """
+        """Test that the username must be unique."""
         admin_user, _ = admin_fixture
 
         factory = APIRequestFactory()
@@ -179,7 +187,7 @@ class TestCustomUserValidate:
         assert "A user with that username already exists." in str(serializer.errors)
 
     def test_email_already_exists(self, admin_fixture, customer_fixture):
-        """ Test that the email must be unique. """
+        """Test that the email must be unique."""
         admin_user, _ = admin_fixture
 
         factory = APIRequestFactory()
@@ -200,7 +208,7 @@ class TestCustomUserValidate:
         assert "A user with that email already exists." in str(serializer.errors)
 
     def test_password_too_short(self):
-        """ Test that the password must be at least 8 characters long. """
+        """Test that the password must be at least 8 characters long."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -217,9 +225,9 @@ class TestCustomUserValidate:
         serializer = CustomUserSerializer(data=data, context={"request": request})
         assert not serializer.is_valid()
         assert "Password must have at least 8 characters" in str(serializer.errors)
-    
+
     def test_invalid_zip_code(self):
-        """ Test that the zip code must be valid. """
+        """Test that the zip code must be valid."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -239,7 +247,7 @@ class TestCustomUserValidate:
         assert "Invalid zip code" in str(serializer.errors)
 
     def test_invalid_country_code(self):
-        """ Test that the country phone number code must be valid. """
+        """Test that the country phone number code must be valid."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -260,7 +268,7 @@ class TestCustomUserValidate:
         assert "Invalid country code" in str(serializer.errors)
 
     def test_invalid_phone_number(self):
-        """ Test that the phone number must be valid. """
+        """Test that the phone number must be valid."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -281,7 +289,7 @@ class TestCustomUserValidate:
         assert "Invalid phone number" in str(serializer.errors)
 
     def test_seller_without_store(self):
-        """ Test that a seller account must have a store. """
+        """Test that a seller account must have a store."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -300,7 +308,7 @@ class TestCustomUserValidate:
         assert "Seller account must have a store" in str(serializer.errors)
 
     def test_seller_with_nonexistent_store(self):
-        """ Test that the store must exist. """
+        """Test that the store must exist."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -318,9 +326,9 @@ class TestCustomUserValidate:
         serializer = CustomUserSerializer(data=data, context={"request": request})
         assert not serializer.is_valid()
         assert "Store does not exist" in str(serializer.errors)
-    
+
     def test_valid_account_creation(self, customer_group):
-        """ Test that the serializer accepts valid data. """
+        """Test that the serializer accepts valid data."""
         factory = APIRequestFactory()
         request = factory.post("")
         request.user = AnonymousUser()
@@ -339,7 +347,7 @@ class TestCustomUserValidate:
         serializer = CustomUserSerializer(data=data, context={"request": request})
         assert serializer.is_valid()
         user = serializer.save()
-        
+
         assert isinstance(user, CustomUser)
         assert user.username == data["username"]
         assert user.email == data["email"]
@@ -348,13 +356,12 @@ class TestCustomUserValidate:
         assert user.check_password(data["password"])
         assert user.groups.filter(name="Customers").exists()
 
-    
     @pytest.mark.django_db
     class TestExistingUserSerializer:
-        """ Test the ExistingUserSerializer. """
+        """Test the ExistingUserSerializer."""
 
         def test_no_request_context(self, customer_fixture):
-            """ Test that the method raises an error if there is no request context. """
+            """Test that the method raises an error if there is no request context."""
             customer_user, _ = customer_fixture
 
             data = {
@@ -374,7 +381,7 @@ class TestCustomUserValidate:
             assert "Request context is required for security purposes" in str(serializer.errors)
 
         def test_customer_cannot_become_admin(self, customer_fixture, admin_group):
-            """ Test that a customer cannot become an admin. """
+            """Test that a customer cannot become an admin."""
             customer_user, _ = customer_fixture
 
             factory = APIRequestFactory()
@@ -390,12 +397,14 @@ class TestCustomUserValidate:
                 "account_type": "admin",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request})
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert not serializer.is_valid()
             assert "Only admins can create admin accounts" in str(serializer.errors)
 
         def test_username_already_exists(self, customer_fixture, admin_fixture):
-            """ Test that the username must be unique. """
+            """Test that the username must be unique."""
             customer_user, _ = customer_fixture
             admin_user, _ = admin_fixture
 
@@ -412,12 +421,14 @@ class TestCustomUserValidate:
                 "account_type": "customer",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request}) 
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert not serializer.is_valid()
             assert "A user with that username already exists." in str(serializer.errors)
 
         def test_email_already_exists(self, customer_fixture, admin_fixture):
-            """ Test that the email must be unique. """
+            """Test that the email must be unique."""
             customer_user, _ = customer_fixture
             admin_user, _ = admin_fixture
 
@@ -434,12 +445,14 @@ class TestCustomUserValidate:
                 "account_type": "customer",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request})
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert not serializer.is_valid()
             assert "A user with that email already exists." in str(serializer.errors)
 
         def test_password_too_short(self, customer_fixture):
-            """ Test that the password must be at least 8 characters long. """
+            """Test that the password must be at least 8 characters long."""
             customer_user, _ = customer_fixture
 
             factory = APIRequestFactory()
@@ -455,12 +468,14 @@ class TestCustomUserValidate:
                 "account_type": "customer",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request})
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert not serializer.is_valid()
             assert "Password must have at least 8 characters" in str(serializer.errors)
-            
+
         def test_invalid_zip_code(self, customer_fixture):
-            """ Test that the zip code must be valid. """
+            """Test that the zip code must be valid."""
             customer_user, _ = customer_fixture
 
             factory = APIRequestFactory()
@@ -477,12 +492,14 @@ class TestCustomUserValidate:
                 "zip_code": "123",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request})
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert not serializer.is_valid()
             assert "Invalid zip code" in str(serializer.errors)
 
         def test_invalid_phone_number(self, customer_fixture):
-            """ Test that the phone number must be valid. """
+            """Test that the phone number must be valid."""
             customer_user, _ = customer_fixture
 
             factory = APIRequestFactory()
@@ -500,12 +517,14 @@ class TestCustomUserValidate:
                 "country_phone_number_code": "1",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request})
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert not serializer.is_valid()
             assert "Invalid phone number" in str(serializer.errors)
 
         def test_new_account(self):
-            """ Test that the serializer creates a new account. """
+            """Test that the serializer creates a new account."""
             factory = APIRequestFactory()
             request = factory.post("")
             request.user = AnonymousUser()
@@ -526,7 +545,7 @@ class TestCustomUserValidate:
             assert "Serializer only to be used for existing users" in str(serializer.errors)
 
         def test_valid_account_update(self, customer_fixture):
-            """ Test that the serializer accepts valid data. """
+            """Test that the serializer accepts valid data."""
             customer_user, _ = customer_fixture
 
             factory = APIRequestFactory()
@@ -545,10 +564,12 @@ class TestCustomUserValidate:
                 "zip_code": "12345",
             }
 
-            serializer = ExistingUserSerializer(customer_user, data=data, context={"request": request})
+            serializer = ExistingUserSerializer(
+                customer_user, data=data, context={"request": request}
+            )
             assert serializer.is_valid()
             user = serializer.save()
-            
+
             assert isinstance(user, CustomUser)
             assert user.username == data["username"]
             assert user.email == data["email"]
@@ -557,5 +578,6 @@ class TestCustomUserValidate:
             assert user.check_password(data["password"])
             assert user.groups.filter(name="Customers").exists()
             assert user.zip_code == data["zip_code"]
-            assert user.phone_number == format_phone_number(data["country_phone_number_code"], data["phone_number"])
-
+            assert user.phone_number == format_phone_number(
+                data["country_phone_number_code"], data["phone_number"]
+            )
