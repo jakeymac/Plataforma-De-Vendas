@@ -169,7 +169,7 @@ def register_store_endpoint(request):
     account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
 
     # account_data["account_type"] = "seller" # TODO delete this later
-    account_serializer = CustomUserSerializer(data=account_data)
+    account_serializer = CustomUserSerializer(data=account_data, context={"request": request})
     store_serializer = StoreSerializer(data=store_data)
     account_data_is_valid = account_serializer.is_valid()
     store_data_is_valid = store_serializer.is_valid()
