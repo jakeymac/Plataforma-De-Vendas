@@ -17,28 +17,32 @@ class TestHelperFunctions:
     """Test the helper functions for the CustomUser Serializers."""
 
     def test_invalid_brasil_phone_number_by_hyphens(self):
-        """Test that the function returns False for an invalid Brasil phone number by amount of hyphens."""
+        """Test that the function returns False for an 
+        invalid Brasil phone number by amount of hyphens."""
         phone_number = "1-23-45-67890"
         country_code = "55"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_usa_phone_number_by_hyphens(self):
-        """Test that the function returns False for an invalid USA phone number by amount of hyphens."""
+        """Test that the function returns False for an 
+        invalid USA phone number by amount of hyphens."""
         phone_number = "123-456-7-8-90"
         country_code = "1"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_brasil_number_by_amount(self):
-        """Test that the function returns False for an invalid Brasil phone number by amount of numbers."""
+        """Test that the function returns False for an 
+        invalid Brasil phone number by amount of numbers."""
         phone_number = "123456789"
         country_code = "55"
 
         assert not is_phone_number_valid(phone_number, country_code)
 
     def test_invalid_usa_number_by_amount(self):
-        """Test that the function returns False for an invalid USA phone number by amount of numbers."""
+        """Test that the function returns False for an 
+        invalid USA phone number by amount of numbers."""
         phone_number = "123456789"
         country_code = "1"
 

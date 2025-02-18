@@ -2,7 +2,6 @@
 from datetime import datetime
 
 from Accounts.serializers import CustomUserSerializer
-from django.contrib.auth.models import Group
 from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
