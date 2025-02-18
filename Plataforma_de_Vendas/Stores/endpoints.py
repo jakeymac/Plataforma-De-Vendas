@@ -178,11 +178,10 @@ def register_store_endpoint(request):
             with transaction.atomic():
                 account = account_serializer.save()
                 account.set_password(account_data["password"])
-                account.groups.add(
-                    Group.objects.get(name="Sellers")
-                )  # TODO add permissions to this account as owner of the store
-                account.save()
 
+                # TODO add permissions to this account as owner of the store
+                account.save()
+                
                 store = store_serializer.save()
                 account.store = store
                 account.save()

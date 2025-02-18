@@ -178,7 +178,7 @@ class TestEditUserEndpoint:
     def setup(self):
         self.url = reverse("edit-user-endpoint")
 
-    def test_admin_access(self, admin_fixture, random_user):
+    def test_admin_access(self, admin_fixture, random_user, customer_group):
         """Admin should get a 200 OK response."""
         admin_user, admin_client = admin_fixture
         data = {
@@ -186,7 +186,9 @@ class TestEditUserEndpoint:
             "username": "new_username",
             "first_name": "new_first_name",
             "last_name": "new_last_name",
+            "password": "new_password",
             "email": "new_email@example.com",
+            "account_type": "customer",
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -203,6 +205,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
+            "account_type": "customer"
         }
         response = customer_client.put(self.url, data, format="json")
         assert response.status_code == 200
@@ -218,6 +221,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
+            "account_type": "customer"
         }
         response = anonymous_client.put(self.url, data, format="json")
         assert response.status_code == 403
@@ -231,6 +235,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
+            "account_type": "customer"
         }
         response = seller_client.put(self.url, data, format="json")
         assert response.status_code == 401
@@ -244,6 +249,7 @@ class TestEditUserEndpoint:
             "first_name": "new_first_name",
             "last_name": "new_last_name",
             "email": "new_email@example.com",
+            "account_type": "customer"
         }
         response = admin_client.put(self.url, data, format="json")
         assert response.status_code == 400

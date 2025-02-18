@@ -48,7 +48,6 @@ class TestCustomUserSave:
     def test_duplicate_email(self, customer_fixture):
         """Tests that a duplicate email raises an IntegrityError"""
         customer_user, _ = customer_fixture
-        print(customer_user.__dict__)
 
         test_user = CustomUser(username="test_user", email=customer_user.email)
         with pytest.raises(IntegrityError) as error_message:

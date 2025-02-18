@@ -26,7 +26,7 @@ logger = logging.getLogger("plataforma_de_vendas")
 def get_users_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
         users = CustomUser.objects.all()
-        serializer = CustomUserSerializer(users, many=True)
+        serializer = CustomUserSerializer(users, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -43,14 +43,14 @@ def get_user_endpoint(request, user_id):
     if request.user.groups.filter(name="Admins").exists():
         try:
             user = CustomUser.objects.get(id=user_id)
-            serializer = CustomUserSerializer(user)
+            serializer = CustomUserSerializer(user, context={"request": request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     # TODO may want to look at this, but for now this is the behavior of this endpoint
     elif request.user.id == user_id:
         user = CustomUser.objects.get(id=user_id)
-        serializer = CustomUserSerializer(user)
+        serializer = CustomUserSerializer(user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -67,7 +67,7 @@ def get_customers_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
         customer_group = Group.objects.get(name="Customers")
         customers = CustomUser.objects.filter(groups=customer_group)
-        serializer = CustomUserSerializer(customers, many=True)
+        serializer = CustomUserSerializer(customers, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -84,7 +84,7 @@ def get_admins_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
         admin_group = Group.objects.get(name="Admins")
         admins = CustomUser.objects.filter(groups=admin_group)
-        serializer = CustomUserSerializer(admins, many=True)
+        serializer = CustomUserSerializer(admins, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -115,7 +115,7 @@ def edit_user_endpoint(request):
             user = CustomUser.objects.get(id=data.get("id"))
         except CustomUser.DoesNotExist:
             return Response({"message": "User not found"}, status.HTTP_404_NOT_FOUND)
-        serializer = ExistingUserSerializer(instance=user, data=data)
+        serializer = ExistingUserSerializer(instance=user, data=data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             response = {"message": "User updated"}
@@ -139,7 +139,7 @@ def edit_user_endpoint(request):
 @permission_classes([IsAuthenticated])
 def get_current_user_info_endpoint(request):
     # TODO make this more secure (remove password, etc from response body)
-    serializer = CustomUserSerializer(request.user)
+    serializer = CustomUserSerializer(request.user, context={"request": request})
     return Response(serializer.data, status.HTTP_200_OK)
 
 
@@ -225,11 +225,10 @@ def register_customer_account_endpoint(request):
     data = request.data
     # TODO may want to remove this check, just have all accounts sent to this endpoint be customers
     if data.get("account_type") == "customer":
-        serializer = CustomUserSerializer(data=data)
+        serializer = CustomUserSerializer(data=data, context={"request": request})
         if serializer.is_valid():
             user = serializer.save()
             user.set_password(data.get("password"))
-            user.groups.add(Group.objects.get(name="Customers"))
             user.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
