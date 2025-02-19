@@ -14,7 +14,6 @@ from Products.models import (
 def is_admin(user):
     return user.is_authenticated and user.groups.filter(name="Admins").exists()
 
-
 @login_required
 @user_passes_test(is_admin, login_url="/login")
 def admin_portal(request):
@@ -58,10 +57,6 @@ def login_page(request):
 
 def register_account_page(request):
     return render(request, "Accounts/register_account.html")
-
-
-def register_seller_page(request):
-    return render(request, "Accounts/register_seller.html")
 
 
 @login_required
