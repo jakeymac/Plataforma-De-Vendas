@@ -29,7 +29,9 @@ class CustomUser(AbstractUser):
 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(
+        unique=True, error_messages={"unique": "A user with that email already exists."}
+    )
 
     address = models.TextField(null=True, blank=True)
     address_two = models.TextField(null=True, blank=True)

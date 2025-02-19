@@ -2,7 +2,6 @@
 from datetime import datetime
 
 from Accounts.serializers import CustomUserSerializer
-from django.contrib.auth.models import Group
 from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -169,7 +168,7 @@ def register_store_endpoint(request):
     account_data, store_data = parse_store_registration_data(request.POST, request.FILES)
 
     # account_data["account_type"] = "seller" # TODO delete this later
-    account_serializer = CustomUserSerializer(data=account_data)
+    account_serializer = CustomUserSerializer(data=account_data, context={"request": request})
     store_serializer = StoreSerializer(data=store_data)
     account_data_is_valid = account_serializer.is_valid()
     store_data_is_valid = store_serializer.is_valid()
@@ -178,9 +177,8 @@ def register_store_endpoint(request):
             with transaction.atomic():
                 account = account_serializer.save()
                 account.set_password(account_data["password"])
-                account.groups.add(
-                    Group.objects.get(name="Sellers")
-                )  # TODO add permissions to this account as owner of the store
+
+                # TODO add permissions to this account as owner of the store
                 account.save()
 
                 store = store_serializer.save()

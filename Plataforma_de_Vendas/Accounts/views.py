@@ -60,10 +60,6 @@ def register_account_page(request):
     return render(request, "Accounts/register_account.html")
 
 
-def register_seller_page(request):
-    return render(request, "Accounts/register_seller.html")
-
-
 @login_required
 def view_account(request):
     if request.user.groups.filter(name="Customers").exists():
