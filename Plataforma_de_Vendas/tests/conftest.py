@@ -1,9 +1,9 @@
 import pytest
 from Accounts.models import CustomUser
-from Orders.models import Order
-from Stores.models import Store
 from django.contrib.auth.models import Group
+from Orders.models import Order
 from rest_framework.test import APIClient
+from Stores.models import Store
 
 
 @pytest.fixture(scope="function")
@@ -135,9 +135,10 @@ def store_fixture(db):
         store_name="Test Store",
         store_description="Test Store Description",
         store_url="teststore",
-        contact_email="test_contact@example.com"
+        contact_email="test_contact@example.com",
     )
     return store
+
 
 @pytest.fixture
 def order_fixture(db, customer_fixture, store_fixture):
@@ -150,4 +151,3 @@ def order_fixture(db, customer_fixture, store_fixture):
         tracking_code="123456",
     )
     return order
-    
