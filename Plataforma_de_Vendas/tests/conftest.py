@@ -66,7 +66,8 @@ def customer_fixture(db):
     return customer_user, client
 
 
-# Logged in fixtures to use with view testing that require users to be logged in rather than authenticated
+# Logged in fixtures to use with view testing that 
+# require users to be logged in rather than authenticated
 @pytest.fixture
 def logged_in_admin(db):
     admin_group, _ = Group.objects.get_or_create(name="Admins")
