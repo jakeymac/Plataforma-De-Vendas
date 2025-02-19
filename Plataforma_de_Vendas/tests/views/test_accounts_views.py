@@ -1,21 +1,23 @@
 import pytest
-from django.urls import reverse
 from Accounts.views import is_admin
-
+from django.urls import reverse
 from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
+
 
 @pytest.mark.django_db
 class TestIsAdmin:
-    """ Tests the is_admin function. """
+    """Tests the is_admin function."""
+
     def test_is_admin(self, logged_in_admin):
-        """ Tests if the is_admin function returns True for an admin user. """
+        """Tests if the is_admin function returns True for an admin user."""
         admin_user, _ = logged_in_admin
         assert is_admin(admin_user)
 
     def test_is_not_admin(self, logged_in_seller):
-        """ Tests if the is_admin function returns False for a seller user. """
+        """Tests if the is_admin function returns False for a seller user."""
         seller_user, _ = logged_in_seller
         assert not is_admin(seller_user)
+
 
 @pytest.mark.django_db
 class TestAdminPortal:
@@ -26,7 +28,9 @@ class TestAdminPortal:
         admin_user, client = logged_in_admin
         # Create a category, subcategory, and top subcategory for setup to test that topsubcategories get queried.
         category = ProductCategory.objects.create(category_name="Test Category")
-        subcategory = ProductSubcategory.objects.create(subcategory_name="Test Subcategory", category=category)
+        subcategory = ProductSubcategory.objects.create(
+            subcategory_name="Test Subcategory", category=category
+        )
         ProductTopSubcategory.objects.create(order=1, subcategory=subcategory)
 
         response = client.get(reverse("admin_portal"))
@@ -59,6 +63,7 @@ class TestAdminPortal:
         assert response.status_code == 302
         assert "/login" in response.url  # Ensures correct redirect
 
+
 @pytest.mark.django_db
 class TestLogoutView:
     """Tests the logout_view view."""
@@ -88,6 +93,7 @@ class TestLoginPage:
         assert "Accounts/login.html" in [t.name for t in response.templates]
         assert "/admin_portal" in response.context["next_link"]
 
+
 @pytest.mark.django_db
 class TestRegisterAccountPage:
     """Tests the register_account_page view."""
@@ -97,6 +103,7 @@ class TestRegisterAccountPage:
         response = client.get(reverse("register_account"))
         assert response.status_code == 200
         assert "Accounts/register_account.html" in [t.name for t in response.templates]
+
 
 @pytest.mark.django_db
 class TestViewAccount:
