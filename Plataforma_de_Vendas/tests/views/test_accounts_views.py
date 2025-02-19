@@ -26,7 +26,7 @@ class TestAdminPortal:
     def test_admin_portal_access_admin(self, logged_in_admin):
         """Ensure an admin user can access the admin portal."""
         admin_user, client = logged_in_admin
-        # Create a category, subcategory, and top subcategory 
+        # Create a category, subcategory, and top subcategory
         # for setup to test that topsubcategories get queried.
         category = ProductCategory.objects.create(category_name="Test Category")
         subcategory = ProductSubcategory.objects.create(
