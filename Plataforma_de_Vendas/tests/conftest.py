@@ -1,5 +1,7 @@
 import pytest
 from Accounts.models import CustomUser
+from Orders.models import Order
+from Stores.models import Store
 from django.contrib.auth.models import Group
 from rest_framework.test import APIClient
 
@@ -125,3 +127,27 @@ def random_user(db):
         username="pytest_random_user", password="password123", email="random_user_@example.com"
     )
     return user
+
+
+@pytest.fixture
+def store_fixture(db):
+    store = Store.objects.create(
+        store_name="Test Store",
+        store_description="Test Store Description",
+        store_url="teststore",
+        contact_email="test_contact@example.com"
+    )
+    return store
+
+@pytest.fixture
+def order_fixture(db, customer_fixture, store_fixture):
+    customer_user, _ = customer_fixture
+    order = Order.objects.create(
+        user_id=customer_user.id,
+        store_id=store_fixture.id,
+        total=100.0,
+        status="PENDING",
+        tracking_code="123456",
+    )
+    return order
+    
