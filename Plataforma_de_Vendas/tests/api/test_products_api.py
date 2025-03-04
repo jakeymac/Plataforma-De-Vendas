@@ -1,8 +1,13 @@
 import pytest
-from rest_framework.test import APIClient
 from django.urls import reverse
+from Products.models import (
+    InitialProductImage,
+    InitialProductState,
+    Product,
+    ProductImage,
+)
+from rest_framework.test import APIClient
 
-from Products.models import Product, InitialProductState, ProductImage, InitialProductImage
 
 @pytest.mark.django_db
 class TestGetProductsByStoreEndpoint:

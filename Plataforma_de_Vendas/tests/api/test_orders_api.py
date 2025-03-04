@@ -1,9 +1,9 @@
 import pytest
-from rest_framework.test import APIClient
-from django.urls import reverse
-from django.contrib.auth.models import Group
 from Accounts.models import CustomUser
+from django.contrib.auth.models import Group
+from django.urls import reverse
 from Orders.models import Order
+from rest_framework.test import APIClient
 from Stores.models import Store
 
 

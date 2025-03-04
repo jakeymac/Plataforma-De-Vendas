@@ -3,9 +3,16 @@ from Accounts.models import CustomUser
 from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from Orders.models import Order
+from Products.models import (
+    InitialProductImage,
+    InitialProductState,
+    Product,
+    ProductCategory,
+    ProductImage,
+    ProductSubcategory,
+)
 from rest_framework.test import APIClient
 from Stores.models import Store
-from Products.models import Product, ProductImage, InitialProductState, InitialProductImage, ProductCategory, ProductSubcategory
 
 
 @pytest.fixture(scope="function")

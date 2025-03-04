@@ -1,8 +1,9 @@
 import pytest
-from rest_framework.exceptions import ValidationError
-from Orders.serializers import OrderSerializer
 from Accounts.models import CustomUser
+from Orders.serializers import OrderSerializer
+from rest_framework.exceptions import ValidationError
 from Stores.models import Store
+
 
 @pytest.mark.django_db
 class TestOrderSerializer:

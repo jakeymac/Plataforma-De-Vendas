@@ -1,7 +1,7 @@
-from rest_framework import serializers
-
 from Accounts.models import CustomUser
+from rest_framework import serializers
 from Stores.models import Store
+
 from .models import Order
 
 
