@@ -38,6 +38,7 @@ def get_orders_endpoint(request):
 def get_order_endpoint(request, order_id):
     try:
         order = Order.objects.get(id=order_id)
+        # TODO add a check to see if the seller is allowed to view the order (MAYBE)
         if (
             request.user.groups.filter(name="Admins").exists()
             or (request.user.groups.filter(name="Sellers") and order.store == request.user.store)
@@ -80,7 +81,7 @@ def get_orders_by_user_endpoint(request, user_id):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-    return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"error": "You are not authorized to view these orders"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @swagger_auto_schema(
@@ -106,7 +107,10 @@ def get_orders_by_store_endpoint(request, store_id):
                 {"message": f"Store not found with the id {store_id}"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-    return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(
+        {"error": "You are not authorized to view these orders"}, 
+        status=status.HTTP_401_UNAUTHORIZED
+    )
 
 
 @swagger_auto_schema(
@@ -122,7 +126,6 @@ def create_order_endpoint(request):
     # make orders for their customers as well
     if request.user.groups.filter(name="Customers").exists():
         data = request.data
-        data["user"] = request.user.id
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -146,7 +149,6 @@ def update_order_endpoint(request):
     if (
         request.user.groups.filter(name="Admins").exists()
         or request.user.groups.filter(name="Sellers").exists()
-        or request.user.groups.filter(name="Customers").exists()
     ):
         data = request.data
         try:

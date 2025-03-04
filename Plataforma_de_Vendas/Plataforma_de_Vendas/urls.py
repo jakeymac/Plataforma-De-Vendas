@@ -99,7 +99,7 @@ urlpatterns = [
         name="update-store-endpoint",
     ),
     path(
-        "api/stores/<int:store_id>/",
+        "api/stores/<str:store_id>/",
         store_endpoints.get_stores_endpoint,
         name="store-by-id-endpoint",
     ),
@@ -139,7 +139,7 @@ urlpatterns = [
         name="final-save-product-endpoint",
     ),
     path(
-        "api/products/store/<int:store_id>/",
+        "api/products/store/<str:store_id>/",
         product_endpoints.get_products_by_store_endpoint,
         name="products-by-store-endpoint",
     ),
@@ -150,7 +150,7 @@ urlpatterns = [
     ),
     # This may get replaced by a proper search endpoint with multiple filters
     path(
-        "api/products/search/<int:store_id>/",
+        "api/products/search/<str:store_id>/",
         product_endpoints.search_for_product_endpoint,
         name="search-product-by-store-endpoint",
     ),
@@ -323,7 +323,7 @@ urlpatterns = [
         name="orders-by-user-endpoint",
     ),
     path(
-        "api/orders/store/<int:store_id>/",
+        "api/orders/store/<str:store_id>/",
         order_endpoints.get_orders_by_store_endpoint,
         name="orders-by-store-endpoint",
     ),

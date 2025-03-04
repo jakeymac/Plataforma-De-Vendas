@@ -11,6 +11,11 @@ from .models import (
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    prices = serializers.SerializerMethodField()
+
+    def get_prices(self, obj):
+        return {int(key): float(value) for key, value in obj.prices.items()}
+
     class Meta:
         model = Product
         fields = "__all__"

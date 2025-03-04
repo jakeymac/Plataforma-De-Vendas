@@ -53,6 +53,9 @@ def get_products_by_store_endpoint(request, store_id):
     )
 
 
+# TODO this endpoint may not be secure, being able to just pull all the product endpoints
+# + being able to confirm the existence or non-existence of a product by id
+
 @swagger_auto_schema(
     method="get",
     responses={200: "OK"},
@@ -140,13 +143,11 @@ def remove_product_endpoint(request, product_id):
             initial_products = InitialProductState.objects.filter(product=product)
             with transaction.atomic():
                 for initial_product in initial_products:
-                    for initial_product_image in initial_product.initialproductimage_set.all():
-                        initial_product_image.delete()
                     initial_product.delete()
                 product.delete()
                 return Response(
                     {"message": "Product removed successfully"},
-                    status=status.HTTP_200_OK,
+                    status=status.HTTP_204_NO_CONTENT, 
                 )
 
         return Response(
