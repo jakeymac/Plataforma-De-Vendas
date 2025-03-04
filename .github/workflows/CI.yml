@@ -143,51 +143,6 @@ jobs:
           path: Plataforma_de_Vendas/htmlcov/
           if-no-files-found: error
 
-    
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' 
-    needs: [python-tests]
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ec2-user/project_files/Plataforma-De-Vendas/Plataforma_de_Vendas
-            git pull origin main
-            conda activate conda_env
-
-            echo "Checking for migration conflicts..."
-            MIGRATION_OUTPUT=$(python manage.py makemigrations --dry-run 2>&1)
-            if echo "$MIGRATION_OUTPUT" | grep -q "conflicting"; then
-              echo "Migration conflict detected. Merging migrations..."
-              python manage.py makemigrations --merge
-            else
-              echo "No migration conflicts detected..."
-            fi
-
-            echo "Validating migration integrity..."
-            python manage.py sqlmigrate Accounts 0001 > /dev/null
-            if [ $? -ne 0 ]; then
-              echo "Migration integrity check failed! Fix the migrations before deploying."
-              exit 1
-            fi
-            
-            echo "Applying migrations..."
-            python manage.py migrate || { echo "Migration failed! Aborting deployment."; exit 1; }
-
-            echo "Collecting static files..."
-            python manage.py collectstatic --noinput || { echo "Static files collection failed!"; exit 1; }
-
-            reload_server
-
 
     
       
