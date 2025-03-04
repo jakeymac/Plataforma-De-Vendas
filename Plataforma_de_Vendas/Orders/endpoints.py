@@ -81,7 +81,10 @@ def get_orders_by_user_endpoint(request, user_id):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-    return Response({"error": "You are not authorized to view these orders"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(
+        {"error": "You are not authorized to view these orders"},
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
 
 
 @swagger_auto_schema(
@@ -108,8 +111,8 @@ def get_orders_by_store_endpoint(request, store_id):
                 status=status.HTTP_404_NOT_FOUND,
             )
     return Response(
-        {"error": "You are not authorized to view these orders"}, 
-        status=status.HTTP_401_UNAUTHORIZED
+        {"error": "You are not authorized to view these orders"},
+        status=status.HTTP_401_UNAUTHORIZED,
     )
 
 

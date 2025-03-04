@@ -9,7 +9,7 @@ from Stores.models import Store
 
 @pytest.mark.django_db
 class TestGetOrdersEndpoint:
-    """ Test the get_orders_endpoint - api/orders/ - all-orders-endpoint """
+    """Test the get_orders_endpoint - api/orders/ - all-orders-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -39,7 +39,7 @@ class TestGetOrdersEndpoint:
 
 @pytest.mark.django_db
 class TestGetOrderEndpoint:
-    """ Test the get_order_endpoint - api/orders/<order_id>/ - order-by-id-endpoint """
+    """Test the get_order_endpoint - api/orders/<order_id>/ - order-by-id-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -68,7 +68,7 @@ class TestGetOrderEndpoint:
         seller_user.groups.add(seller_group.id)
         client = APIClient()
         client.force_authenticate(user=seller_user)
-        
+
         url = reverse(self.view_name, kwargs={"order_id": order_fixture.id})
         response = client.get(url)
 
@@ -82,11 +82,11 @@ class TestGetOrderEndpoint:
     def test_customer_access(self, customer_fixture, store_fixture):
         customer_user, client = customer_fixture
         order = Order.objects.create(
-            user=customer_user, 
-            store=store_fixture, 
+            user=customer_user,
+            store=store_fixture,
             total=100.0,
-            status="PENDING", 
-            tracking_code="123456"
+            status="PENDING",
+            tracking_code="123456",
         )
 
         url = reverse(self.view_name, kwargs={"order_id": order.id})
@@ -122,9 +122,10 @@ class TestGetOrderEndpoint:
         assert response.status_code == 404
         assert response.data == {"message": "Order not found with the id 999"}
 
+
 @pytest.mark.django_db
 class TestGetOrdersByUserEndpoint:
-    """ Test the get_orders_by_user_endpoint - api/orders/user/<user_id>/ - orders-by-user-endpoint """
+    """Test the get_orders_by_user_endpoint - api/orders/user/<user_id>/ - orders-by-user-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -136,7 +137,7 @@ class TestGetOrdersByUserEndpoint:
 
         url = reverse(self.view_name, kwargs={"user_id": customer_user.id})
         response = client.get(url)
-        
+
         assert response.status_code == 200
         assert len(response.data) == 1
         assert response.data[0]["id"] == order_fixture.id
@@ -190,7 +191,7 @@ class TestGetOrdersByUserEndpoint:
 
 @pytest.mark.django_db
 class TestGetOrdersByStoreEndpoint:
-    """ Test the get_orders_by_store_endpoint - api/orders/store/<store_id>/ - orders-by-store-endpoint """
+    """Test the get_orders_by_store_endpoint - api/orders/store/<store_id>/ - orders-by-store-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -236,7 +237,7 @@ class TestGetOrdersByStoreEndpoint:
             store_name="Seller Store",
             store_description="Seller Store Description",
             store_url="sellerstore",
-            contact_email="seller_store_contact@example.com"
+            contact_email="seller_store_contact@example.com",
         )
 
         seller_user.store = seller_store
@@ -247,7 +248,6 @@ class TestGetOrdersByStoreEndpoint:
 
         assert response.status_code == 401
         assert response.data == {"error": "You are not authorized to view these orders"}
-
 
     def test_unauthenticated_access(self, client, store_fixture):
         url = reverse(self.view_name, kwargs={"store_id": store_fixture.id})
@@ -264,9 +264,10 @@ class TestGetOrdersByStoreEndpoint:
         assert response.status_code == 404
         assert response.data == {"message": "Store not found with the id 999"}
 
+
 @pytest.mark.django_db
 class TestCreateOrderEndpoint:
-    """ Test the create_order_endpoint - api/orders/create/ - create-order-endpoint """
+    """Test the create_order_endpoint - api/orders/create/ - create-order-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -274,13 +275,13 @@ class TestCreateOrderEndpoint:
 
     def test_authenticated_access(self, customer_fixture, store_fixture):
         customer_user, client = customer_fixture
-        
+
         data = {
             "user": customer_user.id,
             "store": store_fixture.id,
             "total": 100.0,
             "status": "PENDING",
-            "tracking_code": "123456"
+            "tracking_code": "123456",
         }
 
         response = client.post(self.url, data=data, format="json")
@@ -299,7 +300,7 @@ class TestCreateOrderEndpoint:
             "store": store_fixture.id,
             "total": 100.0,
             "status": "PENDING",
-            "tracking_code": "123456"
+            "tracking_code": "123456",
         }
 
         response = client.post(self.url, data=data, format="json")
@@ -314,7 +315,7 @@ class TestCreateOrderEndpoint:
             "store": store_fixture.id,
             "total": 100.0,
             "status": "PENDING",
-            "tracking_code": "123456"
+            "tracking_code": "123456",
         }
 
         response = client.post(self.url, data=data, format="json")
@@ -329,21 +330,19 @@ class TestCreateOrderEndpoint:
             "user": customer_user.id,
             "total": 100.0,
             "status": "PENDING",
-            "tracking_code": "123456"
+            "tracking_code": "123456",
         }
 
         response = client.post(self.url, data=data, format="json")
 
         assert response.status_code == 400
-        assert response.data == {
-            "store": ["This field is required."]
-        }
+        assert response.data == {"store": ["This field is required."]}
 
 
 @pytest.mark.django_db
 class TestUpdateOrderEndpoint:
-    """ Test the update_order_endpoint - api/orders/update/ - update-order-endpoint """
-    
+    """Test the update_order_endpoint - api/orders/update/ - update-order-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = reverse("update-order-endpoint")
@@ -357,7 +356,7 @@ class TestUpdateOrderEndpoint:
             "store": order_fixture.store.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
 
         response = client.put(self.url, data=data, format="json")
@@ -377,7 +376,7 @@ class TestUpdateOrderEndpoint:
             "store": order_fixture.store.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
 
         response = client.put(self.url, data=data, format="json")
@@ -408,7 +407,7 @@ class TestUpdateOrderEndpoint:
             "store": order_fixture.store.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
 
         response = client.put(self.url, data=data, format="json")
@@ -425,7 +424,7 @@ class TestUpdateOrderEndpoint:
             "store": order_fixture.store.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
 
         response = client.put(self.url, data=data, format="json")
@@ -440,7 +439,7 @@ class TestUpdateOrderEndpoint:
             "store": order_fixture.store.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
 
         response = client.put(self.url, data=data, format="json")
@@ -455,16 +454,13 @@ class TestUpdateOrderEndpoint:
             "user": order_fixture.user.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
-    
+
         response = client.put(self.url, data=data, format="json")
 
         assert response.status_code == 400
-        assert response.data == {
-            "store": ["This field is required."]
-        }
-    
+        assert response.data == {"store": ["This field is required."]}
 
     def test_nonexistent_order(self, admin_fixture, customer_fixture, store_fixture):
         admin_user, client = admin_fixture
@@ -476,7 +472,7 @@ class TestUpdateOrderEndpoint:
             "store": store_fixture.id,
             "total": 200.0,
             "status": "DONE",
-            "tracking_code": "654321"
+            "tracking_code": "654321",
         }
 
         response = client.put(self.url, data=data, format="json")

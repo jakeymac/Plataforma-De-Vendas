@@ -14,7 +14,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_internal_value(self, data):
-        """ Override this method to include the provided ID in error messages. """
+        """Override this method to include the provided ID in error messages."""
         errors = {}
 
         # Extract user and store IDs from the incoming data

@@ -35,6 +35,7 @@ def customer_group(db):
     group, _ = Group.objects.get_or_create(name="Customers")
     return group
 
+
 @pytest.fixture
 def store_fixture(db):
     store = Store.objects.create(
@@ -46,6 +47,7 @@ def store_fixture(db):
 
     return store
 
+
 @pytest.fixture
 def category_fixture(db):
     category = ProductCategory.objects.create(
@@ -55,31 +57,33 @@ def category_fixture(db):
 
     return category
 
+
 @pytest.fixture
 def subcategory_fixture(db, category_fixture):
     subcategory = ProductSubcategory.objects.create(
         category=category_fixture,
         subcategory_name="Test Subcategory Name",
-        subcategory_description="Test subcategory description"
+        subcategory_description="Test subcategory description",
     )
 
     return subcategory
 
+
 @pytest.fixture
 def mock_image():
-    image_content = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10'
+    image_content = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10"
     return SimpleUploadedFile("test_image.png", image_content, content_type="image/png")
 
 
 @pytest.fixture
 def product_fixture(db, store_fixture, subcategory_fixture, mock_image):
     product = Product.objects.create(
-        store=store_fixture, 
+        store=store_fixture,
         product_name="Test Product Name",
         product_description="This is a test product description",
         properties={"test_property_1": "value1", "test_property_2": "value2"},
         prices={12: 125.0, 20: 230.0},
-        subcategory=subcategory_fixture
+        subcategory=subcategory_fixture,
     )
 
     initial_product = InitialProductState.objects.create(
@@ -90,23 +94,22 @@ def product_fixture(db, store_fixture, subcategory_fixture, mock_image):
         properties=product.properties,
         prices=product.prices,
         original_created_at=product.created_at,
-        subcategory=product.subcategory
+        subcategory=product.subcategory,
     )
 
     product_image = ProductImage.objects.create(
-        product=product,
-        image=mock_image,
-        s3_key="test_s3_key"
+        product=product, image=mock_image, s3_key="test_s3_key"
     )
 
     initial_product_image = InitialProductImage.objects.create(
         image=mock_image,
         product=initial_product,
         s3_key=product_image.s3_key,
-        original_created_at=product_image.created_at
+        original_created_at=product_image.created_at,
     )
 
     return product, initial_product
+
 
 # Authenticated user fixtures to use with api testing
 @pytest.fixture
@@ -209,7 +212,6 @@ def random_user(db):
         username="pytest_random_user", password="password123", email="random_user_@example.com"
     )
     return user
-
 
 
 @pytest.fixture

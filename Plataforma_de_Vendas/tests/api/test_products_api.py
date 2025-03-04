@@ -11,8 +11,8 @@ from rest_framework.test import APIClient
 
 @pytest.mark.django_db
 class TestGetProductsByStoreEndpoint:
-    """ Test the get_products_by_store_endpoint - api/products/store/store_id - products-by-store-endpoint """
-    
+    """Test the get_products_by_store_endpoint - api/products/store/store_id - products-by-store-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "products-by-store-endpoint"
@@ -34,7 +34,7 @@ class TestGetProductsByStoreEndpoint:
 
     def test_nonexistent_store(self, customer_fixture):
         customer_user, customer_client = customer_fixture
-        
+
         url = reverse(self.view_name, kwargs={"store_id": "0"})
 
         response = customer_client.get(url)
@@ -45,12 +45,12 @@ class TestGetProductsByStoreEndpoint:
 
 @pytest.mark.django_db
 class TestGetProductsEndpoint:
-    """ Test the get_products_endpoint - api/products + api/products/product_id - all-products-endpoint + product-by-id-endpoint """
+    """Test the get_products_endpoint - api/products + api/products/product_id - all-products-endpoint + product-by-id-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
-         self.all_products_view_name = "all-products-endpoint"
-         self.product_id_view_name = "product-by-id-endpoint"
+        self.all_products_view_name = "all-products-endpoint"
+        self.product_id_view_name = "product-by-id-endpoint"
 
     def test_existent_product(self, customer_fixture, product_fixture):
         customer_user, customer_client = customer_fixture
@@ -97,8 +97,8 @@ class TestGetProductsEndpoint:
 
 @pytest.mark.django_db
 class TestSearchForProductEndpoint:
-    """ Test search_for_product_endpoint - api/products/search/store_id - search-product-endpoint """
-    
+    """Test search_for_product_endpoint - api/products/search/store_id - search-product-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "search-product-endpoint"
@@ -106,8 +106,8 @@ class TestSearchForProductEndpoint:
 
 @pytest.mark.django_db
 class TestRemoveProductEndpoint:
-    """ Test remove_product_endpoint - api/products/remove/product_id - remove-product-endpoint """
-    
+    """Test remove_product_endpoint - api/products/remove/product_id - remove-product-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "remove-product-endpoint"
@@ -128,15 +128,3 @@ class TestRemoveProductEndpoint:
         assert not InitialProductState.objects.filter(id=initial_state_id).exists()
         assert not ProductImage.objects.filter(product=product).exists()
         assert not InitialProductImage.objects.filter(product=initial_product).exists()
-        
-
-
-
-
-        
-
-
-
-
-
-    
