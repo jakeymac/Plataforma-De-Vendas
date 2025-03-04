@@ -6,12 +6,12 @@ from Products.models import (
     Product,
     ProductImage,
 )
-from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
 class TestGetProductsByStoreEndpoint:
-    """Test the get_products_by_store_endpoint - api/products/store/store_id - products-by-store-endpoint"""
+    """Test the get_products_by_store_endpoint - api/products/store/store_id -
+    products-by-store-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -45,7 +45,8 @@ class TestGetProductsByStoreEndpoint:
 
 @pytest.mark.django_db
 class TestGetProductsEndpoint:
-    """Test the get_products_endpoint - api/products + api/products/product_id - all-products-endpoint + product-by-id-endpoint"""
+    """Test the get_products_endpoint - api/products + api/products/product_id -
+    all-products-endpoint + product-by-id-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):

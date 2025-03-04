@@ -125,7 +125,8 @@ class TestGetOrderEndpoint:
 
 @pytest.mark.django_db
 class TestGetOrdersByUserEndpoint:
-    """Test the get_orders_by_user_endpoint - api/orders/user/<user_id>/ - orders-by-user-endpoint"""
+    """Test the get_orders_by_user_endpoint - api/orders/user/<user_id>/ -
+    orders-by-user-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -191,7 +192,8 @@ class TestGetOrdersByUserEndpoint:
 
 @pytest.mark.django_db
 class TestGetOrdersByStoreEndpoint:
-    """Test the get_orders_by_store_endpoint - api/orders/store/<store_id>/ - orders-by-store-endpoint"""
+    """Test the get_orders_by_store_endpoint - api/orders/store/<store_id>/ -
+    orders-by-store-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):

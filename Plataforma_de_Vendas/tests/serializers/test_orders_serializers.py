@@ -1,14 +1,12 @@
 import pytest
-from Accounts.models import CustomUser
 from Orders.serializers import OrderSerializer
-from rest_framework.exceptions import ValidationError
-from Stores.models import Store
 
 
 @pytest.mark.django_db
 class TestOrderSerializer:
     def test_invalid_user_and_store(self):
-        """Test that the serializer raises validation errors with the correct ID when user or store do not exist."""
+        """Test that the serializer raises validation errors
+        with the correct ID when user or store do not exist."""
         invalid_user_id = "99999"
         invalid_store_id = "55555"
 
@@ -19,9 +17,6 @@ class TestOrderSerializer:
         }
 
         serializer = OrderSerializer(data=data)
-        valid = serializer.is_valid()
-        errors = serializer.errors
-        print(errors)
 
         assert not serializer.is_valid()
         assert serializer.errors["user"] == f"User with ID {invalid_user_id} does not exist."
