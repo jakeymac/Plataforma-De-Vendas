@@ -7,6 +7,10 @@ on:
   workflow_dispatch:
 
 jobs:
+  python-tests:
+    name: Python Tests
+    uses: ./.github/workflows/python_tests.yml
+    
   deploy:
     runs-on: ubuntu-latest
     needs: python-tests
