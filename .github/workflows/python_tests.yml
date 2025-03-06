@@ -1,29 +1,23 @@
-name: Python Testing
+name: Python Tests
 
-on:
-  push:
-    branches:
-      - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
+on: 
+  workflow_call:
 
 jobs:
-  tests:
+  python-tests:
+    name: Python Tests
     runs-on: ubuntu-latest
 
     services:
       postgres:
         image: postgres:13
-        env:
+        env: 
           POSTGRES_DB: test_db
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
         ports:
           - 5432:5432
-    
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -57,3 +51,10 @@ jobs:
           name: coverage-report
           path: Plataforma_de_Vendas/htmlcov/
           if-no-files-found: error
+
+
+    
+      
+
+    
+
