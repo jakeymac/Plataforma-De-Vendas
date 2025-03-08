@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 from django.urls import reverse
 from Products.models import (
     InitialProductImage,
@@ -150,13 +149,15 @@ class TestSearchForProductEndpoint:
         # Perform the search query
         url = reverse(self.store_view_name, kwargs={"store_id": store_id}) + "?q=test"
         response = customer_client.get(url)
-        
+
         # Check if response contains product data
         assert response.status_code == 200
         assert len(response.data) > 0
         assert any(product["product_name"] == "Test Product Name" for product in response.data)
 
-    def test_valid_search_no_results_with_store(self, store_fixture, customer_fixture, product_fixture):
+    def test_valid_search_no_results_with_store(
+        self, store_fixture, customer_fixture, product_fixture
+    ):
         """Test that searching for a product by valid query returns no results."""
         customer_user, customer_client = customer_fixture
         product, _ = product_fixture
@@ -169,7 +170,7 @@ class TestSearchForProductEndpoint:
         # Check if response contains product data
         assert response.status_code == 200
         assert len(response.data) == 0
-        
+
     def test_valid_search_nonexistent_store(self, customer_fixture):
         """Test that searching for a product by valid query returns no results."""
         customer_user, customer_client = customer_fixture
