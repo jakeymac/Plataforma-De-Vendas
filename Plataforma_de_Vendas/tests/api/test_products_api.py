@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch
 from django.urls import reverse
 from Products.models import (
     InitialProductImage,
@@ -102,7 +103,84 @@ class TestSearchForProductEndpoint:
 
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.view_name = "search-product-endpoint"
+        self.no_store_view_name = "search-product-endpoint"
+        self.store_view_name = "search-product-by-store-endpoint"
+
+    ######################################
+    # Tests searching without a store ID #
+    ######################################
+
+    def test_valid_search_no_store(self, customer_fixture, product_fixture):
+        """Test that searching for a product by valid query returns correct results."""
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        # Perform the search query
+        url = reverse(self.no_store_view_name) + "?q=test"
+        response = customer_client.get(url)
+
+        # Check if response contains product data
+        assert response.status_code == 200
+        assert len(response.data) > 0
+        assert any(product["product_name"] == "Test Product Name" for product in response.data)
+
+    def test_valid_search_no_results_no_store(self, customer_fixture, product_fixture):
+        """Test that searching for a product by valid query returns no results."""
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        # Perform the search query
+        url = reverse(self.no_store_view_name) + "?q=invalid"
+        response = customer_client.get(url)
+
+        # Check if response contains product data
+        assert response.status_code == 200
+        assert len(response.data) == 0
+
+    ####################################
+    # Tests searching with a store ID #
+    ####################################
+
+    def test_valid_search_with_store(self, store_fixture, customer_fixture, product_fixture):
+        """Test that searching for a product by valid query returns correct results."""
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+        store_id = store_fixture.id
+
+        # Perform the search query
+        url = reverse(self.store_view_name, kwargs={"store_id": store_id}) + "?q=test"
+        response = customer_client.get(url)
+        
+        # Check if response contains product data
+        assert response.status_code == 200
+        assert len(response.data) > 0
+        assert any(product["product_name"] == "Test Product Name" for product in response.data)
+
+    def test_valid_search_no_results_with_store(self, store_fixture, customer_fixture, product_fixture):
+        """Test that searching for a product by valid query returns no results."""
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+        store_id = store_fixture.id
+
+        # Perform the search query
+        url = reverse(self.store_view_name, kwargs={"store_id": store_id}) + "?q=invalid"
+        response = customer_client.get(url)
+
+        # Check if response contains product data
+        assert response.status_code == 200
+        assert len(response.data) == 0
+        
+    def test_valid_search_nonexistent_store(self, customer_fixture):
+        """Test that searching for a product by valid query returns no results."""
+        customer_user, customer_client = customer_fixture
+
+        # Perform the search query
+        url = reverse("search-product-by-store-endpoint", kwargs={"store_id": "0"}) + "?q=test"
+        response = customer_client.get(url)
+
+        # Check if response contains product data
+        assert response.status_code == 404
+        assert response.data["message"] == "Store not found with the id 0"
 
 
 @pytest.mark.django_db
@@ -129,3 +207,26 @@ class TestRemoveProductEndpoint:
         assert not InitialProductState.objects.filter(id=initial_state_id).exists()
         assert not ProductImage.objects.filter(product=product).exists()
         assert not InitialProductImage.objects.filter(product=initial_product).exists()
+
+    def test_unauthorized_access(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        product_id = product.id
+
+        url = reverse(self.view_name, kwargs={"product_id": product_id})
+
+        response = customer_client.delete(url)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to delete this product"
+
+    def test_nonexistent_product(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        url = reverse(self.view_name, kwargs={"product_id": "0"})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"

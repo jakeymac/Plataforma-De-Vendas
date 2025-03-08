@@ -99,7 +99,7 @@ def search_for_product_endpoint(request, store_id=None):
     search_terms = request.GET.get("q", "").split(" ")
     query = Q()
     for term in search_terms:
-        query |= Q(name__icontains=term) | Q(description__icontains=term)
+        query |= Q(product_name__icontains=term) | Q(product_description__icontains=term)
 
     if store_id is not None:
         try:
@@ -161,39 +161,6 @@ def remove_product_endpoint(request, product_id):
             {"message": f"Product not found with the id {product_id}"},
             status=status.HTTP_404_NOT_FOUND,
         )
-
-    except Exception as e:
-        return Response(
-            {"message": f"An error occurred: {e}"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-    # OLD VERSION OF THE ENDPOINT, KEPT FOR REFERENCE,
-    # if changed, may use PUT instead of DELETE
-    # data = request.data
-    # product_id = data.get('id')
-    # try:
-    #     product = Product.objects.get(id=product_id)
-    #     if request.user.is_authenticated:
-    #         if (
-    #             request.user.account_type == "admin"
-    #             or request.user.store == product.store
-    #         ):
-    #             product.is_active = False
-    #             product.save()
-    #             return Response(
-    #                 {"message": "Product deactivated successfully"},
-    #                 status=status.HTTP_200_OK,
-    #             )
-    #     return Response(
-    #         {"message": "You do not have permission to delete this product"},
-    #         status=status.HTTP_403_FORBIDDEN,
-    #     )
-    # except Product.DoesNotExist:
-    #     return Response(
-    #         {"message": f"Product not found with the id {product_id}"},
-    #         status=status.HTTP_404_NOT_FOUND,
-    #     )
 
 
 @swagger_auto_schema(
