@@ -212,11 +212,12 @@ def add_product_image_endpoint(request):
             request.user.groups.filter(name="Sellers").exists()
             and request.user.store == product.store
         ):
-            # TODO Add functionality to redo the order of the images if adding just one image with the order specified
+            # TODO Add functionality to redo the order of the images
+            # if adding just one image with the order specified
             if data.get("order") is not None:
                 try:
                     order = int(data.get("order"))
-                except:
+                except Exception:
                     return Response(
                         {"message": "Invalid order, must be an integer"},
                         status=status.HTTP_400_BAD_REQUEST,
@@ -277,7 +278,9 @@ def remove_product_image_endpoint(request, image_id):
         try:
             image = ProductImage.objects.get(id=image_id)
             image.delete()
-            return Response({"message": "Image removed successfully"}, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"message": "Image removed successfully"}, status=status.HTTP_204_NO_CONTENT
+            )
         except ProductImage.DoesNotExist:
             return Response(
                 {"message": f"Image not found with the id {image_id}"},

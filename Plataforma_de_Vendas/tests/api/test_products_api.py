@@ -1,6 +1,6 @@
 import pytest
-from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
 from Products.models import (
     InitialProductImage,
     InitialProductState,
@@ -236,7 +236,8 @@ class TestRemoveProductEndpoint:
 
 @pytest.mark.django_db
 class TestProductImagesEndpoint:
-    """Test the product_images_endpoint - api/products/images/product_id - product-images-endpoint"""
+    """Test the product_images_endpoint -
+    api/products/images/product_id - product-images-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -270,7 +271,8 @@ class TestProductImagesEndpoint:
 
 @pytest.mark.django_db
 class TestAddProductImageEndpoint:
-    """Test the add_product_image_endpoint - api/products/add-image/product_id - add-product-image-endpoint"""
+    """Test the add_product_image_endpoint -
+    api/products/add-image/product_id - add-product-image-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -289,7 +291,7 @@ class TestAddProductImageEndpoint:
         assert response.data["message"] == "Image added successfully"
 
         product_images = ProductImage.objects.filter(product=product)
-        assert product_images.count() == 2 # The product already has an image, now this one
+        assert product_images.count() == 2  # The product already has an image, now this one
         assert product_images[1].order == 1
 
     def test_first_iamge_added(self, admin_fixture):
@@ -364,7 +366,9 @@ class TestAddProductImageEndpoint:
         response = customer_client.post(self.url, data)
 
         assert response.status_code == 403
-        assert response.data["message"] == "You do not have permission to add an image to this product"
+        assert (
+            response.data["message"] == "You do not have permission to add an image to this product"
+        )
 
     def test_nonexistent_product(self, admin_fixture):
         admin_user, admin_client = admin_fixture
@@ -380,16 +384,17 @@ class TestAddProductImageEndpoint:
 
 @pytest.mark.django_db
 class TestRemoveProductImageEndpoint:
-    """ Test the remove_product_image_endpoint - api/products/remove_image/image_id - remove-product-image-endpoint"""
-    
+    """Test the remove_product_image_endpoint -
+    api/products/remove_image/image_id - remove-product-image-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.view_name  = "remove-product-image-endpoint"
+        self.view_name = "remove-product-image-endpoint"
 
     def test_valid_access(self, admin_fixture, product_fixture):
         admin_user, admin_client = admin_fixture
         product, _ = product_fixture
-    
+
         image = ProductImage.objects.filter(product=product)[0]
 
         url = reverse(self.view_name, kwargs={"image_id": image.id})
