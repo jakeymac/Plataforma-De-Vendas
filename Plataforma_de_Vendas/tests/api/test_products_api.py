@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
 from Products.models import (
     InitialProductImage,
     InitialProductState,
@@ -231,3 +232,192 @@ class TestRemoveProductEndpoint:
 
         assert response.status_code == 404
         assert response.data["message"] == "Product not found with the id 0"
+
+
+@pytest.mark.django_db
+class TestProductImagesEndpoint:
+    """Test the product_images_endpoint - api/products/images/product_id - product-images-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "product-images-endpoint"
+
+    def test_valid_access(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        url = reverse(self.view_name, kwargs={"product_id": product.id})
+        response = customer_client.get(url)
+
+        assert response.status_code == 200
+
+        response_json = response.json()
+
+        assert response_json["product_id"] == product.id
+        assert response_json["images"][0]["id"] == product.productimage_set.first().id
+        assert response_json["images"][0]["url"] == product.productimage_set.first().image.url
+
+    def test_nonexistent_product(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+
+        url = reverse(self.view_name, kwargs={"product_id": "0"})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"
+
+
+@pytest.mark.django_db
+class TestAddProductImageEndpoint:
+    """Test the add_product_image_endpoint - api/products/add-image/product_id - add-product-image-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("add-product-image-endpoint")
+
+    def test_valid_access(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+        data = {"product_id": product.id, "image": image}
+
+        response = admin_client.post(self.url, data)
+
+        assert response.status_code == 201
+        assert response.data["message"] == "Image added successfully"
+
+        product_images = ProductImage.objects.filter(product=product)
+        assert product_images.count() == 2 # The product already has an image, now this one
+        assert product_images[1].order == 1
+
+    def test_first_iamge_added(self, admin_fixture):
+        """Test adding a first image to a product to test the order attribute."""
+        admin_user, admin_client = admin_fixture
+
+        product = Product.objects.create(
+            product_name="Test Product Name",
+            product_description="Test Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={"price": 10.0, "discount_price": 5.0},
+        )
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+        data = {"product_id": product.id, "image": image}
+
+        response = admin_client.post(self.url, data)
+
+        assert response.status_code == 201
+        assert response.data["message"] == "Image added successfully"
+
+        product_images = ProductImage.objects.filter(product=product)
+        assert product_images.count() == 1
+        assert product_images[0].order == 0
+
+    def test_image_with_order(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+        data = {"product_id": product.id, "image": image, "order": 2}
+
+        response = admin_client.post(self.url, data)
+
+        assert response.status_code == 201
+        assert response.data["message"] == "Image added successfully"
+
+        product_images = ProductImage.objects.filter(product=product)
+        assert product_images.count() == 2
+        assert product_images[1].order == 2
+
+    def test_invalid_order(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+        data = {"product_id": product.id, "image": image, "order": "invalid"}
+
+        response = admin_client.post(self.url, data)
+
+        assert response.status_code == 400
+        assert response.data["message"] == "Invalid order, must be an integer"
+
+    def test_no_image(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        data = {"product_id": product.id}
+
+        response = admin_client.post(self.url, data)
+
+        assert response.status_code == 400
+        assert response.data["message"] == "No image file provided"
+
+    def test_unauthorized_access(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+        data = {"product_id": product.id, "image": image}
+
+        response = customer_client.post(self.url, data)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to add an image to this product"
+
+    def test_nonexistent_product(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
+        data = {"product_id": "0", "image": image}
+
+        response = admin_client.post(self.url, data)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"
+
+
+@pytest.mark.django_db
+class TestRemoveProductImageEndpoint:
+    """ Test the remove_product_image_endpoint - api/products/remove_image/image_id - remove-product-image-endpoint"""
+    
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name  = "remove-product-image-endpoint"
+
+    def test_valid_access(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+    
+        image = ProductImage.objects.filter(product=product)[0]
+
+        url = reverse(self.view_name, kwargs={"image_id": image.id})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 204
+        assert not ProductImage.objects.filter(id=image.id).exists()
+
+    def test_unauthorized_access(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        image = ProductImage.objects.filter(product=product)[0]
+
+        url = reverse(self.view_name, kwargs={"image_id": image.id})
+
+        response = customer_client.delete(url)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to remove this image"
+
+    def test_nonexistent_image(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        url = reverse(self.view_name, kwargs={"image_id": "0"})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Image not found with the id 0"
