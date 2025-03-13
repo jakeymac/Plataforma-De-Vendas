@@ -343,10 +343,7 @@ def find_products_in_category_endpoint(request, category_id):
         )
 
 
-@swagger_auto_schema(
-    method="get", 
-    responses={200: "OK"}, 
-    description="Get all subcategories")
+@swagger_auto_schema(method="get", responses={200: "OK"}, description="Get all subcategories")
 @api_view(["GET"])
 def get_subcategories_endpoint(request):
     subcategories = ProductSubcategory.objects.all()
@@ -354,6 +351,7 @@ def get_subcategories_endpoint(request):
         return Response({"message": "No subcategories found"}, status=status.HTTP_404_NOT_FOUND)
     serializer = ProductSubcategorySerializer(subcategories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @swagger_auto_schema(
     method="get", responses={200: "OK"}, description="Get a category by category id"
@@ -377,12 +375,16 @@ def get_subcategory_endpoint(request, subcategory_id):
 @api_view(["GET"])
 def get_subcategories_by_category_endpoint(request, category_id):
     try:
+        breakpoint()
         category = ProductCategory.objects.get(id=category_id)
         subcategories = ProductSubcategory.objects.filter(category=category)
         serializer = ProductSubcategorySerializer(subcategories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
-        return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"message": f"Category not found with the id {category_id}"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
 @swagger_auto_schema(method="get", responses={200: "OK"}, description="Get all categories")

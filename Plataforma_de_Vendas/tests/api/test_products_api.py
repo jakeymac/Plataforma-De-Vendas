@@ -6,7 +6,7 @@ from Products.models import (
     InitialProductState,
     Product,
     ProductImage,
-    ProductSubcategory
+    ProductSubcategory,
 )
 
 
@@ -460,6 +460,7 @@ class TestProductsInOrderEndpoint:
         assert response.status_code == 404
         assert response.data["message"] == "Order not found with the id 0"
 
+
 @pytest.mark.django_db
 class TestFindProductsInCategoryEndpoint:
     """Test the find_products_in_category_endpoint -
@@ -483,7 +484,7 @@ class TestFindProductsInCategoryEndpoint:
 
     def test_nonexistent_category(self, customer_fixture):
         customer_user, customer_client = customer_fixture
-        
+
         url = reverse(self.view_name, kwargs={"category_id": "0"})
 
         response = customer_client.get(url)
@@ -494,13 +495,12 @@ class TestFindProductsInCategoryEndpoint:
 
 @pytest.mark.django_db
 class TestGetSubcategoriesEndpoint:
-    """ Test the get_subcategories_endpoint - 
-    api/products/subcategories - subcategories-endpoint """
+    """Test the get_subcategories_endpoint -
+    api/products/subcategories - subcategories-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = reverse("all-subcategories-endpoint")
-        
 
     def test_valid_access(self, customer_fixture, subcategory_fixture):
         customer_user, customer_client = customer_fixture
@@ -572,7 +572,7 @@ class TestGetSubcategoriesByCategoryEndpoint:
 
         assert response.status_code == 200
         assert response.data[0]["subcategory_name"] == subcategory.subcategory_name
-    
+
     def test_nonexistent_category(self, customer_fixture):
         customer_user, customer_client = customer_fixture
 
@@ -582,4 +582,3 @@ class TestGetSubcategoriesByCategoryEndpoint:
 
         assert response.status_code == 404
         assert response.data["message"] == "Category not found with the id 0"
-        

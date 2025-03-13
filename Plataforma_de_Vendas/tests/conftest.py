@@ -9,8 +9,8 @@ from Products.models import (
     Product,
     ProductCategory,
     ProductImage,
-    ProductSubcategory,
     ProductInOrder,
+    ProductSubcategory,
 )
 from rest_framework.test import APIClient
 from Stores.models import Store
@@ -227,9 +227,5 @@ def order_fixture(db, customer_fixture, store_fixture, product_fixture):
         tracking_code="123456",
     )
 
-    ProductInOrder.objects.create(
-        order=order, 
-        product=product, 
-        quantity=5, 
-        price=50.25)
+    ProductInOrder.objects.create(order=order, product=product, quantity=5, price=50.25)
     return order

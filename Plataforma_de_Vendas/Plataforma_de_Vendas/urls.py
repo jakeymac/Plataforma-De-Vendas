@@ -169,7 +169,6 @@ urlpatterns = [
         product_endpoints.get_subcategory_endpoint,
         name="subcategory-endpoint",
     ),
-    
     path(
         "api/products/categories/<str:category_id>/",
         product_endpoints.get_category_endpoint,
