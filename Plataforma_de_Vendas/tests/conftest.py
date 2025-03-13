@@ -10,6 +10,7 @@ from Products.models import (
     ProductCategory,
     ProductImage,
     ProductSubcategory,
+    ProductInOrder,
 )
 from rest_framework.test import APIClient
 from Stores.models import Store
@@ -215,8 +216,9 @@ def random_user(db):
 
 
 @pytest.fixture
-def order_fixture(db, customer_fixture, store_fixture):
+def order_fixture(db, customer_fixture, store_fixture, product_fixture):
     customer_user, _ = customer_fixture
+    product, _ = product_fixture
     order = Order.objects.create(
         user_id=customer_user.id,
         store_id=store_fixture.id,
@@ -224,4 +226,10 @@ def order_fixture(db, customer_fixture, store_fixture):
         status="PENDING",
         tracking_code="123456",
     )
+
+    ProductInOrder.objects.create(
+        order=order, 
+        product=product, 
+        quantity=5, 
+        price=50.25)
     return order

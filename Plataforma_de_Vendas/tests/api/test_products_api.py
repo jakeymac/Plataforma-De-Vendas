@@ -6,6 +6,7 @@ from Products.models import (
     InitialProductState,
     Product,
     ProductImage,
+    ProductSubcategory
 )
 
 
@@ -426,3 +427,159 @@ class TestRemoveProductImageEndpoint:
 
         assert response.status_code == 404
         assert response.data["message"] == "Image not found with the id 0"
+
+
+@pytest.mark.django_db
+class TestProductsInOrderEndpoint:
+    """Test the products_in_order_endpoint -
+    api/products/order/order_id - products-in-order-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "products-in-order-endpoint"
+
+    def test_valid_access(self, customer_fixture, product_fixture, order_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+        order = order_fixture
+
+        url = reverse(self.view_name, kwargs={"order_id": order.id})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 200
+        assert response.data[0]["product"] == product.id
+
+    def test_nonexistent_order(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+
+        url = reverse(self.view_name, kwargs={"order_id": "0"})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Order not found with the id 0"
+
+@pytest.mark.django_db
+class TestFindProductsInCategoryEndpoint:
+    """Test the find_products_in_category_endpoint -
+    api/products/category/category_id - find-products-in-category-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "find-products-in-category-endpoint"
+
+    def test_valid_access(self, customer_fixture, product_fixture, category_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+        category = category_fixture
+
+        url = reverse(self.view_name, kwargs={"category_id": category.id})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 200
+        assert response.data[0]["id"] == product.id
+
+    def test_nonexistent_category(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+        
+        url = reverse(self.view_name, kwargs={"category_id": "0"})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Category not found with the id 0"
+
+
+@pytest.mark.django_db
+class TestGetSubcategoriesEndpoint:
+    """ Test the get_subcategories_endpoint - 
+    api/products/subcategories - subcategories-endpoint """
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("all-subcategories-endpoint")
+        
+
+    def test_valid_access(self, customer_fixture, subcategory_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+
+        response = customer_client.get(self.url)
+
+        assert response.status_code == 200
+        assert response.data[0]["subcategory_name"] == subcategory.subcategory_name
+        assert response.data[0]["subcategory_description"] == subcategory.subcategory_description
+
+    def test_no_subcategories_found(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+
+        response = customer_client.get(self.url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "No subcategories found"
+
+
+@pytest.mark.django_db
+class TestGetSubcategoryEndpoint:
+    """Test the get_subcategory_endpoint -
+    api/products/subcategory/subcategory_id - subcategory-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "subcategory-endpoint"
+
+    def test_valid_access(self, customer_fixture, subcategory_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+
+        url = reverse(self.view_name, kwargs={"subcategory_id": subcategory.id})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 200
+        assert response.data["subcategory_name"] == subcategory.subcategory_name
+
+    def test_nonexistent_subcategory(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+
+        url = reverse(self.view_name, kwargs={"subcategory_id": "0"})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Subcategory not found with the id 0"
+
+
+@pytest.mark.django_db
+class TestGetSubcategoriesByCategoryEndpoint:
+    """Test the get_subcategories_by_category_endpoint -
+    api/products/subcategories/category_id - subcategories-by-category-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "subcategories-by-category-endpoint"
+
+    def test_valid_access(self, customer_fixture, subcategory_fixture, category_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+        category = category_fixture
+
+        url = reverse(self.view_name, kwargs={"category_id": category.id})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 200
+        assert response.data[0]["subcategory_name"] == subcategory.subcategory_name
+    
+    def test_nonexistent_category(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+
+        url = reverse(self.view_name, kwargs={"category_id": "0"})
+
+        response = customer_client.get(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Category not found with the id 0"
+        

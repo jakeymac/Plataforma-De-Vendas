@@ -87,9 +87,7 @@ def view_product(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
         prices = product.prices
-        print(prices)
         images = product.productimage_set.all().order_by("order")
-        print(images)
         return render(
             request,
             "products/view_product.html",
