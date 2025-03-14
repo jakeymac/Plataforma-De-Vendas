@@ -375,7 +375,6 @@ def get_subcategory_endpoint(request, subcategory_id):
 @api_view(["GET"])
 def get_subcategories_by_category_endpoint(request, category_id):
     try:
-        breakpoint()
         category = ProductCategory.objects.get(id=category_id)
         subcategories = ProductSubcategory.objects.filter(category=category)
         serializer = ProductSubcategorySerializer(subcategories, many=True)
@@ -391,6 +390,8 @@ def get_subcategories_by_category_endpoint(request, category_id):
 @api_view(["GET"])
 def get_categories_endpoint(request):
     categories = ProductCategory.objects.all()
+    if not categories:
+        return Response({"message": "No categories found"}, status=status.HTTP_404_NOT_FOUND)
     serializer = ProductCategorySerializer(categories, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -405,7 +406,7 @@ def get_category_endpoint(request, category_id):
         serializer = ProductCategorySerializer(category)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
-        return Response({"message": f"Category not found with the id {category_id}"}, status)
+        return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @swagger_auto_schema(
@@ -414,7 +415,7 @@ def get_category_endpoint(request, category_id):
         type=openapi.TYPE_OBJECT,
         required=["name", "category_id"],
         properties={
-            "name": openapi.Schema(type=openapi.TYPE_STRING, description="Subcategory name"),
+            "subcategory_name": openapi.Schema(type=openapi.TYPE_STRING, description="Subcategory name"),
             "category_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Category id"),
             "subcategory_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory description"
@@ -428,19 +429,20 @@ def get_category_endpoint(request, category_id):
 def add_subcategory_endpoint(request):
     # Use copy to allow for modification of the request data
     if request.user.groups.filter(name="Admins").exists():
-        data = request.data.copy()
-        category_id = data.get("category")
+        data = request.data
+        category_id = data.get("category_id")
         try:
             category = ProductCategory.objects.get(id=category_id)
-            data["category"] = category.id
 
             serializer = ProductSubcategorySerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                response_data = serializer.data.copy()
+                response_data["message"] = "Subcategory added successfully"
+                return Response(response_data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ProductCategory.DoesNotExist:
-            return Response({"message": f"Category not found with the id {category_id}"}, status)
+            return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response(
             {"message": "You do not have permission to add a subcategory"},
@@ -470,7 +472,9 @@ def add_category_endpoint(request):
         serializer = ProductCategorySerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            response_data = serializer.data.copy()
+            response_data["message"] = "Category added successfully"
+            return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(
@@ -499,18 +503,20 @@ def add_category_endpoint(request):
 def update_category_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
         data = request.data
-        category_id = data.get("category")
+        category_id = data.get("category_id")
         try:
             category = ProductCategory.objects.get(id=category_id)
-            serializer = ProductCategorySerializer(category, data=data)
+            serializer = ProductCategorySerializer(category, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                response_data = serializer.data.copy()
+                response_data["message"] = "Category updated successfully"
+                return Response(response_data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ProductCategory.DoesNotExist:
             return Response(
-                {"category": f"Category not found with the id {category_id}"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"message": f"Category not found with the id {category_id}"},
+                status=status.HTTP_404_NOT_FOUND,
             )
     else:
         return Response(
@@ -546,22 +552,21 @@ def update_category_endpoint(request):
 def update_subcategory_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
         # Use copy to allow for modification of the request data
-        data = request.data.copy()
-        subcategory_id = data.get("subcategory")
-        category_id = data.get("category")
+        data = request.data
+        subcategory_id = data.get("subcategory_id")
         try:
-            category = ProductCategory.objects.get(id=category_id)
-            data["category"] = category.id
             subcategory = ProductSubcategory.objects.get(id=subcategory_id)
-            serializer = ProductSubcategorySerializer(subcategory, data=data)
+            serializer = ProductSubcategorySerializer(subcategory, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                response_data = serializer.data.copy()
+                response_data["message"] = "Subcategory updated successfully"
+                return Response(response_data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ProductSubcategory.DoesNotExist:
             return Response(
-                {"category": f"Subcategory not found with the id {subcategory_id}"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"message": f"Subcategory not found with the id {subcategory_id}"},
+                status=status.HTTP_404_NOT_FOUND,
             )
     else:
         return Response(
