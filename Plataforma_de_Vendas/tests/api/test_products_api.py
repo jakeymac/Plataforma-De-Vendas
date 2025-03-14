@@ -770,7 +770,7 @@ class TestAddCategoryEndpoint:
 
 @pytest.mark.django_db
 class TestUpdateCategoryEndpoint:
-    """Test the update_category_endpoint - 
+    """Test the update_category_endpoint -
     api/products/categories/update/ - update-category-endpoint"""
 
     @pytest.fixture(autouse=True)
