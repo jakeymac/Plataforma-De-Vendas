@@ -5,8 +5,8 @@ from Products.models import (
     InitialProductImage,
     InitialProductState,
     Product,
-    ProductImage,
     ProductCategory,
+    ProductImage,
     ProductSubcategory,
 )
 
@@ -556,7 +556,7 @@ class TestGetSubcategoryEndpoint:
 @pytest.mark.django_db
 class TestGetSubcategoriesByCategoryEndpoint:
     """Test the get_subcategories_by_category_endpoint -
-    api/products/subcategories/category_id - subcategories-by-category-endpoint """
+    api/products/subcategories/category_id - subcategories-by-category-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -587,7 +587,7 @@ class TestGetSubcategoriesByCategoryEndpoint:
 
 @pytest.mark.django_db
 class TestGetCategoriesEndpoint:
-    """Test the get_categories_endpoint - api/products/categories - categories-endpoint """
+    """Test the get_categories_endpoint - api/products/categories - categories-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -609,6 +609,7 @@ class TestGetCategoriesEndpoint:
 
         assert response.status_code == 404
         assert response.data["message"] == "No categories found"
+
 
 @pytest.mark.django_db
 class TestGetCategoryEndpoint:
@@ -698,7 +699,7 @@ class TestAddSubcategoryEndpoint:
 
         assert response.status_code == 400
         assert response.data["subcategory_name"][0] == "Subcategory with this name already exists"
-        
+
     def test_nonexistent_category(self, admin_fixture):
         admin_user, admin_client = admin_fixture
 
@@ -716,7 +717,7 @@ class TestAddSubcategoryEndpoint:
 
 @pytest.mark.django_db
 class TestAddCategoryEndpoint:
-    """ Test the add_category_endpoint - api/products/add-category - add-category-endpoint """
+    """Test the add_category_endpoint - api/products/add-category - add-category-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -766,9 +767,11 @@ class TestAddCategoryEndpoint:
         assert response.status_code == 400
         assert response.data["category_name"][0] == "Category with this name already exists"
 
+
 @pytest.mark.django_db
 class TestUpdateCategoryEndpoint:
-    """ Test the update_category_endpoint - api/products/categories/update/ - update-category-endpoint """
+    """Test the update_category_endpoint - 
+    api/products/categories/update/ - update-category-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -781,7 +784,7 @@ class TestUpdateCategoryEndpoint:
         data = {
             "category_id": category.id,
             "category_name": "New Test Category Name",
-            "category_description": "New test category description"
+            "category_description": "New test category description",
         }
 
         response = admin_client.put(self.url, data)
@@ -797,16 +800,13 @@ class TestUpdateCategoryEndpoint:
         category = category_fixture
 
         new_category = ProductCategory.objects.create(
-            category_name="New Category Name",
-            category_description="New Category Description"
+            category_name="New Category Name", category_description="New Category Description"
         )
-
-        new_category_id = new_category.id
 
         data = {
             "category_id": new_category.id,
             "category_name": category.category_name,
-            "category_description": "Test Category Description"
+            "category_description": "Test Category Description",
         }
 
         response = admin_client.put(self.url, data)
@@ -820,7 +820,7 @@ class TestUpdateCategoryEndpoint:
         data = {
             "category_id": "0",
             "category_name": "Testing category name",
-            "category_description": "Testing category description"
+            "category_description": "Testing category description",
         }
 
         response = admin_client.put(self.url, data)
@@ -831,23 +831,23 @@ class TestUpdateCategoryEndpoint:
     def test_unauthenticated_access(self, customer_fixture, category_fixture):
         customer_user, customer_client = customer_fixture
         category = category_fixture
-        
+
         data = {
             "category_id": category.id,
             "category_name": "Updated category name",
-            "category_description": "Updated description"
+            "category_description": "Updated description",
         }
 
         response = customer_client.put(self.url, data)
 
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to update this category"
-        
+
 
 @pytest.mark.django_db
 class TestUpdateSubcategoryEndpoint:
-    """ Test the update_subcategory_endpoint - 
-    api/products/subcategories/update/ - update-subcategory-endpoint """
+    """Test the update_subcategory_endpoint -
+    api/products/subcategories/update/ - update-subcategory-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -860,7 +860,7 @@ class TestUpdateSubcategoryEndpoint:
         data = {
             "subcategory_id": subcategory.id,
             "subcategory_name": "New Test Subcategory Name",
-            "subcategory_description": "New test subcategory description"
+            "subcategory_description": "New test subcategory description",
         }
 
         response = admin_client.put(self.url, data)
@@ -879,15 +879,13 @@ class TestUpdateSubcategoryEndpoint:
         new_subcategory = ProductSubcategory.objects.create(
             category=subcategory.category,
             subcategory_name="New Subcategory Name",
-            subcategory_description="New Subcategory Description"
+            subcategory_description="New Subcategory Description",
         )
-
-        new_subcategory_id = new_subcategory.id
 
         data = {
             "subcategory_id": new_subcategory.id,
             "subcategory_name": subcategory.subcategory_name,
-            "subcategory_description": "Test Subcategory Description"
+            "subcategory_description": "Test Subcategory Description",
         }
 
         response = admin_client.put(self.url, data)
@@ -901,22 +899,22 @@ class TestUpdateSubcategoryEndpoint:
         data = {
             "subcategory_id": "0",
             "subcategory_name": "Testing subcategory name",
-            "subcategory_description": "Testing subcategory description"
+            "subcategory_description": "Testing subcategory description",
         }
 
         response = admin_client.put(self.url, data)
 
         assert response.status_code == 404
-        assert response.data["message"]== "Subcategory not found with the id 0"
+        assert response.data["message"] == "Subcategory not found with the id 0"
 
     def test_unauthenticated_access(self, customer_fixture, subcategory_fixture):
         customer_user, customer_client = customer_fixture
         subcategory = subcategory_fixture
-        
+
         data = {
             "subcategory_id": subcategory.id,
             "subcategory_name": "Updated subcategory name",
-            "subcategory_description": "Updated description"
+            "subcategory_description": "Updated description",
         }
 
         response = customer_client.put(self.url, data)

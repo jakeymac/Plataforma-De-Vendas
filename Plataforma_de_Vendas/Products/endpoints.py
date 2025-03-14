@@ -406,7 +406,10 @@ def get_category_endpoint(request, category_id):
         serializer = ProductCategorySerializer(category)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except ProductCategory.DoesNotExist:
-        return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"message": f"Category not found with the id {category_id}"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
 @swagger_auto_schema(
@@ -415,7 +418,9 @@ def get_category_endpoint(request, category_id):
         type=openapi.TYPE_OBJECT,
         required=["name", "category_id"],
         properties={
-            "subcategory_name": openapi.Schema(type=openapi.TYPE_STRING, description="Subcategory name"),
+            "subcategory_name": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Subcategory name"
+            ),
             "category_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Category id"),
             "subcategory_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory description"
@@ -432,8 +437,6 @@ def add_subcategory_endpoint(request):
         data = request.data
         category_id = data.get("category_id")
         try:
-            category = ProductCategory.objects.get(id=category_id)
-
             serializer = ProductSubcategorySerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -442,7 +445,10 @@ def add_subcategory_endpoint(request):
                 return Response(response_data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ProductCategory.DoesNotExist:
-            return Response({"message": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": f"Category not found with the id {category_id}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
     else:
         return Response(
             {"message": "You do not have permission to add a subcategory"},
