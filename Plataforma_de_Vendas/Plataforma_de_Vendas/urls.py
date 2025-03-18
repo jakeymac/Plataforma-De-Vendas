@@ -122,7 +122,7 @@ urlpatterns = [
     path(
         "api/products/topsubcategories/",
         product_endpoints.get_top_subcategories_endpoint,
-        name="all-top-subcategories-endpoint",
+        name="top-subcategories-endpoint",
     ),
     path(
         "api/products/categories/add/",
@@ -180,7 +180,7 @@ urlpatterns = [
         name="update-top-subcategories-endpoint",
     ),
     path(
-        "api/products/topsubcategories/<int:category_id>/",
+        "api/products/topsubcategories/<str:category_id>/",
         product_endpoints.get_top_subcategories_endpoint,
         name="top-subcategories-by-category-endpoint",
     ),

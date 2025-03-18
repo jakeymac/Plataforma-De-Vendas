@@ -77,7 +77,7 @@
                     <label for="subcategory_description" class="form-label">Subcategory description</label>
                     <textarea class="form-control" id="subcategory_description" name="subcategory_description" rows="3"></textarea>
                     <label for="category_selector" class="form-label">Category:</label>
-                    <select class="form-select" id="category_selector" name="category">
+                    <select class="form-select" id="category_selector" name="category_id">
                         <option value="">Select a category</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.category_name }}</option>
@@ -95,7 +95,7 @@
                 <h2>Edit Category</h2>
                 <form method="put" id="edit-category-form">
                     <label for="edit_category_selector" class="form-label">Select Category</label>
-                    <select class="form-select edit-selector" id="edit_category_selector" name="category">
+                    <select class="form-select edit-selector" id="edit_category_selector" name="category_id">
                         <option value="">Select a category</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.category_name }}</option>
@@ -118,7 +118,7 @@
                 <h2>Edit Subcategory</h2>
                 <form method="put" id="edit-subcategory-form">
                     <label for="edit_subcategory_selector" class="form-label">Select Subcategory</label>
-                    <select class="form-select" id="edit_subcategory_selector" name="subcategory">
+                    <select class="form-select" id="edit_subcategory_selector" name="subcategory_id">
                         <option value="">Select a subcategory</option>
                         {% for subcategory in subcategories %}
                             <option value="{{ subcategory.id }}">{{ subcategory.subcategory_name }}</option>
@@ -131,7 +131,7 @@
                     <textarea class="form-control" id="edit_subcategory_description" name="subcategory_description" rows="3"></textarea>
                     <div id="edit_subcategory_description_error_container" class="error-message"></div>
                     <label for="edit_subcategory_category_selector" class="form-label">Category:</label>
-                    <select class="form-select" id="edit_subcategory_category_selector" class="edit-selector" name="category">
+                    <select class="form-select" id="edit_subcategory_category_selector" class="edit-selector" name="category_id">
                         <option value="">Select a category</option>
                         {% for category in categories %}
                             <option value="{{ category.id }}">{{ category.category_name }}</option>

@@ -21,6 +21,7 @@ from .models import (
     ProductSubcategory,
     ProductTopSubcategory,
 )
+
 from .serializers import (
     ProductCategorySerializer,
     ProductInOrderSerializer,
@@ -421,7 +422,7 @@ def get_category_endpoint(request, category_id):
             "subcategory_name": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory name"
             ),
-            "category_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Category id"),
+            "category_id": openapi.Schema(type=openapi.TYPE_STRING, description="Category id"),
             "subcategory_description": openapi.Schema(
                 type=openapi.TYPE_STRING, description="Subcategory description"
             ),
@@ -437,6 +438,7 @@ def add_subcategory_endpoint(request):
         data = request.data
         category_id = data.get("category_id")
         try:
+            category = ProductCategory.objects.get(id=category_id)
             serializer = ProductSubcategorySerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -596,9 +598,9 @@ def remove_category_endpoint(request, category_id):
                 subcategory.delete()
             category = ProductCategory.objects.get(id=category_id)
             category.delete()
-            return Response({"message": "Category removed successfully"}, status=status.HTTP_200_OK)
+            return Response({"message": "Category removed successfully"}, status=status.HTTP_204_NO_CONTENT)
         except ProductCategory.DoesNotExist:
-            return Response({"category": f"Category not found with the id {category_id}"}, status)
+            return Response({"category": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response(
             {"message": "You do not have permission to remove this category"},
@@ -620,12 +622,12 @@ def remove_subcategory_endpoint(request, subcategory_id):
             subcategory.delete()
             return Response(
                 {"message": "Subcategory removed successfully"},
-                status=status.HTTP_200_OK,
+                status=status.HTTP_204_NO_CONTENT,
             )
         except ProductSubcategory.DoesNotExist:
             return Response(
                 {"message": f"Subcategory not found with the id {subcategory_id}"},
-                status,
+                status=status.HTTP_404_NOT_FOUND,
             )
     else:
         return Response(
@@ -637,33 +639,35 @@ def remove_subcategory_endpoint(request, subcategory_id):
 @swagger_auto_schema(
     method="GET",
     responses={200: "OK"},
-    description=("Get all top subcategories or get all top subcategories by category id."),
+    description=("Get all top subcategories"),
 )
 @api_view(["GET"])
-def get_top_subcategories_endpoint(request, category_id=None):
-    if category_id:
-        try:
-            category = ProductCategory.objects.get(id=category_id)
-            top_subcategories = []
-            for id in category.top_subcategory_ids:
-                top_subcategories.append(ProductTopSubcategory.objects.get(id=id))
-
-            return JsonResponse({})
-        except ProductCategory.DoesNotExist:
-            return Response({"message": f"Category not found with the id {category_id}"}, status)
-    categories = ProductCategory.objects.all()
-    for category in categories:
-        pass
+def get_top_subcategories_endpoint(request):
+    top_subcategories = ProductTopSubcategory.objects.all().order_by("order")
+    response_data = {}
+    for top_subcategory in top_subcategories:
+        response_data[top_subcategory.order] = {
+            "subcategory_name": top_subcategory.subcategory.subcategory_name,
+            "subcategory_description": top_subcategory.subcategory.subcategory_description,
+            "id": top_subcategory.subcategory.id,
+        }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
-@swagger_auto_schema(method="POST", responses={200: "OK"}, description="Update top subcategories")
-@api_view(["POST"])
+@swagger_auto_schema(method="PUT", responses={200: "OK"}, description="Update top subcategories")
+@api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_top_subcategories_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
         data = request.data
         seen = set()
         duplicates = []
+        # TODO could make this number a built-in setting to keep uniform across the project
+        if len(request.data) != 6:
+            return Response(
+                {"message": "There must be 6 top subcategories"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         for subcategory in request.data:
             if data.get(subcategory) in seen:
                 duplicates.append(data.get(subcategory))
@@ -671,28 +675,44 @@ def update_top_subcategories_endpoint(request):
                 seen.add(data.get(subcategory))
         if duplicates:
             return Response(
-                {"error": "Duplicate subcategories found", "duplicates": duplicates},
+                {"message": "Duplicate subcategories found", "duplicates": duplicates},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         organized_data = []
-        for subcategory in request.data:
+        
+        # Order starts at 1
+        not_found_subcategories = []
+        for current_order, subcategory in enumerate(request.data, start=1):
+            if not ProductSubcategory.objects.filter(id=data.get(subcategory)).exists():
+                not_found_subcategories.append(data.get(subcategory))
+
             organized_data.append(
                 {
                     "subcategory": data.get(subcategory),
-                    "order": int(subcategory.split("_")[2]),
+                    "order": current_order,
                 }
             )
-
+        if not_found_subcategories:
+            return Response(
+                {
+                    "message": f"Subcategories not found with id(s): {not_found_subcategories}",
+                    "ids": not_found_subcategories
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
         serializer = ProductTopSubcategorySerializer(data=organized_data, many=True)
-        if serializer.is_valid():
-            # Delete the top subcategories that are being updated
-            for subcategory in organized_data:
-                ProductTopSubcategory.objects.filter(order=subcategory.get("order")).delete()
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Delete the top subcategories that are being updated
+        # TODO perhaps add a rollback to make sure these changes do get done fully and properly
+        for subcategory in organized_data:
+            ProductTopSubcategory.objects.filter(order=subcategory.get("order")).delete()
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        response_data = {
+            "message": "Top subcategories updated successfully",
+                "data": serializer.data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     else:
         return Response(
             {"message": "You do not have permission to update top subcategories"},
@@ -1040,3 +1060,4 @@ def final_save_product_endpoint(request):
         {"message": "You do not have permission to save a product"},
         status=status.HTTP_403_FORBIDDEN,
     )
+

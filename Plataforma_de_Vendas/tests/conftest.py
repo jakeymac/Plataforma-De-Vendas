@@ -11,6 +11,7 @@ from Products.models import (
     ProductImage,
     ProductInOrder,
     ProductSubcategory,
+    ProductTopSubcategory
 )
 from rest_framework.test import APIClient
 from Stores.models import Store
@@ -66,6 +67,8 @@ def subcategory_fixture(db, category_fixture):
         subcategory_name="Test Subcategory Name",
         subcategory_description="Test subcategory description",
     )
+
+    ProductTopSubcategory.objects.create(subcategory=subcategory, order=1)
 
     return subcategory
 

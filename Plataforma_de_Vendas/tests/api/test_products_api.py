@@ -1,4 +1,5 @@
 import pytest
+import json
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from Products.models import (
@@ -8,6 +9,7 @@ from Products.models import (
     ProductCategory,
     ProductImage,
     ProductSubcategory,
+    ProductTopSubcategory
 )
 
 
@@ -921,3 +923,222 @@ class TestUpdateSubcategoryEndpoint:
 
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to update this subcategory"
+
+
+@pytest.mark.django_db
+class TestRemoveCategoryEndpoint:
+    """ Test the remove_category_endpoint - 
+    api/products/categories/remove/category_id/ - remove-category-endpoint """    
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "remove-category-endpoint"
+    
+    def test_valid_access(self, admin_fixture, category_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        category = category_fixture
+        subcategory = subcategory_fixture
+
+        url = reverse(self.view_name, kwargs={"category_id": category.id})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 204
+        assert response.data["message"] == "Category removed successfully"
+        assert not ProductCategory.objects.filter(id=category.id).exists()
+
+        # Confirm any product subcategories belonging to this category get deleted
+        assert not ProductSubcategory.objects.filter(id=subcategory.id).exists()
+
+
+        assert response.status_code == 204
+        assert response.data["message"] == "Category removed successfully"
+        assert not ProductCategory.objects.filter(id=category.id).exists()
+        
+
+    def test_nonexistent_category(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        url = reverse(self.view_name, kwargs={"category_id": "0"})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 404
+        assert response.data["category"] == "Category not found with the id 0"
+
+    def test_unauthorized_access(self, customer_fixture, category_fixture):
+        customer_user, customer_client = customer_fixture
+        category = category_fixture
+
+        url = reverse(self.view_name, kwargs={"category_id": category.id})
+
+        response = customer_client.delete(url)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to remove this category"
+
+@pytest.mark.django_db
+class TestRemoveSubcategoryEndpoint:
+    """ Test the remove_subcategory_endpoint - 
+    api/products/subcategories/remove/subcategory_id/ - remove-subcategory-endpoint """    
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "remove-subcategory-endpoint"
+    
+    def test_valid_access(self, admin_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+
+        url = reverse(self.view_name, kwargs={"subcategory_id": subcategory.id})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 204
+        assert response.data["message"] == "Subcategory removed successfully"
+        assert not ProductSubcategory.objects.filter(id=subcategory.id).exists()
+
+    def test_nonexistent_subcategory(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        url = reverse(self.view_name, kwargs={"subcategory_id": "0"})
+
+        response = admin_client.delete(url)
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Subcategory not found with the id 0"
+
+    def test_unauthorized_access(self, customer_fixture, subcategory_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+
+        url = reverse(self.view_name, kwargs={"subcategory_id": subcategory.id})
+
+        response = customer_client.delete(url)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to remove this subcategory"
+
+
+@pytest.mark.django_db
+class TestGetTopSubcategoriesEndpoint:
+    """ Test the get_top_subcategories_endpoint -
+    api/products/top-subcategories - top-subcategories-endpoint """
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("top-subcategories-endpoint")
+
+    def test_valid_access(self, customer_fixture, subcategory_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+
+        top_category = ProductTopSubcategory.objects.get(subcategory=subcategory)
+
+        response = customer_client.get(self.url)
+
+        assert response.status_code == 200
+        assert response.data[top_category.order]["id"] == subcategory.id
+        assert response.data[top_category.order]["subcategory_name"] == subcategory.subcategory_name
+        assert response.data[top_category.order]["subcategory_description"] == subcategory.subcategory_description
+
+
+@pytest.mark.django_db
+class TestUpdateTopSubcategoriesEndpoint:
+    """ Test the update_top_subcategories_endpoint -
+    api/products/update-top-subcategories - update-top-subcategories-endpoint """
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("update-top-subcategories-endpoint")
+
+    def create_subcategories(self, subcategory_fixture, count=6):
+        """ Generates data to use in testing """
+        subcategory = subcategory_fixture
+
+        subcategory_names = [f"New Subcategory {i+1}" for i in range(count)]
+        subcategory_descriptions = [f"New Subcategory {i+1} Description" for i in range(count)]
+
+        new_subcategory_ids = []
+        for i in range(count):
+            new_subcategory = ProductSubcategory.objects.create(
+                category=subcategory.category,
+                subcategory_name=subcategory_names[i],
+                subcategory_description=subcategory_descriptions[i],
+            )
+            new_subcategory_ids.append(new_subcategory.id)
+
+        return {subcategory_names[i]: new_subcategory_ids[i] for i in range(count)
+        }
+
+    def test_valid_access(self, admin_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+
+        data = self.create_subcategories(subcategory, 6)
+
+        response = admin_client.put(self.url, data)
+
+        assert response.status_code == 200
+        assert response.data["message"] == "Top subcategories updated successfully"
+
+        # Ensure original top subcategory was deleted
+        assert not ProductTopSubcategory.objects.filter(subcategory=subcategory).exists()
+
+        assert ProductTopSubcategory.objects.count() == 6
+        
+        for i in range(6):
+            top_subcategory = ProductTopSubcategory.objects.get(order=i + 1)
+            assert top_subcategory.subcategory.subcategory_name == list(data.keys())[i]
+
+    def test_not_enough_subcategories(self, admin_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+
+        data = self.create_subcategories(subcategory, 5)
+        response = admin_client.put(self.url, data)
+
+        assert response.status_code == 400
+        assert response.data["message"] == "There must be 6 top subcategories"
+
+    def test_unauthenticated_access(self, customer_fixture, subcategory_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+
+        data = self.create_subcategories(subcategory, 6)
+
+        response = customer_client.put(self.url, data)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to update top subcategories"
+
+    def test_duplicate_subcategories(self, admin_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+
+        data = self.create_subcategories(subcategory, 6)
+        data["New Subcategory 1"] = data["New Subcategory 2"]
+
+        response = admin_client.put(self.url, data)
+
+        assert response.status_code == 400
+        assert response.data["message"] == "Duplicate subcategories found"
+
+        assert data["New Subcategory 1"] in response.data["duplicates"]
+        assert data["New Subcategory 2"] in response.data["duplicates"]
+
+    def test_nonexistent_subcategory_ids(self, admin_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+
+        data = self.create_subcategories(subcategory, 6)
+        data["New Subcategory 1"] = "non_existent_id"
+        data["New Subcategory 2"] = "non_existent_id_2"
+
+        response = admin_client.put(self.url, data)
+
+        assert response.status_code == 404
+        print("Testing...")
+        print(response.data)
+        assert response.data["message"] == "Subcategories not found with id(s): ['non_existent_id', 'non_existent_id_2']"
+
