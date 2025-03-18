@@ -437,6 +437,8 @@ def add_subcategory_endpoint(request):
         data = request.data
         category_id = data.get("category_id")
         try:
+            # Check if the category exists
+            ProductCategory.objects.get(id=category_id)
             serializer = ProductSubcategorySerializer(data=data)
             if serializer.is_valid():
                 serializer.save()

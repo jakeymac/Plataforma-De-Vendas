@@ -1138,8 +1138,6 @@ class TestUpdateTopSubcategoriesEndpoint:
         response = admin_client.put(self.url, data)
 
         assert response.status_code == 404
-        print("Testing...")
-        print(response.data)
         assert (
             response.data["message"]
             == "Subcategories not found with id(s): ['non_existent_id', 'non_existent_id_2']"
