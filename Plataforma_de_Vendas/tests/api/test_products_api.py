@@ -1,5 +1,4 @@
 import pytest
-import json
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from Products.models import (
@@ -9,7 +8,7 @@ from Products.models import (
     ProductCategory,
     ProductImage,
     ProductSubcategory,
-    ProductTopSubcategory
+    ProductTopSubcategory,
 )
 
 
@@ -927,13 +926,13 @@ class TestUpdateSubcategoryEndpoint:
 
 @pytest.mark.django_db
 class TestRemoveCategoryEndpoint:
-    """ Test the remove_category_endpoint - 
-    api/products/categories/remove/category_id/ - remove-category-endpoint """    
+    """Test the remove_category_endpoint -
+    api/products/categories/remove/category_id/ - remove-category-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "remove-category-endpoint"
-    
+
     def test_valid_access(self, admin_fixture, category_fixture, subcategory_fixture):
         admin_user, admin_client = admin_fixture
         category = category_fixture
@@ -950,11 +949,9 @@ class TestRemoveCategoryEndpoint:
         # Confirm any product subcategories belonging to this category get deleted
         assert not ProductSubcategory.objects.filter(id=subcategory.id).exists()
 
-
         assert response.status_code == 204
         assert response.data["message"] == "Category removed successfully"
         assert not ProductCategory.objects.filter(id=category.id).exists()
-        
 
     def test_nonexistent_category(self, admin_fixture):
         admin_user, admin_client = admin_fixture
@@ -977,15 +974,16 @@ class TestRemoveCategoryEndpoint:
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to remove this category"
 
+
 @pytest.mark.django_db
 class TestRemoveSubcategoryEndpoint:
-    """ Test the remove_subcategory_endpoint - 
-    api/products/subcategories/remove/subcategory_id/ - remove-subcategory-endpoint """    
+    """Test the remove_subcategory_endpoint -
+    api/products/subcategories/remove/subcategory_id/ - remove-subcategory-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "remove-subcategory-endpoint"
-    
+
     def test_valid_access(self, admin_fixture, subcategory_fixture):
         admin_user, admin_client = admin_fixture
         subcategory = subcategory_fixture
@@ -1022,8 +1020,8 @@ class TestRemoveSubcategoryEndpoint:
 
 @pytest.mark.django_db
 class TestGetTopSubcategoriesEndpoint:
-    """ Test the get_top_subcategories_endpoint -
-    api/products/top-subcategories - top-subcategories-endpoint """
+    """Test the get_top_subcategories_endpoint -
+    api/products/top-subcategories - top-subcategories-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -1040,20 +1038,23 @@ class TestGetTopSubcategoriesEndpoint:
         assert response.status_code == 200
         assert response.data[top_category.order]["id"] == subcategory.id
         assert response.data[top_category.order]["subcategory_name"] == subcategory.subcategory_name
-        assert response.data[top_category.order]["subcategory_description"] == subcategory.subcategory_description
+        assert (
+            response.data[top_category.order]["subcategory_description"]
+            == subcategory.subcategory_description
+        )
 
 
 @pytest.mark.django_db
 class TestUpdateTopSubcategoriesEndpoint:
-    """ Test the update_top_subcategories_endpoint -
-    api/products/update-top-subcategories - update-top-subcategories-endpoint """
+    """Test the update_top_subcategories_endpoint -
+    api/products/update-top-subcategories - update-top-subcategories-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = reverse("update-top-subcategories-endpoint")
 
     def create_subcategories(self, subcategory_fixture, count=6):
-        """ Generates data to use in testing """
+        """Generates data to use in testing"""
         subcategory = subcategory_fixture
 
         subcategory_names = [f"New Subcategory {i+1}" for i in range(count)]
@@ -1068,8 +1069,7 @@ class TestUpdateTopSubcategoriesEndpoint:
             )
             new_subcategory_ids.append(new_subcategory.id)
 
-        return {subcategory_names[i]: new_subcategory_ids[i] for i in range(count)
-        }
+        return {subcategory_names[i]: new_subcategory_ids[i] for i in range(count)}
 
     def test_valid_access(self, admin_fixture, subcategory_fixture):
         admin_user, admin_client = admin_fixture
@@ -1086,7 +1086,7 @@ class TestUpdateTopSubcategoriesEndpoint:
         assert not ProductTopSubcategory.objects.filter(subcategory=subcategory).exists()
 
         assert ProductTopSubcategory.objects.count() == 6
-        
+
         for i in range(6):
             top_subcategory = ProductTopSubcategory.objects.get(order=i + 1)
             assert top_subcategory.subcategory.subcategory_name == list(data.keys())[i]
@@ -1140,5 +1140,7 @@ class TestUpdateTopSubcategoriesEndpoint:
         assert response.status_code == 404
         print("Testing...")
         print(response.data)
-        assert response.data["message"] == "Subcategories not found with id(s): ['non_existent_id', 'non_existent_id_2']"
-
+        assert (
+            response.data["message"]
+            == "Subcategories not found with id(s): ['non_existent_id', 'non_existent_id_2']"
+        )

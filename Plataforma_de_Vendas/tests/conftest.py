@@ -11,7 +11,7 @@ from Products.models import (
     ProductImage,
     ProductInOrder,
     ProductSubcategory,
-    ProductTopSubcategory
+    ProductTopSubcategory,
 )
 from rest_framework.test import APIClient
 from Stores.models import Store

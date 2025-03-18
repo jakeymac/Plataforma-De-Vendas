@@ -94,7 +94,6 @@ class ProductSubcategorySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         name = data.get("subcategory_name")
-        category = data.get("category")
 
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError(

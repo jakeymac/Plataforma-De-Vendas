@@ -21,7 +21,6 @@ from .models import (
     ProductSubcategory,
     ProductTopSubcategory,
 )
-
 from .serializers import (
     ProductCategorySerializer,
     ProductInOrderSerializer,
@@ -438,7 +437,6 @@ def add_subcategory_endpoint(request):
         data = request.data
         category_id = data.get("category_id")
         try:
-            category = ProductCategory.objects.get(id=category_id)
             serializer = ProductSubcategorySerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -598,9 +596,14 @@ def remove_category_endpoint(request, category_id):
                 subcategory.delete()
             category = ProductCategory.objects.get(id=category_id)
             category.delete()
-            return Response({"message": "Category removed successfully"}, status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"message": "Category removed successfully"}, status=status.HTTP_204_NO_CONTENT
+            )
         except ProductCategory.DoesNotExist:
-            return Response({"category": f"Category not found with the id {category_id}"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"category": f"Category not found with the id {category_id}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
     else:
         return Response(
             {"message": "You do not have permission to remove this category"},
@@ -665,8 +668,7 @@ def update_top_subcategories_endpoint(request):
         # TODO could make this number a built-in setting to keep uniform across the project
         if len(request.data) != 6:
             return Response(
-                {"message": "There must be 6 top subcategories"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"message": "There must be 6 top subcategories"}, status=status.HTTP_400_BAD_REQUEST
             )
         for subcategory in request.data:
             if data.get(subcategory) in seen:
@@ -680,7 +682,7 @@ def update_top_subcategories_endpoint(request):
             )
 
         organized_data = []
-        
+
         # Order starts at 1
         not_found_subcategories = []
         for current_order, subcategory in enumerate(request.data, start=1):
@@ -697,7 +699,7 @@ def update_top_subcategories_endpoint(request):
             return Response(
                 {
                     "message": f"Subcategories not found with id(s): {not_found_subcategories}",
-                    "ids": not_found_subcategories
+                    "ids": not_found_subcategories,
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -710,7 +712,7 @@ def update_top_subcategories_endpoint(request):
         serializer.save()
         response_data = {
             "message": "Top subcategories updated successfully",
-                "data": serializer.data
+            "data": serializer.data,
         }
         return Response(response_data, status=status.HTTP_200_OK)
     else:
@@ -1060,4 +1062,3 @@ def final_save_product_endpoint(request):
         {"message": "You do not have permission to save a product"},
         status=status.HTTP_403_FORBIDDEN,
     )
-
