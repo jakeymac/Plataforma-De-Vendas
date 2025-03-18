@@ -1,10 +1,10 @@
 // Dict to use for form fetch calls
 const apiUrls = {
-    'add-category-form': '/api/products/categories/add/', 
-    'add-subcategory-form': '/api/products/subcategories/add/',
-    'edit-category-form': '/api/products/categories/update/',
-    'edit-subcategory-form': '/api/products/subcategories/update/',
-    'top-categories-form': '/api/products/topsubcategories/update/'
+    'add-category-form': ['/api/products/categories/add/', 'POST'], 
+    'add-subcategory-form': ['/api/products/subcategories/add/', 'POST'],
+    'edit-category-form': ['/api/products/categories/update/', 'PUT'],
+    'edit-subcategory-form': ['/api/products/subcategories/update/', 'PUT'],
+    'top-categories-form': ['/api/products/topsubcategories/update/', 'PUT']
 };
 
 function update_product_selector(products) {
@@ -89,13 +89,8 @@ function load_listeners() {
         e.preventDefault();
         const formData = new FormData(this);
         const formId = $(this).attr('id');
-        const formUrl = apiUrls[formId];
-        var method;
-        if (formId.includes('edit')) {
-            method = 'PUT';
-        } else {
-            method = 'POST';
-        }
+        const formUrl = apiUrls[formId][0];
+        var method = apiUrls[formId][1];
         try {
             const response = await fetch(formUrl, {
                 method: method,

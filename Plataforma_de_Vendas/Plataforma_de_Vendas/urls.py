@@ -86,6 +86,9 @@ urlpatterns = [
         user_passes_test(is_admin)(schema_view.with_ui("swagger", cache_timeout=0)),
         name="schema-swagger-ui",
     ),
+    ###################
+    # STORE ENDPOINTS #
+    ###################
     path("api/stores/", store_endpoints.get_stores_endpoint, name="all-stores-endpoint"),
     path("api/stores/add/", store_endpoints.add_store_endpoint, name="add-store-endpoint"),
     path(
@@ -103,20 +106,101 @@ urlpatterns = [
         store_endpoints.get_stores_endpoint,
         name="store-by-id-endpoint",
     ),
+    ######################################
+    # CATEGORY AND SUBCATEGORY ENDPOINTS #
+    ######################################
+    path(
+        "api/products/categories/",
+        product_endpoints.get_categories_endpoint,
+        name="all-categories-endpoint",
+    ),
+    path(
+        "api/products/subcategories/",
+        product_endpoints.get_subcategories_endpoint,
+        name="all-subcategories-endpoint",
+    ),
+    path(
+        "api/products/topsubcategories/",
+        product_endpoints.get_top_subcategories_endpoint,
+        name="top-subcategories-endpoint",
+    ),
+    path(
+        "api/products/categories/add/",
+        product_endpoints.add_category_endpoint,
+        name="add-category-endpoint",
+    ),
+    path(
+        "api/products/subcategories/add/",
+        product_endpoints.add_subcategory_endpoint,
+        name="add-subcategory-endpoint",
+    ),
+    path(
+        "api/products/categories/update/",
+        product_endpoints.update_category_endpoint,
+        name="update-category-endpoint",
+    ),
+    path(
+        "api/products/subcategories/update/",
+        product_endpoints.update_subcategory_endpoint,
+        name="update-subcategory-endpoint",
+    ),
+    path(
+        "api/products/subcategories/category/<str:category_id>/",
+        product_endpoints.get_subcategories_by_category_endpoint,
+        name="subcategories-by-category-endpoint",
+    ),
+    path(
+        "api/products/search_category/<str:category_id>/",
+        product_endpoints.find_products_in_category_endpoint,
+        name="find-products-in-category-endpoint",
+    ),
+    path(
+        "api/products/categories/remove/<str:category_id>/",
+        product_endpoints.remove_category_endpoint,
+        name="remove-category-endpoint",
+    ),
+    path(
+        "api/products/subcategories/remove/<str:subcategory_id>/",
+        product_endpoints.remove_subcategory_endpoint,
+        name="remove-subcategory-endpoint",
+    ),
+    path(
+        "api/products/subcategories/<str:subcategory_id>/",
+        product_endpoints.get_subcategory_endpoint,
+        name="subcategory-endpoint",
+    ),
+    path(
+        "api/products/categories/<str:category_id>/",
+        product_endpoints.get_category_endpoint,
+        name="category-endpoint",
+    ),
+    path(
+        "api/products/topsubcategories/update/",
+        product_endpoints.update_top_subcategories_endpoint,
+        name="update-top-subcategories-endpoint",
+    ),
+    path(
+        "api/products/topsubcategories/<str:category_id>/",
+        product_endpoints.get_top_subcategories_endpoint,
+        name="top-subcategories-by-category-endpoint",
+    ),
+    #####################
+    # PRODUCT ENDPOINTS #
+    #####################
     path(
         "api/products/",
         product_endpoints.get_products_endpoint,
         name="all-products-endpoint",
     ),
     path(
-        "api/products/add/",
-        product_endpoints.add_product_endpoint,
-        name="add-product-endpoint",
-    ),
-    path(
         "api/products/add_image/",
         product_endpoints.add_product_image_endpoint,
         name="add-product-image-endpoint",
+    ),
+    path(
+        "api/products/add/",
+        product_endpoints.add_product_endpoint,
+        name="add-product-endpoint",
     ),
     path(
         "api/products/search/",
@@ -142,11 +226,6 @@ urlpatterns = [
         "api/products/store/<str:store_id>/",
         product_endpoints.get_products_by_store_endpoint,
         name="products-by-store-endpoint",
-    ),
-    path(
-        "api/products/<str:product_id>/",
-        product_endpoints.get_products_endpoint,
-        name="product-by-id-endpoint",
     ),
     # This may get replaced by a proper search endpoint with multiple filters
     path(
@@ -175,80 +254,13 @@ urlpatterns = [
         name="remove-product-image-endpoint",
     ),
     path(
-        "api/products/categories/",
-        product_endpoints.get_categories_endpoint,
-        name="all-categories-endpoint",
+        "api/products/<str:product_id>/",
+        product_endpoints.get_products_endpoint,
+        name="product-by-id-endpoint",
     ),
-    path(
-        "api/products/subcategories/",
-        product_endpoints.get_subcategories_endpoint,
-        name="all-subcategories-endpoint",
-    ),
-    path(
-        "api/products/topsubcategories/",
-        product_endpoints.get_top_subcategories_endpoint,
-        name="all-top-subcategories-endpoint",
-    ),
-    path(
-        "api/products/categories/add/",
-        product_endpoints.add_category_endpoint,
-        name="add-category-endpoint",
-    ),
-    path(
-        "api/products/subcategories/add/",
-        product_endpoints.add_subcategory_endpoint,
-        name="add-subcategory-endpoint",
-    ),
-    path(
-        "api/products/categories/update/",
-        product_endpoints.update_category_endpoint,
-        name="update-category-endpoint",
-    ),
-    path(
-        "api/products/subcategories/update/",
-        product_endpoints.update_subcategory_endpoint,
-        name="update-subcategory-endpoint",
-    ),
-    path(
-        "api/products/search_category/<str:category_id>/",
-        product_endpoints.find_products_in_category_endpoint,
-        name="find-products-in-category-endpoint",
-    ),
-    path(
-        "api/products/categories/<str:category_id>/",
-        product_endpoints.get_category_endpoint,
-        name="category-endpoint",
-    ),
-    path(
-        "api/products/subcategories/<str:subcategory_id>/",
-        product_endpoints.get_subcategory_endpoint,
-        name="subcategory-endpoint",
-    ),
-    path(
-        "api/products/subcategories/category/<str:category_id>/",
-        product_endpoints.get_subcategories_by_category_endpoint,
-        name="subcategories-by-category-endpoint",
-    ),
-    path(
-        "api/products/categories/remove/<str:category_id>/",
-        product_endpoints.remove_category_endpoint,
-        name="remove-category-endpoint",
-    ),
-    path(
-        "api/products/subcategories/remove/<str:subcategory_id>/",
-        product_endpoints.remove_subcategory_endpoint,
-        name="remove-subcategory-endpoint",
-    ),
-    path(
-        "api/products/topsubcategories/<int:category_id>/",
-        product_endpoints.get_top_subcategories_endpoint,
-        name="top-subcategories-by-category-endpoint",
-    ),
-    path(
-        "api/products/topsubcategories/update/",
-        product_endpoints.update_top_subcategories_endpoint,
-        name="update-top-subcategories-endpoint",
-    ),
+    #####################
+    # ACCOUNT ENDPOINTS #
+    #####################
     path("api/accounts/", account_endpoints.get_users_endpoint, name="all-users-endpoint"),
     path("api/accounts/login/", account_endpoints.login_endpoint, name="login-endpoint"),
     path(
@@ -301,6 +313,9 @@ urlpatterns = [
         account_endpoints.get_user_endpoint,
         name="user-by-id-endpoint",
     ),
+    ###################
+    # ORDER ENDPOINTS #
+    ###################
     path("api/orders/", order_endpoints.get_orders_endpoint, name="all-orders-endpoint"),
     path(
         "api/orders/add/",
@@ -313,11 +328,6 @@ urlpatterns = [
         name="update-order-endpoint",
     ),
     path(
-        "api/orders/<int:order_id>/",
-        order_endpoints.get_order_endpoint,
-        name="order-by-id-endpoint",
-    ),
-    path(
         "api/orders/user/<str:user_id>/",
         order_endpoints.get_orders_by_user_endpoint,
         name="orders-by-user-endpoint",
@@ -326,6 +336,11 @@ urlpatterns = [
         "api/orders/store/<str:store_id>/",
         order_endpoints.get_orders_by_store_endpoint,
         name="orders-by-store-endpoint",
+    ),
+    path(
+        "api/orders/<int:order_id>/",
+        order_endpoints.get_order_endpoint,
+        name="order-by-id-endpoint",
     ),
 ]
 

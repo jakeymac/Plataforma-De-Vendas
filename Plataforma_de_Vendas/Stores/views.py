@@ -23,7 +23,6 @@ def home(request):
         "categories": categories_dict,
         "top_subcategories": top_subcategories_dict,
     }
-    print(context)
     return render(request, "Stores/home.html", context)
 
 

@@ -84,16 +84,17 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSubcategorySerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=ProductCategory.objects.all(), write_only=True
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProductCategory.objects.all(), source="category"
     )
 
     class Meta:
         model = ProductSubcategory
-        fields = ["category", "subcategory_name", "subcategory_description"]
+        fields = ["category_id", "subcategory_name", "subcategory_description"]
 
     def validate(self, data):
         name = data.get("subcategory_name")
+
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError(
                 {"subcategory_name": ("Subcategory with this name already exists as a category")}
