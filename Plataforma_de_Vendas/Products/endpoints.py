@@ -861,6 +861,7 @@ def rollback_product_changes_endpoint(request):
 def create_initial_product_state_endpoint(request):
     # TODO Could update all of this to not create a new initial state every 
     # time each time the edit product page is reloaded for example
+    breakpoint()
     if (
         request.user.groups.filter(name="Admins").exists()
         or request.user.groups.filter(name="Sellers").exists()
@@ -899,7 +900,7 @@ def create_initial_product_state_endpoint(request):
 
             for image in product.productimage_set.all():
                 InitialProductImage.objects.create(
-                    initial_product_state=initial_state,
+                    initial_product=initial_state,
                     image=image.image,
                     order=image.order,
                     s3_key=image.s3_key,

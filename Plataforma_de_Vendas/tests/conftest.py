@@ -107,7 +107,7 @@ def product_fixture(db, store_fixture, subcategory_fixture, mock_image):
 
     InitialProductImage.objects.create(
         image=mock_image,
-        product=initial_product,
+        initial_product=initial_product,
         s3_key=product_image.s3_key,
         original_created_at=product_image.created_at,
     )

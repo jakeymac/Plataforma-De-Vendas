@@ -149,7 +149,7 @@ class ProductImage(models.Model):
 
 
 class InitialProductImage(models.Model):
-    product = models.ForeignKey("InitialProductState", on_delete=models.CASCADE)
+    initial_product = models.ForeignKey("InitialProductState", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="product_images/", null=True, blank=True)
     order = models.PositiveIntegerField(default=0)
     s3_key = models.CharField(max_length=255, null=True, blank=True)

@@ -218,7 +218,7 @@ class TestRemoveProductEndpoint:
         assert not Product.objects.filter(id=product_id).exists()
         assert not InitialProductState.objects.filter(id=initial_state_id).exists()
         assert not ProductImage.objects.filter(product=product).exists()
-        assert not InitialProductImage.objects.filter(product=initial_product).exists()
+        assert not InitialProductImage.objects.filter(initial_product=initial_product).exists()
 
     def test_unauthorized_access(self, customer_fixture, product_fixture):
         customer_user, customer_client = customer_fixture
@@ -1259,7 +1259,7 @@ class TestRollbackProductChangesEndpoint:
         )
 
         initial_image = SimpleUploadedFile("rollback_test_initial_image.jpg", b"file_content", content_type="image/jpeg")
-        initial_product_image = InitialProductImage.objects.create(product=initial_state, image=initial_image, original_created_at=product_image.created_at)
+        initial_product_image = InitialProductImage.objects.create(initial_product=initial_state, image=initial_image, original_created_at=product_image.created_at)
 
         data = {"product_id": product.id, "initial_product_state_id": initial_state.id}
 
@@ -1367,3 +1367,49 @@ class TestCreateInitialProductStateEndpoint:
     """ Test the create_initial_product_state_endpoint -
     api/products/create-initial-product-state/product_id - create-initial-product-state-endpoint """
     
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("create-initial-product-state-endpoint")
+
+    def test_valid_access(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+        
+        new_product = Product.objects.create(
+            product_name="Initial Product Name",
+            product_description="Initial Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        new_product_image_file = SimpleUploadedFile("new_product_image.jpg", b"file_content", content_type="image/jpeg")
+        new_product_image = ProductImage.objects.create(product=new_product, image=new_product_image_file)
+
+        data = {"product_id": new_product.id}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 201
+        assert response.data["message"] == "Initial product state created successfully"
+
+        assert InitialProductState.objects.filter(product=new_product).exists()
+        
+
+        initial_state = InitialProductState.objects.get(product=product)
+
+        assert InitialProductImage.objects.filter(product=initial_state).exists()
+
+        initial_image = InitialProductImage.objects.get(initial_product=initial_state)
+
+        assert initial_state.product_name == new_product.product_name
+        assert initial_state.product_description == new_product.product_description
+        assert initial_state.properties == new_product.properties
+        assert initial_state.prices == new_product.prices
+        assert initial_state.original_created_at == new_product.created_at
+
+        assert initial_image.image == new_product_image.image
+        assert initial_image.original_created_at == new_product_image.created_at
+
+
+
+
+
