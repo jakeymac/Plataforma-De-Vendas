@@ -744,12 +744,11 @@ def add_product_endpoint(request):
             )
         else:
             product_serializer = ProductSerializer(data=data, partial=True)
-            if product_serializer.is_valid():
-                product_serializer.save()
-            return Response(
-                product_serializer.data,
-                status=status.HTTP_201_CREATED,
-            )
+            product_serializer.is_valid(raise_exception=True)
+            product_serializer.save()
+            response_data = product_serializer.data.copy()
+            response_data["message"] = "Product added successfully"
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
     return Response(
         {"message": "You do not have permission to add a product"},
@@ -777,7 +776,7 @@ def rollback_product_changes_endpoint(request):
             product = Product.objects.get(id=data.get("product_id"))
             if (
                 not request.user.groups.filter(name="Admins").exists()
-                or request.user.store != product.store
+                and request.user.store != product.store
             ):
                 return Response(
                     {"message": "You do not have permission to rollback this product"},
@@ -796,8 +795,8 @@ def rollback_product_changes_endpoint(request):
             return Response(
                 {
                     "message": (
-                        f"Product with id {data.get('id')} and initial state with "
-                        f"{data.get('id')} not found"
+                        f"Product with id {data.get('product_id')} and initial product state with id "
+                        f"{data.get('initial_product_state_id')} not found"
                     )
                 },
                 status=status.HTTP_404_NOT_FOUND,
@@ -805,13 +804,13 @@ def rollback_product_changes_endpoint(request):
 
         elif product_not_found:
             return Response(
-                {"message": f"Product with id {data.get('id')} not found"},
+                {"message": f"Product not found with the id {data.get('product_id')}"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         elif initial_state_not_found:
             return Response(
-                {"message": (f"Initial state with id {data.get('initial_state_id')} " "not found")},
+                {"message": (f"Initial product state not found with the id {data.get('initial_product_state_id')}")},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -846,13 +845,8 @@ def rollback_product_changes_endpoint(request):
                     status=status.HTTP_200_OK,
                 )
 
-        return Response(
-            {"message": "There was an error rolling back the product"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
     return Response(
-        {"message": "You do not have permission to rollback a product"},
+        {"message": "You do not have permission to rollback products"},
         status=status.HTTP_403_FORBIDDEN,
     )
 
@@ -912,7 +906,10 @@ def create_initial_product_state_endpoint(request):
                 )
 
             return Response(
-                {"message": "Initial state created successfully"},
+                {
+                    "message": "Initial state created successfully",
+                    "initial_product_state_id": initial_state.id
+                },
                 status=status.HTTP_200_OK,
             )
         except Product.DoesNotExist:

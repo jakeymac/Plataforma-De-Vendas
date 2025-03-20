@@ -29,7 +29,7 @@ def edit_product_view(request, product_id):
     ):
         try:
             product = Product.objects.get(id=product_id)
-            if product.store != request.user.store:
+            if product.store != request.user.store and not request.user.groups.filter(name="Admins").exists():
                 # TODO add a forbidden page to let users know what's happening
                 return redirect("home")
 

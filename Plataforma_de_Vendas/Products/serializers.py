@@ -11,14 +11,29 @@ from .models import (
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    prices = serializers.SerializerMethodField()
-
-    def get_prices(self, obj):
-        return {int(key): float(value) for key, value in obj.prices.items()}
+    prices = serializers.JSONField()
 
     class Meta:
         model = Product
         fields = "__all__"
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if "prices" in data and isinstance(data["prices"], dict):
+            data["prices"] = {int(key): float(value) for key, value in data["prices"].items()}
+        return data
+
+    def validate_prices(self, prices):
+        if isinstance(prices, dict):
+            try:
+                return {int(key): float(value) for key, value in prices.items()}
+            except (ValueError, TypeError):
+                raise serializers.ValidationError(
+                    {
+                        "prices": "Invalid format. Must be a dictionary with integer keys and float values."
+                    }
+                )
+        return prices
 
     def validate(self, data):
         product_name = data.get("product_name")

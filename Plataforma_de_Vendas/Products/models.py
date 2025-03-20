@@ -38,6 +38,9 @@ class Product(models.Model):
 
     # Custom save method to generate unique id and ensure it is unique
     def save(self, *args, **kwargs):
+        if isinstance(self.prices, dict):
+            self.prices = {int(k): float(v) for k, v in self.prices.items()}
+
         if not self.id:
             self.id = generate_unique_id()
         while True:
@@ -122,22 +125,24 @@ class ProductImage(models.Model):
         if not self.id:
             self.id = generate_unique_id()
 
-        # Save the instance without the `image` field to ensure `id` is generated
-        if not self.pk:  # Checks if the object is new
-            while True:
-                try:
-                    super().save(*args, **kwargs)
-                    break
-                except IntegrityError:
-                    # Handle non-unique ID by regenerating it
-                    self.id = generate_unique_id()
+        attempts = 0
+        max_attempts = 5
 
-        # Now save the instance with the `image` field and set the `s3_key`
+        while attempts < max_attempts:
+            try:
+                super().save(*args, **kwargs)
+                break
+            except IntegrityError:
+                # Handle non-unique ID by regenerating one
+                self.id = generate_unique_id()
+                attempts += 1
+
+        if attempts == max_attempts:
+            raise IntegrityError("Could not generate a unique ID in 5 attempts")
+
         if self.image and not self.s3_key:
             self.s3_key = self.image.name
             super().save(update_fields=["s3_key"])
-
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.product.product_name} - {self.order}"
