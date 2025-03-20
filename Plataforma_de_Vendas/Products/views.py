@@ -33,30 +33,7 @@ def edit_product_view(request, product_id):
                 # TODO add a forbidden page to let users know what's happening
                 return redirect("home")
 
-            initial_product_state = InitialProductState.objects.create(
-                product=product,
-                store=product.store,
-                subcategory=product.subcategory,
-                product_name=product.product_name,
-                product_description=product.product_description,
-                properties=product.properties,
-                is_active=product.is_active,
-                draft=product.draft,
-                prices=product.prices,
-                original_created_at=product.created_at,
-            )
-
             images = product.productimage_set.all().order_by("order")
-            for image in images:
-                InitialProductImage.objects.create(
-                    product=initial_product_state,
-                    image=image.image,
-                    order=image.order,
-                    s3_key=image.s3_key,
-                    original_created_at=image.created_at,
-                    updated_at=image.updated_at,
-                )
-
             properties = product.properties
             prices = product.prices
             subcategories = ProductSubcategory.objects.all()
@@ -66,7 +43,6 @@ def edit_product_view(request, product_id):
                 "products/edit_product.html",
                 {
                     "product": product,
-                    "initial_product_state": initial_product_state,
                     "images": images,
                     "subcategories": subcategories,
                     "properties": properties,

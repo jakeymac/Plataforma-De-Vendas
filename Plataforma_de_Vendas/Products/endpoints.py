@@ -859,6 +859,8 @@ def rollback_product_changes_endpoint(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_initial_product_state_endpoint(request):
+    # TODO Could update all of this to not create a new initial state every 
+    # time each time the edit product page is reloaded for example
     if (
         request.user.groups.filter(name="Admins").exists()
         or request.user.groups.filter(name="Sellers").exists()

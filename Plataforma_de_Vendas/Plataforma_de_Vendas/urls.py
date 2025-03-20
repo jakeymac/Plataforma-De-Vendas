@@ -208,6 +208,11 @@ urlpatterns = [
         name="search-product-endpoint",
     ),
     path(
+        "api/products/create_initial_product_state/",
+        product_endpoints.create_initial_product_state_endpoint,
+        name="create-initial-product-state-endpoint",
+    ),
+    path(
         "api/products/rollback_product_changes/",
         product_endpoints.rollback_product_changes_endpoint,
         name="rollback-product-changes-endpoint",
