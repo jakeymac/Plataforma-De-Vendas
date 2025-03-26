@@ -2,8 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .models import (
-    InitialProductImage,
-    InitialProductState,
     Product,
     ProductSubcategory,
 )
@@ -29,7 +27,10 @@ def edit_product_view(request, product_id):
     ):
         try:
             product = Product.objects.get(id=product_id)
-            if product.store != request.user.store and not request.user.groups.filter(name="Admins").exists():
+            if (
+                product.store != request.user.store
+                and not request.user.groups.filter(name="Admins").exists()
+            ):
                 # TODO add a forbidden page to let users know what's happening
                 return redirect("home")
 

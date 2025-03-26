@@ -30,7 +30,10 @@ class ProductSerializer(serializers.ModelSerializer):
             except (ValueError, TypeError):
                 raise serializers.ValidationError(
                     {
-                        "prices": "Invalid format. Must be a dictionary with integer keys and float values."
+                        "prices": (
+                            "Invalid format. Must be a dictionary with integer keys "
+                            "and float values."
+                        )
                     }
                 )
         return prices

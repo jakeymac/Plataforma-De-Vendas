@@ -795,8 +795,8 @@ def rollback_product_changes_endpoint(request):
             return Response(
                 {
                     "message": (
-                        f"Product with id {data.get('product_id')} and initial product state with id "
-                        f"{data.get('initial_product_state_id')} not found"
+                        f"Product with id {data.get('product_id')} and initial product "
+                        f"state with id {data.get('initial_product_state_id')} not found"
                     )
                 },
                 status=status.HTTP_404_NOT_FOUND,
@@ -810,7 +810,12 @@ def rollback_product_changes_endpoint(request):
 
         elif initial_state_not_found:
             return Response(
-                {"message": (f"Initial product state not found with the id {data.get('initial_product_state_id')}")},
+                {
+                    "message": (
+                        "Initial product state not found with the id "
+                        f"{data.get('initial_product_state_id')}"
+                    )
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -859,7 +864,7 @@ def rollback_product_changes_endpoint(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_initial_product_state_endpoint(request):
-    # TODO Could update all of this to not create a new initial state every 
+    # TODO Could update all of this to not create a new initial state every
     # time each time the edit product page is reloaded for example
     if (
         request.user.groups.filter(name="Admins").exists()
@@ -910,7 +915,7 @@ def create_initial_product_state_endpoint(request):
             return Response(
                 {
                     "message": "Initial product state created successfully",
-                    "initial_product_state_id": initial_state.id
+                    "initial_product_state_id": initial_state.id,
                 },
                 status=status.HTTP_201_CREATED,
             )

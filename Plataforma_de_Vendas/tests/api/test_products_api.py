@@ -10,12 +10,11 @@ from Products.models import (
     ProductSubcategory,
     ProductTopSubcategory,
 )
-
 from Stores.models import Store
 
 
 def convert_prices_dict(prices):
-    """ Convert the prices dictionary to the correct format. """
+    """Convert the prices dictionary to the correct format."""
     return {int(key): float(value) for key, value in prices.items()}
 
 
@@ -1159,9 +1158,8 @@ class TestAddProductEndpoint:
     def setup(self):
         self.url = reverse("add-product-endpoint")
 
-    def test_valid_access(self, admin_fixture, category_fixture, subcategory_fixture):
+    def test_valid_access(self, admin_fixture, subcategory_fixture):
         admin_user, admin_client = admin_fixture
-        category = category_fixture
         subcategory = subcategory_fixture
 
         data = {
@@ -1183,7 +1181,9 @@ class TestAddProductEndpoint:
         assert convert_prices_dict(product.prices) == {5: 10.0, 10: 5.0}
         assert product.subcategory_id == subcategory.id
 
-    def test_already_existing_product_name(self, admin_fixture, subcategory_fixture, product_fixture):
+    def test_already_existing_product_name(
+        self, admin_fixture, subcategory_fixture, product_fixture
+    ):
         admin_user, admin_client = admin_fixture
         subcategory = subcategory_fixture
         product, _ = product_fixture
@@ -1221,8 +1221,8 @@ class TestAddProductEndpoint:
 
 @pytest.mark.django_db
 class TestRollbackProductChangesEndpoint:
-    """ Test the rollback_product_changes_endpoint -
-    api/products/rollback/product_id - rollback-product-changes-endpoint """
+    """Test the rollback_product_changes_endpoint -
+    api/products/rollback/product_id - rollback-product-changes-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -1237,10 +1237,12 @@ class TestRollbackProductChangesEndpoint:
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
         )
-        
-        image = SimpleUploadedFile("rollback_test_image.jpg", b"file_content", content_type="image/jpeg")
+
+        image = SimpleUploadedFile(
+            "rollback_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
         product_image = ProductImage.objects.create(product=product, image=image)
-        
+
         initial_values = {
             "product_name": "Initial Rollback Product Name",
             "product_description": "Initial Rollback Product Description",
@@ -1258,8 +1260,14 @@ class TestRollbackProductChangesEndpoint:
             original_created_at=initial_values["original_created_at"],
         )
 
-        initial_image = SimpleUploadedFile("rollback_test_initial_image.jpg", b"file_content", content_type="image/jpeg")
-        initial_product_image = InitialProductImage.objects.create(initial_product=initial_state, image=initial_image, original_created_at=product_image.created_at)
+        initial_image = SimpleUploadedFile(
+            "rollback_test_initial_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        initial_product_image = InitialProductImage.objects.create(
+            initial_product=initial_state,
+            image=initial_image,
+            original_created_at=product_image.created_at,
+        )
 
         data = {"product_id": product.id, "initial_product_state_id": initial_state.id}
 
@@ -1311,7 +1319,10 @@ class TestRollbackProductChangesEndpoint:
         response = admin_client.post(self.url, data, format="json")
 
         assert response.status_code == 404
-        assert response.data["message"] == "Product with id 0 and initial product state with id 1 not found"
+        assert (
+            response.data["message"]
+            == "Product with id 0 and initial product state with id 1 not found"
+        )
 
     def test_unauthorized_to_change_product(self, seller_fixture):
         seller_user, seller_client = seller_fixture
@@ -1323,7 +1334,7 @@ class TestRollbackProductChangesEndpoint:
             product_description="Rollback Product Description",
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
-            store=store
+            store=store,
         )
 
         initial_values = {
@@ -1364,9 +1375,9 @@ class TestRollbackProductChangesEndpoint:
 
 @pytest.mark.django_db
 class TestCreateInitialProductStateEndpoint:
-    """ Test the create_initial_product_state_endpoint -
-    api/products/create_initial_product_state/ - create-initial-product-state-endpoint """
-    
+    """Test the create_initial_product_state_endpoint -
+    api/products/create_initial_product_state/ - create-initial-product-state-endpoint"""
+
     @pytest.fixture(autouse=True)
     def setup(self):
         self.url = reverse("create-initial-product-state-endpoint")
@@ -1374,17 +1385,21 @@ class TestCreateInitialProductStateEndpoint:
     def test_valid_access(self, admin_fixture, store_fixture):
         admin_user, admin_client = admin_fixture
         store = store_fixture
-        
+
         new_product = Product.objects.create(
             product_name="Initial Product Name",
             product_description="Initial Product Description",
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
-            store=store
+            store=store,
         )
 
-        new_product_image_file = SimpleUploadedFile("new_product_image.jpg", b"file_content", content_type="image/jpeg")
-        new_product_image = ProductImage.objects.create(product=new_product, image=new_product_image_file)
+        new_product_image_file = SimpleUploadedFile(
+            "new_product_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        new_product_image = ProductImage.objects.create(
+            product=new_product, image=new_product_image_file
+        )
 
         data = {"product_id": new_product.id}
 
@@ -1394,7 +1409,6 @@ class TestCreateInitialProductStateEndpoint:
         assert response.data["message"] == "Initial product state created successfully"
 
         assert InitialProductState.objects.filter(product=new_product).exists()
-        
 
         initial_state = InitialProductState.objects.get(product=new_product)
 
@@ -1411,7 +1425,6 @@ class TestCreateInitialProductStateEndpoint:
         assert initial_image.image == new_product_image.image
         assert initial_image.original_created_at == new_product_image.created_at
 
-
     def test_unauthorized_on_product(self, seller_fixture):
         seller_user, seller_client = seller_fixture
 
@@ -1422,7 +1435,7 @@ class TestCreateInitialProductStateEndpoint:
             product_description="Initial Product Description",
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
-            store=new_store
+            store=new_store,
         )
 
         data = {"product_id": new_product.id}
@@ -1430,7 +1443,10 @@ class TestCreateInitialProductStateEndpoint:
         response = seller_client.post(self.url, data, format="json")
 
         assert response.status_code == 403
-        assert response.data["message"] == "You do not have permission to create an initial product state for this product"
+        assert (
+            response.data["message"]
+            == "You do not have permission to create an initial product state for this product"
+        )
 
     def test_nonexistend_product(self, admin_fixture):
         admin_user, admin_client = admin_fixture
@@ -1442,7 +1458,6 @@ class TestCreateInitialProductStateEndpoint:
         assert response.status_code == 404
         assert response.data["message"] == "Product not found with the id 0"
 
-
     def test_unauthorized_on_all_products(self, customer_fixture, product_fixture):
         customer_user, customer_client = customer_fixture
         product, _ = product_fixture
@@ -1452,13 +1467,16 @@ class TestCreateInitialProductStateEndpoint:
         response = customer_client.post(self.url, data, format="json")
 
         assert response.status_code == 403
-        assert response.data["message"] == "You do not have permission to create initial product states"
+        assert (
+            response.data["message"]
+            == "You do not have permission to create initial product states"
+        )
 
 
 @pytest.mark.django_db
 class TestAutosaveProductEndpoint:
-    """ Test the autosave_product_endpoint -
-    api/products/autosave_product/ - autosave-product-endpoint """
+    """Test the autosave_product_endpoint -
+    api/products/autosave_product/ - autosave-product-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -1475,8 +1493,12 @@ class TestAutosaveProductEndpoint:
             prices={5: 10.0, 10: 5.0},
         )
 
-        image_file = SimpleUploadedFile("autosave_test_image.jpg", b"file_content", content_type="image/jpeg")
-        image_file_2 = SimpleUploadedFile("autosave_test_image_2.jpg", b"file_content", content_type="image/jpeg")
+        image_file = SimpleUploadedFile(
+            "autosave_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        image_file_2 = SimpleUploadedFile(
+            "autosave_test_image_2.jpg", b"file_content", content_type="image/jpeg"
+        )
 
         product_image = ProductImage.objects.create(product=new_product, image=image_file)
         product_image_2 = ProductImage.objects.create(product=new_product, image=image_file_2)
@@ -1488,7 +1510,6 @@ class TestAutosaveProductEndpoint:
             "properties": {"color": "blue", "size": "large"},
             "prices": {5: 20.0, 10: 10.0},
             "image_ids": [product_image.id, product_image_2.id],
-
         }
 
         response = admin_client.post(self.url, data, format="json")
@@ -1518,10 +1539,12 @@ class TestAutosaveProductEndpoint:
             product_description="Autosave Product Description",
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
-            store=new_store
+            store=new_store,
         )
 
-        new_image = SimpleUploadedFile("autosave_test_image.jpg", b"file_content", content_type="image/jpeg")
+        new_image = SimpleUploadedFile(
+            "autosave_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
         product_image = ProductImage.objects.create(product=new_product, image=new_image)
 
         data = {
@@ -1549,7 +1572,9 @@ class TestAutosaveProductEndpoint:
             prices={5: 10.0, 10: 5.0},
         )
 
-        image_file = SimpleUploadedFile("autosave_test_image.jpg", b"file_content", content_type="image/jpeg")
+        image_file = SimpleUploadedFile(
+            "autosave_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
         product_image = ProductImage.objects.create(product=new_product, image=image_file)
 
         data = {
@@ -1576,9 +1601,6 @@ class TestAutosaveProductEndpoint:
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
         )
-
-        image_file = SimpleUploadedFile("autosave_test_image.jpg", b"file_content", content_type="image/jpeg")
-        product_image = ProductImage.objects.create(product=new_product, image=image_file)
 
         data = {
             "product_id": new_product.id,
@@ -1632,8 +1654,8 @@ class TestAutosaveProductEndpoint:
 
 @pytest.mark.django_db
 class TestFinalSaveProductEndpoint:
-    """ Test the final_save_product_endpoint -
-    api/products/final_save_product/ - final-save-product-endpoint """
+    """Test the final_save_product_endpoint -
+    api/products/final_save_product/ - final-save-product-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -1644,7 +1666,6 @@ class TestFinalSaveProductEndpoint:
         product, inital_state = product_fixture
 
         product_image = ProductImage.objects.get(product=product)
-        initial_image = InitialProductImage.objects.get(initial_product=inital_state)
 
         data = {
             "product_id": product.id,
@@ -1682,10 +1703,12 @@ class TestFinalSaveProductEndpoint:
             product_description="Final Save Product Description",
             properties={"color": "red", "size": "small"},
             prices={5: 10.0, 10: 5.0},
-            store=new_store
+            store=new_store,
         )
 
-        new_image = SimpleUploadedFile("final_save_test_image.jpg", b"file_content", content_type="image/jpeg")
+        new_image = SimpleUploadedFile(
+            "final_save_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
         product_image = ProductImage.objects.create(product=new_product, image=new_image)
 
         data = {
@@ -1701,7 +1724,7 @@ class TestFinalSaveProductEndpoint:
 
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to save this product"
-        
+
     def test_repeated_product_name(self, admin_fixture, product_fixture):
         admin_user, admin_client = admin_fixture
         product, _ = product_fixture
@@ -1713,7 +1736,9 @@ class TestFinalSaveProductEndpoint:
             prices={5: 10.0, 10: 5.0},
         )
 
-        image_file = SimpleUploadedFile("final_save_test_image.jpg", b"file_content", content_type="image/jpeg")
+        image_file = SimpleUploadedFile(
+            "final_save_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
         product_image = ProductImage.objects.create(product=new_product, image=image_file)
 
         data = {
@@ -1788,4 +1813,3 @@ class TestFinalSaveProductEndpoint:
 
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to save products"
-
