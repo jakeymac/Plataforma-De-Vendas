@@ -2,6 +2,7 @@
 
 import Accounts.models
 from django.db import migrations, models
+from core.helpers import generate_unique_id
 
 
 class Migration(migrations.Migration):
@@ -14,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='customuser',
             name='id',
-            field=models.CharField(default=Accounts.models.generate_unique_id, editable=False, max_length=12, primary_key=True, serialize=False, unique=True),
+            field=models.CharField(default=generate_unique_id, editable=False, max_length=12, primary_key=True, serialize=False, unique=True),
         ),
     ]

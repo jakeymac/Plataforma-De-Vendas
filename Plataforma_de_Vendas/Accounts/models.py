@@ -2,23 +2,12 @@ from django.contrib.auth.models import AbstractUser
 from django.db import IntegrityError, models, transaction
 from nanoid import generate
 
-
-def generate_unique_id():
-    return generate(size=12)
+from core.models import UniqueIDModel
 
 
-class CustomUser(AbstractUser):
-
+class CustomUser(AbstractUser, UniqueIDModel):
     def user_profile_picture_path(instance, filename):
         return f"profile_pictures/{instance.username}/{filename}"
-
-    id = models.CharField(
-        max_length=12,
-        primary_key=True,
-        default=generate_unique_id,
-        editable=False,
-        unique=True,
-    )
 
     store = models.ForeignKey(
         "Stores.Store", on_delete=models.CASCADE, null=True, blank=True
@@ -46,28 +35,16 @@ class CustomUser(AbstractUser):
 
     created_on = models.DateTimeField(auto_now_add=True)
 
-    # Custom save method to generate unique id and ensure it is unique
     def save(self, *args, **kwargs):
-        # Prevent infinite loops
-        attempts = 0
-        max_attempts = 5
-        while attempts < max_attempts:
-            try:
-                with transaction.atomic():
-                    super().save(*args, **kwargs)
-                return
-
-            except IntegrityError as e:
-                if "id" in str(e):
-                    self.id = generate_unique_id()
-                    attempts += 1
-                elif "username" in str(e):
-                    raise IntegrityError(f"Username '{self.username}' is already taken.")
-                elif "email" in str(e):
-                    raise IntegrityError(f"Email '{self.email}' is already taken.")
-
-        raise IntegrityError(f"Could not generate a unique id after {max_attempts} attempts")
-
+        try:
+            return super().save(*args, **kwargs)
+        except IntegrityError as e:
+            if "username" in str(e):
+                raise IntegrityError(f"Username '{self.username}' is already taken.")
+            elif "email" in str(e):
+                raise IntegrityError(f"Email '{self.email}' is already taken.")
+            raise
+        
     def __str__(self):
         return self.username
 

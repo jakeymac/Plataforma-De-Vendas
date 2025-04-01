@@ -38,6 +38,23 @@ class ProductSerializer(serializers.ModelSerializer):
                 )
         return prices
 
+    def validate_product_name(self, product_name):
+        if self.instance:
+            if (
+                Product.objects.filter(product_name=product_name)
+                .exclude(id=self.instance.id)
+                .exists()
+            ):
+                raise serializers.ValidationError(
+                    {"product_name": "Product with this name already exists"}
+                )
+        else:
+            if Product.objects.filter(product_name=product_name).exists():
+                raise serializers.ValidationError(
+                    {"product_name": "Product with this name already exists"}
+                )
+        return product_name
+
     def validate(self, data):
         product_name = data.get("product_name")
         # TODO update this check to allow for the

@@ -28,7 +28,7 @@ class TestCustomUserSave:
         user2.id = user1.id  # Force duplicate ID
 
         mocker.patch(
-            "Accounts.models.generate_unique_id", return_value="NEW_UNIQUE_ID"
+            "core.models.generate_unique_id", return_value="NEW_UNIQUE_ID"
         )  # Mock unique ID generator
 
         user2.save()  # This should regenerate the ID
@@ -64,7 +64,7 @@ class TestCustomUserSave:
         user_2 = CustomUser(username="user2", email="user2@example.com")
         user_2.id = "TEST_ID"
 
-        mocker.patch("Accounts.models.generate_unique_id", return_value="TEST_ID")
+        mocker.patch("core.models.generate_unique_id", return_value="TEST_ID")
 
         with pytest.raises(IntegrityError) as error_message:
             user_2.save()
