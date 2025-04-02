@@ -1,4 +1,5 @@
-from django.db import models, IntegrityError, transaction
+from django.db import IntegrityError, models, transaction
+
 from .helpers import generate_unique_id
 
 
@@ -30,6 +31,6 @@ class UniqueIDModel(models.Model):
                     attempts += 1
                 else:
                     # Handle other IntegrityErrors (like unique constraints on other fields)
-                    raise 
-                
+                    raise
+
         raise IntegrityError(f"Could not generate a unique id after {max_attempts} attempts")

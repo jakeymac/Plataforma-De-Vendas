@@ -1,7 +1,5 @@
-from django.db import IntegrityError, models, transaction
-from nanoid import generate
-
 from core.models import UniqueIDModel
+from django.db import IntegrityError, models
 
 
 def product_image_upload_path(instance, filename):
@@ -17,9 +15,13 @@ class Product(UniqueIDModel):
     subcategory = models.ForeignKey(
         "ProductSubcategory", on_delete=models.CASCADE, null=True, blank=True
     )
-    product_name = models.CharField(max_length=255, null=True, blank=True, unique=True, error_messages={
-        "unique": "Product with this name already exists"
-    })
+    product_name = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        unique=True,
+        error_messages={"unique": "Product with this name already exists"},
+    )
     product_description = models.TextField(null=True, blank=True)
     properties = models.JSONField(null=True, blank=True, default=dict)
     is_active = models.BooleanField(default=True)
@@ -84,7 +86,7 @@ class ProductImage(UniqueIDModel):
             super().save(update_fields=["s3_key"])
 
     def __str__(self):
-        return f"{self.product.product_name} - {self.order}"
+        return f"Image for {self.product.product_name} - {self.order}"
 
 
 class InitialProductImage(models.Model):
@@ -97,7 +99,7 @@ class InitialProductImage(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Initial Image of {self.product.product_name}"
+        return f"Initial Image of {self.initial_product.product_name}"
 
 
 class ProductInOrder(models.Model):
@@ -111,7 +113,11 @@ class ProductInOrder(models.Model):
 
 
 class ProductCategory(UniqueIDModel):
-    category_name = models.CharField(max_length=45)
+    category_name = models.CharField(
+        max_length=45,
+        unique=True,
+        error_messages={"unique": "Category with this name already exists"},
+    )
     category_description = models.TextField(null=True, blank=True)
     top_subcategory_ids = (models.JSONField(default=list, null=True, blank=True),)
     top_subcategories_products = models.JSONField(
@@ -124,7 +130,11 @@ class ProductCategory(UniqueIDModel):
 
 class ProductSubcategory(UniqueIDModel):
     category = models.ForeignKey("ProductCategory", on_delete=models.CASCADE)
-    subcategory_name = models.CharField(max_length=45)
+    subcategory_name = models.CharField(
+        max_length=45,
+        unique=True,
+        error_messages={"unique": "Subcategory with this name already exists"},
+    )
     subcategory_description = models.TextField(null=True, blank=True)
 
     def __str__(self):

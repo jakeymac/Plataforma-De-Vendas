@@ -1,8 +1,6 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import IntegrityError, models, transaction
-from nanoid import generate
-
 from core.models import UniqueIDModel
+from django.contrib.auth.models import AbstractUser
+from django.db import IntegrityError, models
 
 
 class CustomUser(AbstractUser, UniqueIDModel):
@@ -44,7 +42,7 @@ class CustomUser(AbstractUser, UniqueIDModel):
             elif "email" in str(e):
                 raise IntegrityError(f"Email '{self.email}' is already taken.")
             raise
-        
+
     def __str__(self):
         return self.username
 

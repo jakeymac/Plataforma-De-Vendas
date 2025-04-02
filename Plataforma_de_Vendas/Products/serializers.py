@@ -24,57 +24,17 @@ class ProductSerializer(serializers.ModelSerializer):
         return data
 
     def validate_prices(self, prices):
-        if isinstance(prices, dict):
-            try:
-                return {int(key): float(value) for key, value in prices.items()}
-            except (ValueError, TypeError):
-                raise serializers.ValidationError(
-                    {
-                        "prices": (
-                            "Invalid format. Must be a dictionary with integer keys "
-                            "and float values."
-                        )
-                    }
-                )
-        return prices
+        if not isinstance(prices, dict):
+            raise serializers.ValidationError(
+                "Prices must be a dictionary with integer keys and float values."
+            )
 
-    def validate_product_name(self, product_name):
-        if self.instance:
-            if (
-                Product.objects.filter(product_name=product_name)
-                .exclude(id=self.instance.id)
-                .exists()
-            ):
-                raise serializers.ValidationError(
-                    {"product_name": "Product with this name already exists"}
-                )
-        else:
-            if Product.objects.filter(product_name=product_name).exists():
-                raise serializers.ValidationError(
-                    {"product_name": "Product with this name already exists"}
-                )
-        return product_name
-
-    def validate(self, data):
-        product_name = data.get("product_name")
-        # TODO update this check to allow for the
-        # same product name in different stores
-        if self.instance:
-            if (
-                Product.objects.filter(product_name=product_name)
-                .exclude(id=self.instance.id)
-                .exists()
-            ):
-                raise serializers.ValidationError(
-                    {"product_name": "Product with this name already exists"}
-                )
-        else:
-            if Product.objects.filter(product_name=product_name).exists():
-                raise serializers.ValidationError(
-                    {"product_name": "Product with this name already exists"}
-                )
-
-        return data
+        try:
+            return {int(key): float(value) for key, value in prices.items()}
+        except (ValueError, TypeError):
+            raise serializers.ValidationError(
+                "Invalid format. Must be a dictionary with integer keys and float values."
+            )
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -96,24 +56,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         name = data.get("category_name")
-        if self.instance:
-            if (
-                ProductCategory.objects.filter(category_name=name)
-                .exclude(id=self.instance.id)
-                .exists()
-            ):
-                raise serializers.ValidationError(
-                    {"category_name": "Category with this name already exists"}
-                )
-        else:
-            if ProductCategory.objects.filter(category_name=name).exists():
-                raise serializers.ValidationError(
-                    {"category_name": "Category with this name already exists"}
-                )
-
         if ProductSubcategory.objects.filter(subcategory_name=name).exists():
             raise serializers.ValidationError(
-                {"category_name": ("Category with this name already exists as a subcategory")}
+                {"category_name": ("A subcategory with this name already exists as a subcategory")}
             )
         return data
 
@@ -132,22 +77,8 @@ class ProductSubcategorySerializer(serializers.ModelSerializer):
 
         if ProductCategory.objects.filter(category_name=name).exists():
             raise serializers.ValidationError(
-                {"subcategory_name": ("Subcategory with this name already exists as a category")}
+                {"subcategory_name": ("A category with this name already exists as a category")}
             )
-        if self.instance:
-            if (
-                ProductSubcategory.objects.filter(subcategory_name=name)
-                .exclude(id=self.instance.id)
-                .exists()
-            ):
-                raise serializers.ValidationError(
-                    {"subcategory_name": "Subcategory with this name already exists"}
-                )
-        else:
-            if ProductSubcategory.objects.filter(subcategory_name=name).exists():
-                raise serializers.ValidationError(
-                    {"subcategory_name": "Subcategory with this name already exists"}
-                )
         return data
 
 

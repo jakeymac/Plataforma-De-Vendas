@@ -1,5 +1,6 @@
-import pytest
 from unittest import mock
+
+import pytest
 from Accounts.models import CustomUser
 from django.db.utils import IntegrityError
 
@@ -36,10 +37,12 @@ class TestCustomUserSave:
 
     def test_custom_user_generic_integrity_error(self, customer_fixture):
         customer_user, _ = customer_fixture
-        with mock.patch("core.models.UniqueIDModel.save", side_effect=IntegrityError("Generic error")):
+        with mock.patch(
+            "core.models.UniqueIDModel.save", side_effect=IntegrityError("Generic error")
+        ):
             with pytest.raises(IntegrityError) as e:
                 customer_user.save()
-        
+
             assert str(e.value) == "Generic error"
 
     def test_str(self, customer_fixture):

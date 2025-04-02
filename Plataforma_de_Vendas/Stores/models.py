@@ -1,7 +1,5 @@
-from django.db import IntegrityError, models, transaction
-from nanoid import generate
-
 from core.models import UniqueIDModel
+from django.db import models
 
 
 # Create your models here.
