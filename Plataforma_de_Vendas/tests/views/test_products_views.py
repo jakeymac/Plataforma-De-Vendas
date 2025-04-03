@@ -65,7 +65,7 @@ class TestEditProductView:
     def test_edit_product_view_seller_not_own_product(
         self, logged_in_seller, product_fixture, store_fixture
     ):
-        """ Ensure a logged in seller cannot access the edit 
+        """ Ensure a logged in seller cannot access the edit
         product view of a product not owned by them. """
 
         seller_user, client = logged_in_seller
@@ -84,7 +84,7 @@ class TestEditProductView:
         assert "/home" in response.url
 
     def test_edit_product_view_nonexistent_product(self, logged_in_seller):
-        """ Ensure a logged in seller cannot access the edit 
+        """ Ensure a logged in seller cannot access the edit
         product view of a nonexistent product. """
         seller_user, client = logged_in_seller
         response = client.get(reverse("edit_product", args=[9999]))
@@ -111,7 +111,7 @@ class TestViewProductView:
         assert product.prices == convert_prices_dict(response.context["prices"])
 
     def test_view_product_view_nonexistent_product(self, logged_in_customer):
-        """ Ensure a logged in customer cannot access the 
+        """ Ensure a logged in customer cannot access the
         view product view of a nonexistent product. """
         customer_user, client = logged_in_customer
         response = client.get(reverse("view_product", args=[9999]))
