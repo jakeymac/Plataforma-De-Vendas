@@ -11,12 +11,7 @@ from Products.models import (
     ProductTopSubcategory,
 )
 from Stores.models import Store
-
-
-def convert_prices_dict(prices):
-    """Convert the prices dictionary to the correct format."""
-    return {int(key): float(value) for key, value in prices.items()}
-
+from core.helpers import convert_prices_dict
 
 @pytest.mark.django_db
 class TestGetProductsByStoreEndpoint:
