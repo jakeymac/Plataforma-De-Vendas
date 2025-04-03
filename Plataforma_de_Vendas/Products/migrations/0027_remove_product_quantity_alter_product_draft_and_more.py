@@ -3,6 +3,7 @@
 import Products.models
 import django.db.models.deletion
 from django.db import migrations, models
+from core.helpers import generate_unique_id
 
 
 class Migration(migrations.Migration):
@@ -25,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='InitialProductState',
             fields=[
-                ('id', models.CharField(default=Products.models.generate_unique_id, editable=False, max_length=12, primary_key=True, serialize=False, unique=True)),
+                ('id', models.CharField(default=generate_unique_id, editable=False, max_length=12, primary_key=True, serialize=False, unique=True)),
                 ('product_name', models.CharField(blank=True, max_length=255, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('properties', models.JSONField(blank=True, default=dict, null=True)),

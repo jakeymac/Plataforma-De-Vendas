@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
 
 
@@ -29,8 +29,17 @@ def home(request):
 @login_required
 def view_my_store(request):
     if request.user.groups.filter(name="Sellers").exists():
-        store = request.user.store
-        return render(request, "Stores/view_store.html", {"store": store})
+        if request.user.store:
+            store = request.user.store
+            return render(request, "Stores/view_store.html", {"store": store})
+        else:
+            # TODO add a 404 page to let users know what's
+            # happening - that their store was not found
+            return redirect("home")
+    else:
+        # TODO add a 404 page to let users know that they
+        # need to register
+        return redirect("home")
 
 
 def register_store_page(request):

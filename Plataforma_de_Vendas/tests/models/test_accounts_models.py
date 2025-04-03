@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from Accounts.models import CustomUser
 from django.db.utils import IntegrityError
@@ -12,28 +14,6 @@ class TestCustomUserSave:
         customer_user, _ = customer_fixture
         customer_user.save()
         assert customer_user.id is not None
-
-    def test_for_different_ids(self, customer_fixture, seller_fixture):
-        """Tests that ids are different for different users"""
-        customer_user, _ = customer_fixture
-        seller_user, _ = seller_fixture
-        assert customer_user.id != seller_user.id
-
-    def test_duplicate_id_is_regenerated(self, mocker):
-        """Tests that a duplicate ID is regenerated"""
-        user1 = CustomUser.objects.create(username="user1", email="user1@example.com")
-
-        # Try creating a second user with the same ID
-        user2 = CustomUser(username="user2", email="user2@example.com")
-        user2.id = user1.id  # Force duplicate ID
-
-        mocker.patch(
-            "Accounts.models.generate_unique_id", return_value="NEW_UNIQUE_ID"
-        )  # Mock unique ID generator
-
-        user2.save()  # This should regenerate the ID
-
-        assert user2.id == "NEW_UNIQUE_ID"  # ID should be different
 
     def test_duplicate_username(self, customer_fixture):
         """Tests that a duplicate username raises an IntegrityError"""
@@ -55,21 +35,15 @@ class TestCustomUserSave:
 
         assert str(error_message.value) == f"Email '{customer_user.email}' is already taken."
 
-    def test_save_max_attempts_reached(self, mocker):
-        """Tests that an IntegrityError is raised if max attempts are reached"""
-        user_1 = CustomUser(username="user1", email="user1@example.com")
-        user_1.id = "TEST_ID"
-        user_1.save()
+    def test_custom_user_generic_integrity_error(self, customer_fixture):
+        customer_user, _ = customer_fixture
+        with mock.patch(
+            "core.models.UniqueIDModel.save", side_effect=IntegrityError("Generic error")
+        ):
+            with pytest.raises(IntegrityError) as e:
+                customer_user.save()
 
-        user_2 = CustomUser(username="user2", email="user2@example.com")
-        user_2.id = "TEST_ID"
-
-        mocker.patch("Accounts.models.generate_unique_id", return_value="TEST_ID")
-
-        with pytest.raises(IntegrityError) as error_message:
-            user_2.save()
-
-        assert str(error_message.value) == "Could not generate a unique id after 5 attempts"
+            assert str(e.value) == "Generic error"
 
     def test_str(self, customer_fixture):
         """Tests the __str__ method"""

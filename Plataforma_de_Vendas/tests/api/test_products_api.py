@@ -1,4 +1,5 @@
 import pytest
+from core.helpers import convert_prices_dict
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from Products.models import (
@@ -10,6 +11,7 @@ from Products.models import (
     ProductSubcategory,
     ProductTopSubcategory,
 )
+from Stores.models import Store
 
 
 @pytest.mark.django_db
@@ -211,7 +213,7 @@ class TestRemoveProductEndpoint:
         assert not Product.objects.filter(id=product_id).exists()
         assert not InitialProductState.objects.filter(id=initial_state_id).exists()
         assert not ProductImage.objects.filter(product=product).exists()
-        assert not InitialProductImage.objects.filter(product=initial_product).exists()
+        assert not InitialProductImage.objects.filter(initial_product=initial_product).exists()
 
     def test_unauthorized_access(self, customer_fixture, product_fixture):
         customer_user, customer_client = customer_fixture
@@ -297,7 +299,7 @@ class TestAddProductImageEndpoint:
         assert product_images.count() == 2  # The product already has an image, now this one
         assert product_images[1].order == 1
 
-    def test_first_iamge_added(self, admin_fixture):
+    def test_first_image_added(self, admin_fixture):
         """Test adding a first image to a product to test the order attribute."""
         admin_user, admin_client = admin_fixture
 
@@ -305,7 +307,7 @@ class TestAddProductImageEndpoint:
             product_name="Test Product Name",
             product_description="Test Product Description",
             properties={"color": "red", "size": "small"},
-            prices={"price": 10.0, "discount_price": 5.0},
+            prices={5: 10.0, 10: 5.0},
         )
 
         image = SimpleUploadedFile("test.jpg", b"file_content", content_type="image/jpeg")
@@ -1142,3 +1144,668 @@ class TestUpdateTopSubcategoriesEndpoint:
             response.data["message"]
             == "Subcategories not found with id(s): ['non_existent_id', 'non_existent_id_2']"
         )
+
+
+@pytest.mark.django_db
+class TestAddProductEndpoint:
+    """Test the add_product_endpoint - api/products/add-product - add-product-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("add-product-endpoint")
+
+    def test_valid_access(self, admin_fixture, subcategory_fixture):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+
+        data = {
+            "product_name": "Test Product Name",
+            "product_description": "Test Product Description",
+            "properties": {"color": "red", "size": "small"},
+            "prices": {5: 10.0, 10: 5.0},
+            "subcategory": subcategory.id,
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 201
+        assert response.data["message"] == "Product added successfully"
+
+        product = Product.objects.get(product_name="Test Product Name")
+        assert product.product_description == "Test Product Description"
+        assert product.properties == {"color": "red", "size": "small"}
+        assert convert_prices_dict(product.prices) == {5: 10.0, 10: 5.0}
+        assert product.subcategory_id == subcategory.id
+
+    def test_already_existing_product_name(
+        self, admin_fixture, subcategory_fixture, product_fixture
+    ):
+        admin_user, admin_client = admin_fixture
+        subcategory = subcategory_fixture
+        product, _ = product_fixture
+
+        data = {
+            "product_name": product.product_name,
+            "product_description": "Test Product Description",
+            "properties": {"color": "red", "size": "small"},
+            "prices": {5: 10.0, 10: 5.0},
+            "subcategory": subcategory.id,
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 400
+        assert response.data["message"] == "Product with that name already exists"
+
+    def test_unauthenticated_access(self, customer_fixture, subcategory_fixture):
+        customer_user, customer_client = customer_fixture
+        subcategory = subcategory_fixture
+
+        data = {
+            "product_name": "Test Product Name",
+            "product_description": "Test Product Description",
+            "properties": {"color": "red", "size": "small"},
+            "prices": {5: 10.0, 10: 5.0},
+            "subcategory": subcategory.id,
+        }
+
+        response = customer_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to add a product"
+
+
+@pytest.mark.django_db
+class TestRollbackProductChangesEndpoint:
+    """Test the rollback_product_changes_endpoint -
+    api/products/rollback/product_id - rollback-product-changes-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("rollback-product-changes-endpoint")
+
+    def test_valid_access(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        product = Product.objects.create(
+            product_name="Rollback Product Name",
+            product_description="Rollback Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        image = SimpleUploadedFile(
+            "rollback_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        product_image = ProductImage.objects.create(product=product, image=image)
+
+        initial_values = {
+            "product_name": "Initial Rollback Product Name",
+            "product_description": "Initial Rollback Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "original_created_at": product.created_at,
+        }
+
+        initial_state = InitialProductState.objects.create(
+            product=product,
+            product_name=initial_values["product_name"],
+            product_description=initial_values["product_description"],
+            properties=initial_values["properties"],
+            prices=initial_values["prices"],
+            original_created_at=initial_values["original_created_at"],
+        )
+
+        initial_image = SimpleUploadedFile(
+            "rollback_test_initial_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        initial_product_image = InitialProductImage.objects.create(
+            initial_product=initial_state,
+            image=initial_image,
+            original_created_at=product_image.created_at,
+        )
+
+        data = {"product_id": product.id, "initial_product_state_id": initial_state.id}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 200
+        assert response.data["message"] == "Product rolled back successfully"
+
+        # Retreive any changes made to the product
+        product.refresh_from_db()
+
+        assert product.product_name == initial_values["product_name"]
+        assert product.product_description == initial_values["product_description"]
+        assert product.properties == initial_values["properties"]
+        assert convert_prices_dict(product.prices) == initial_values["prices"]
+
+        assert not ProductImage.objects.filter(id=product_image.id).exists()
+        assert not InitialProductImage.objects.filter(id=initial_product_image.id).exists()
+
+        assert ProductImage.objects.filter(image=initial_product_image.image).exists()
+
+    def test_nonexistent_product(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        _, initial_product = product_fixture
+
+        data = {"product_id": "0", "initial_product_state_id": initial_product.id}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"
+
+    def test_non_existent_initial_product(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        data = {"product_id": product.id, "initial_product_state_id": "0"}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Initial product state not found with the id 0"
+
+    def test_non_existent_product_and_initial_product(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+
+        data = {"product_id": "0", "initial_product_state_id": "1"}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert (
+            response.data["message"]
+            == "Product with id 0 and initial product state with id 1 not found"
+        )
+
+    def test_unauthorized_to_change_product(self, seller_fixture):
+        seller_user, seller_client = seller_fixture
+
+        store = Store.objects.create(store_name="Test Store")
+
+        product = Product.objects.create(
+            product_name="Rollback Product Name",
+            product_description="Rollback Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+            store=store,
+        )
+
+        initial_values = {
+            "product_name": "Initial Rollback Product Name",
+            "product_description": "Initial Rollback Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "original_created_at": product.created_at,
+        }
+
+        initial_state = InitialProductState.objects.create(
+            product=product,
+            product_name=initial_values["product_name"],
+            product_description=initial_values["product_description"],
+            properties=initial_values["properties"],
+            prices=initial_values["prices"],
+            original_created_at=initial_values["original_created_at"],
+        )
+
+        data = {"product_id": product.id, "initial_product_state_id": initial_state.id}
+
+        response = seller_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to rollback this product"
+
+    def test_unauthorized_to_change_all_products(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, initial_product = product_fixture
+
+        data = {"product_id": product.id, "initial_product_state_id": initial_product.id}
+
+        response = customer_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to rollback products"
+
+
+@pytest.mark.django_db
+class TestCreateInitialProductStateEndpoint:
+    """Test the create_initial_product_state_endpoint -
+    api/products/create_initial_product_state/ - create-initial-product-state-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("create-initial-product-state-endpoint")
+
+    def test_valid_access(self, admin_fixture, store_fixture):
+        admin_user, admin_client = admin_fixture
+        store = store_fixture
+
+        new_product = Product.objects.create(
+            product_name="Initial Product Name",
+            product_description="Initial Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+            store=store,
+        )
+
+        new_product_image_file = SimpleUploadedFile(
+            "new_product_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        new_product_image = ProductImage.objects.create(
+            product=new_product, image=new_product_image_file
+        )
+
+        data = {"product_id": new_product.id}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 201
+        assert response.data["message"] == "Initial product state created successfully"
+
+        assert InitialProductState.objects.filter(product=new_product).exists()
+
+        initial_state = InitialProductState.objects.get(product=new_product)
+
+        assert InitialProductImage.objects.filter(initial_product=initial_state).exists()
+
+        initial_image = InitialProductImage.objects.get(initial_product=initial_state)
+
+        assert initial_state.product_name == new_product.product_name
+        assert initial_state.product_description == new_product.product_description
+        assert initial_state.properties == new_product.properties
+        assert convert_prices_dict(initial_state.prices) == new_product.prices
+        assert initial_state.original_created_at == new_product.created_at
+
+        assert initial_image.image == new_product_image.image
+        assert initial_image.original_created_at == new_product_image.created_at
+
+    def test_unauthorized_on_product(self, seller_fixture):
+        seller_user, seller_client = seller_fixture
+
+        new_store = Store.objects.create(store_name="Initial Product Test Store")
+
+        new_product = Product.objects.create(
+            product_name="Initial Product Name",
+            product_description="Initial Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+            store=new_store,
+        )
+
+        data = {"product_id": new_product.id}
+
+        response = seller_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert (
+            response.data["message"]
+            == "You do not have permission to create an initial product state for this product"
+        )
+
+    def test_nonexistend_product(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        data = {"product_id": "0"}
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"
+
+    def test_unauthorized_on_all_products(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        data = {"product_id": product.id}
+
+        response = customer_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert (
+            response.data["message"]
+            == "You do not have permission to create initial product states"
+        )
+
+
+@pytest.mark.django_db
+class TestAutosaveProductEndpoint:
+    """Test the autosave_product_endpoint -
+    api/products/autosave_product/ - autosave-product-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("autosave-product-endpoint")
+
+    def test_valid_access(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        new_product = Product.objects.create(
+            product_name="Autosave Product Name",
+            product_description="Autosave Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        image_file = SimpleUploadedFile(
+            "autosave_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        image_file_2 = SimpleUploadedFile(
+            "autosave_test_image_2.jpg", b"file_content", content_type="image/jpeg"
+        )
+
+        product_image = ProductImage.objects.create(product=new_product, image=image_file)
+        product_image_2 = ProductImage.objects.create(product=new_product, image=image_file_2)
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": "Autosave Product Name",
+            "product_description": "Autosave Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": [product_image.id, product_image_2.id],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 200
+        assert response.data["message"] == "Product autosaved successfully"
+
+        new_product.refresh_from_db()
+
+        assert new_product.product_name == "Autosave Product Name"
+        assert new_product.product_description == "Autosave Product Description"
+        assert new_product.properties == {"color": "blue", "size": "large"}
+        assert convert_prices_dict(new_product.prices) == {5: 20.0, 10: 10.0}
+
+        assert ProductImage.objects.filter(product=new_product).count() == 2
+
+        assert ProductImage.objects.get(id=product_image.id).order == 0
+        assert ProductImage.objects.get(id=product_image_2.id).order == 1
+
+    def test_unauthorized_on_product(self, seller_fixture):
+        seller_user, seller_client = seller_fixture
+
+        new_store = Store.objects.create(store_name="Autosave Product Test Store")
+
+        new_product = Product.objects.create(
+            product_name="Autosave Product Name",
+            product_description="Autosave Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+            store=new_store,
+        )
+
+        new_image = SimpleUploadedFile(
+            "autosave_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        product_image = ProductImage.objects.create(product=new_product, image=new_image)
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": "Autosave Product Name",
+            "product_description": "Autosave Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": [product_image.id],
+        }
+
+        response = seller_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to autosave this product"
+
+    def test_repeated_product_name(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        new_product = Product.objects.create(
+            product_name="Autosave Product Name",
+            product_description="Autosave Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        image_file = SimpleUploadedFile(
+            "autosave_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        product_image = ProductImage.objects.create(product=new_product, image=image_file)
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": product.product_name,
+            "product_description": "Autosave Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": [product_image.id],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 400
+        assert response.data["product_name"][0] == "Product with this name already exists"
+
+    def test_nonexistent_image_ids(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        new_product = Product.objects.create(
+            product_name="Autosave Product Name",
+            product_description="Autosave Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": "Autosave Product Name",
+            "product_description": "Autosave Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": ["0", "1"],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Images not found with the ids ['0', '1']"
+
+    def test_nonexistent_product(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        data = {
+            "product_id": "0",
+            "product_name": "Autosave Product Name",
+            "product_description": "Autosave Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": ["0"],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"
+
+    def test_unauthorized_on_all_products(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        data = {
+            "product_id": product.id,
+            "product_name": "Autosave Product Name",
+            "product_description": "Autosave Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": ["0"],
+        }
+
+        response = customer_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to autosave products"
+
+
+@pytest.mark.django_db
+class TestFinalSaveProductEndpoint:
+    """Test the final_save_product_endpoint -
+    api/products/final_save_product/ - final-save-product-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("final-save-product-endpoint")
+
+    def test_valid_access(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, inital_state = product_fixture
+
+        product_image = ProductImage.objects.get(product=product)
+
+        data = {
+            "product_id": product.id,
+            "product_name": "Final Save Product Name",
+            "product_description": "Final Save Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": [product_image.id],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 200
+        assert response.data["message"] == "Product saved successfully"
+
+        product.refresh_from_db()
+
+        assert product.product_name == "Final Save Product Name"
+        assert product.product_description == "Final Save Product Description"
+        assert product.properties == {"color": "blue", "size": "large"}
+        assert convert_prices_dict(product.prices) == {5: 20.0, 10: 10.0}
+
+        assert ProductImage.objects.filter(product=product).count() == 1
+
+        assert not InitialProductImage.objects.filter(initial_product=inital_state).exists()
+        assert not InitialProductState.objects.filter(product=product).exists()
+
+    def test_unauthorized_on_product(self, seller_fixture):
+        seller_user, seller_client = seller_fixture
+
+        new_store = Store.objects.create(store_name="Final Save Product Test Store")
+
+        new_product = Product.objects.create(
+            product_name="Final Save Product Name",
+            product_description="Final Save Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+            store=new_store,
+        )
+
+        new_image = SimpleUploadedFile(
+            "final_save_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        product_image = ProductImage.objects.create(product=new_product, image=new_image)
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": "Final Save Product Name",
+            "product_description": "Final Save Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": [product_image.id],
+        }
+
+        response = seller_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to save this product"
+
+    def test_repeated_product_name(self, admin_fixture, product_fixture):
+        admin_user, admin_client = admin_fixture
+        product, _ = product_fixture
+
+        new_product = Product.objects.create(
+            product_name="Final Save Product Name",
+            product_description="Final Save Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        image_file = SimpleUploadedFile(
+            "final_save_test_image.jpg", b"file_content", content_type="image/jpeg"
+        )
+        product_image = ProductImage.objects.create(product=new_product, image=image_file)
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": product.product_name,
+            "product_description": "Final Save Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": [product_image.id],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 400
+        assert response.data["product_name"][0] == "Product with this name already exists"
+
+    def test_nonexistent_image_ids(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        new_product = Product.objects.create(
+            product_name="Final Save Product Name",
+            product_description="Final Save Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        data = {
+            "product_id": new_product.id,
+            "product_name": "Final Save Product Name",
+            "product_description": "Final Save Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": ["0", "1"],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Images not found with the ids ['0', '1']"
+
+    def test_nonexistent_product(self, admin_fixture):
+        admin_user, admin_client = admin_fixture
+
+        data = {
+            "product_id": "0",
+            "product_name": "Final Save Product Name",
+            "product_description": "Final Save Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": ["0"],
+        }
+
+        response = admin_client.post(self.url, data, format="json")
+
+        assert response.status_code == 404
+        assert response.data["message"] == "Product not found with the id 0"
+
+    def test_unauthorized_on_all_products(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        data = {
+            "product_id": product.id,
+            "product_name": "Final Save Product Name",
+            "product_description": "Final Save Product Description",
+            "properties": {"color": "blue", "size": "large"},
+            "prices": {5: 20.0, 10: 10.0},
+            "image_ids": ["0"],
+        }
+
+        response = customer_client.post(self.url, data, format="json")
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to save products"

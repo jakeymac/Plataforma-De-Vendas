@@ -4,6 +4,8 @@
 let autoSaveTimeout;
 let uploadInProgress = false;
 
+let initialProductStateId;
+
 function addNewPropertyRow() {
     $('#product-properties').append(`
         <div class="row sortable-item property-row" id="property-row-${propertyCounter}">
@@ -162,6 +164,33 @@ function loadData() {
         $('#inner-images-messages-label').addClass('error-message-div');
         $('#inner-images-messages-label').show();
     });
+
+    // Create the initial product state
+    fetch(`/api/products/create_initial_product_state/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'product_id': productId
+        })
+
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            console.error('Error creating initial product state: ', response.json());
+        }
+    })
+    .then(data => {
+        initialProductStateId = data.initial_product_state_id;
+    })
+    .catch(error => {
+        console.error('Error creating initial product state: ', error);
+    });
+
 }
 
 function loadListeners() {

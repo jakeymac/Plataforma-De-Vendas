@@ -15,7 +15,6 @@
     <script> var propertyCounter = {{ properties|length }} || 0; // Defaults to 0 if no properties are found
              var priceCounter = {{ prices|length }} || 0; // Defaults to 0 if no prices are found
              var productId = "{{ product.id }}";
-             var initialProductStateId = "{{ initial_product_state.id }}";
     </script> 
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="{% static 'products/js/edit_product.js' %}"></script>

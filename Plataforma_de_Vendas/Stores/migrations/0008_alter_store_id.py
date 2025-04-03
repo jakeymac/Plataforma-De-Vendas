@@ -3,6 +3,7 @@
 import Stores.models
 from django.db import migrations, models
 
+from core.helpers import generate_unique_id
 
 class Migration(migrations.Migration):
 
@@ -15,7 +16,7 @@ class Migration(migrations.Migration):
             model_name="store",
             name="id",
             field=models.CharField(
-                default=Stores.models.generate_unique_id,
+                default=generate_unique_id,
                 editable=False,
                 max_length=12,
                 primary_key=True,

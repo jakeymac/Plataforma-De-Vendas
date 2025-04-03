@@ -744,12 +744,11 @@ def add_product_endpoint(request):
             )
         else:
             product_serializer = ProductSerializer(data=data, partial=True)
-            if product_serializer.is_valid():
-                product_serializer.save()
-            return Response(
-                product_serializer.data,
-                status=status.HTTP_201_CREATED,
-            )
+            product_serializer.is_valid(raise_exception=True)
+            product_serializer.save()
+            response_data = product_serializer.data.copy()
+            response_data["message"] = "Product added successfully"
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
     return Response(
         {"message": "You do not have permission to add a product"},
@@ -777,7 +776,7 @@ def rollback_product_changes_endpoint(request):
             product = Product.objects.get(id=data.get("product_id"))
             if (
                 not request.user.groups.filter(name="Admins").exists()
-                or request.user.store != product.store
+                and request.user.store != product.store
             ):
                 return Response(
                     {"message": "You do not have permission to rollback this product"},
@@ -796,8 +795,8 @@ def rollback_product_changes_endpoint(request):
             return Response(
                 {
                     "message": (
-                        f"Product with id {data.get('id')} and initial state with "
-                        f"{data.get('id')} not found"
+                        f"Product with id {data.get('product_id')} and initial product "
+                        f"state with id {data.get('initial_product_state_id')} not found"
                     )
                 },
                 status=status.HTTP_404_NOT_FOUND,
@@ -805,13 +804,18 @@ def rollback_product_changes_endpoint(request):
 
         elif product_not_found:
             return Response(
-                {"message": f"Product with id {data.get('id')} not found"},
+                {"message": f"Product not found with the id {data.get('product_id')}"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         elif initial_state_not_found:
             return Response(
-                {"message": (f"Initial state with id {data.get('initial_state_id')} " "not found")},
+                {
+                    "message": (
+                        "Initial product state not found with the id "
+                        f"{data.get('initial_product_state_id')}"
+                    )
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -846,13 +850,8 @@ def rollback_product_changes_endpoint(request):
                     status=status.HTTP_200_OK,
                 )
 
-        return Response(
-            {"message": "There was an error rolling back the product"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
     return Response(
-        {"message": "You do not have permission to rollback a product"},
+        {"message": "You do not have permission to rollback products"},
         status=status.HTTP_403_FORBIDDEN,
     )
 
@@ -865,6 +864,8 @@ def rollback_product_changes_endpoint(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_initial_product_state_endpoint(request):
+    # TODO Could update all of this to not create a new initial state every
+    # time each time the edit product page is reloaded for example
     if (
         request.user.groups.filter(name="Admins").exists()
         or request.user.groups.filter(name="Sellers").exists()
@@ -875,12 +876,12 @@ def create_initial_product_state_endpoint(request):
             product = Product.objects.get(id=product_id)
             if (
                 not request.user.groups.filter(name="Admins").exists()
-                or request.user.store != product.store
+                and request.user.store != product.store
             ):
                 return Response(
                     {
                         "message": (
-                            "You do not have permission to create an initial state "
+                            "You do not have permission to create an initial product state "
                             "for this product"
                         )
                     },
@@ -903,7 +904,7 @@ def create_initial_product_state_endpoint(request):
 
             for image in product.productimage_set.all():
                 InitialProductImage.objects.create(
-                    initial_product_state=initial_state,
+                    initial_product=initial_state,
                     image=image.image,
                     order=image.order,
                     s3_key=image.s3_key,
@@ -912,8 +913,11 @@ def create_initial_product_state_endpoint(request):
                 )
 
             return Response(
-                {"message": "Initial state created successfully"},
-                status=status.HTTP_200_OK,
+                {
+                    "message": "Initial product state created successfully",
+                    "initial_product_state_id": initial_state.id,
+                },
+                status=status.HTTP_201_CREATED,
             )
         except Product.DoesNotExist:
             return Response(
@@ -922,7 +926,7 @@ def create_initial_product_state_endpoint(request):
             )
 
     return Response(
-        {"message": "You do not have permission to create an initial state"},
+        {"message": "You do not have permission to create initial product states"},
         status=status.HTTP_403_FORBIDDEN,
     )
 
@@ -948,7 +952,7 @@ def autosave_product_endpoint(request):
             product = Product.objects.get(id=product_id)
             if (
                 not request.user.groups.filter(name="Admins").exists()
-                or request.user.store != product.store
+                and request.user.store != product.store
             ):
                 return Response(
                     {"message": "You do not have permission to autosave this product"},
@@ -991,7 +995,7 @@ def autosave_product_endpoint(request):
             )
 
     return Response(
-        {"message": "You do not have permission to autosave a product"},
+        {"message": "You do not have permission to autosave products"},
         status=status.HTTP_403_FORBIDDEN,
     )
 
@@ -1017,7 +1021,7 @@ def final_save_product_endpoint(request):
             product = Product.objects.get(id=product_id)
             if (
                 not request.user.groups.filter(name="Admins").exists()
-                or request.user.store != product.store
+                and request.user.store != product.store
             ):
                 return Response(
                     {"message": "You do not have permission to save this product"},
@@ -1040,11 +1044,11 @@ def final_save_product_endpoint(request):
                     order += 1
                 except ProductImage.DoesNotExist:
                     ids_not_found.append(image_id)
-                if ids_not_found:
-                    return Response(
-                        {"message": f"Images not found with the ids {ids_not_found}"},
-                        status=status.HTTP_404_NOT_FOUND,
-                    )
+            if ids_not_found:
+                return Response(
+                    {"message": f"Images not found with the ids {ids_not_found}"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             initial_states = InitialProductState.objects.filter(product=product)
             for initial_state in initial_states:
@@ -1061,6 +1065,6 @@ def final_save_product_endpoint(request):
             )
 
     return Response(
-        {"message": "You do not have permission to save a product"},
+        {"message": "You do not have permission to save products"},
         status=status.HTTP_403_FORBIDDEN,
     )

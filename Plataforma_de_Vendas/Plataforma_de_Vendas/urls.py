@@ -60,7 +60,7 @@ urlpatterns = [
     path("", store_views.home, name="index"),
     path("login/", account_views.login_page, name="login"),
     path("register/", account_views.register_account_page, name="register_account"),
-    path("register_seller/", store_views.register_store_page, name="register_seller"),
+    path("register_store/", store_views.register_store_page, name="register_store"),
     path("logout/", account_views.logout_view, name="logout"),
     path("home/", store_views.home, name="home"),
     path("account/", account_views.view_account, name="view_account"),
@@ -90,7 +90,6 @@ urlpatterns = [
     # STORE ENDPOINTS #
     ###################
     path("api/stores/", store_endpoints.get_stores_endpoint, name="all-stores-endpoint"),
-    path("api/stores/add/", store_endpoints.add_store_endpoint, name="add-store-endpoint"),
     path(
         "api/stores/register/",
         store_endpoints.register_store_endpoint,
@@ -103,7 +102,7 @@ urlpatterns = [
     ),
     path(
         "api/stores/<str:store_id>/",
-        store_endpoints.get_stores_endpoint,
+        store_endpoints.get_store_endpoint,
         name="store-by-id-endpoint",
     ),
     ######################################
@@ -206,6 +205,11 @@ urlpatterns = [
         "api/products/search/",
         product_endpoints.search_for_product_endpoint,
         name="search-product-endpoint",
+    ),
+    path(
+        "api/products/create_initial_product_state/",
+        product_endpoints.create_initial_product_state_endpoint,
+        name="create-initial-product-state-endpoint",
     ),
     path(
         "api/products/rollback_product_changes/",
