@@ -1,13 +1,14 @@
-import pytest
-from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
 from datetime import datetime
 from io import BytesIO
-from PIL import Image
 
+import pytest
 from Accounts.models import CustomUser
-from Stores.models import Store
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from PIL import Image
 from Stores.endpoints import parse_store_registration_data
+from Stores.models import Store
+
 
 # Helper function for generating test image files
 def generate_test_image_file(name="test.jpg"):
@@ -86,7 +87,7 @@ class TestParseStoreRegistrationData:
         }
 
         account_data, store_data = parse_store_registration_data(request_data, request_files)
-        
+
         assert account_data["date_of_birth"] is None
         assert account_data["username"] == "testuser"
         assert account_data["profile_picture"] == profile_pic
@@ -122,29 +123,30 @@ class TestParseStoreRegistrationData:
         }
 
         account_data, store_data = parse_store_registration_data(request_data, request_files)
-        
+
         assert account_data["date_of_birth"] == "1985-05-12"
         assert account_data["username"] == "testuser"
         assert account_data["profile_picture"] == profile_pic
         assert store_data["store_logo"] == store_logo
         assert store_data["store_name"] == "Test Store"
 
+
 class TestGetStoreEndpoint:
-    """ Test class for the get_store_endpoint - api/stores/store_id - store-by-id-endpoint """
+    """Test class for the get_store_endpoint - api/stores/store_id - store-by-id-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "store-by-id-endpoint"
 
     def test_valid_access(self, customer_fixture, store_fixture):
-        """ Test valid access to the endpoint """
+        """Test valid access to the endpoint"""
         customer_user, customer_client = customer_fixture
         store = store_fixture
 
         url = reverse(self.view_name, kwargs={"store_id": store.id})
 
         response = customer_client.get(url)
-        
+
         assert response.status_code == 200
         assert response.data["id"] == store.id
         assert response.data["store_name"] == store.store_name
@@ -152,7 +154,7 @@ class TestGetStoreEndpoint:
         assert response.data["store_url"] == store.store_url
 
     def test_non_existent_store(self, customer_fixture):
-        """ Test invalid access to the endpoint """
+        """Test invalid access to the endpoint"""
         customer_user, customer_client = customer_fixture
 
         url = reverse(self.view_name, kwargs={"store_id": "0"})
@@ -161,15 +163,16 @@ class TestGetStoreEndpoint:
         assert response.status_code == 404
         assert response.data["message"] == "Store not found with the id 0"
 
+
 class TestGetStoresEndpoint:
-    """ Test class for the get_stores_endpoint - api/stores/add - add-store-endpoint """
+    """Test class for the get_stores_endpoint - api/stores/add - add-store-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
         self.view_name = "all-stores-endpoint"
 
     def test_valid_access(self, customer_fixture, store_fixture):
-        """ Test valid access to the endpoint """
+        """Test valid access to the endpoint"""
         customer_user, customer_client = customer_fixture
         store = store_fixture
 
@@ -184,9 +187,10 @@ class TestGetStoresEndpoint:
         assert response.data[0]["store_description"] == store.store_description
         assert response.data[0]["store_url"] == store.store_url
 
+
 @pytest.mark.django_db
 class TestUpdateStoreEndpoint:
-    """ Test class for the update_store_endpoint - api/stores/update - update-store-endpoint """
+    """Test class for the update_store_endpoint - api/stores/update - update-store-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -245,11 +249,11 @@ class TestUpdateStoreEndpoint:
 
         assert response.status_code == 403
         assert response.data["message"] == "You are not authorized to update stores"
-        
+
     def test_unauthorized_seller_account(self, seller_fixture):
-        """ Test for sellers that aren't part of the targeted store """
+        """Test for sellers that aren't part of the targeted store"""
         seller_user, seller_client = seller_fixture
-        
+
         new_store = Store.objects.create(
             store_name="New Store",
             store_description="New Store Description",
@@ -267,7 +271,7 @@ class TestUpdateStoreEndpoint:
 
         assert response.status_code == 403
         assert response.data["message"] == "You are not authorized to update this store"
-    
+
     def test_already_existing_store_name(self, admin_fixture, store_fixture):
         admin_user, admin_client = admin_fixture
         store = store_fixture
@@ -304,9 +308,10 @@ class TestUpdateStoreEndpoint:
         assert response.status_code == 404
         assert response.data["message"] == "Store not found with the id 0"
 
+
 @pytest.mark.django_db
 class TestRegisterStoreEndpoint:
-    """ Test class for the register_store_endpoint - api/stores/register - register-store-endpoint """
+    """Test class for the register_store_endpoint - api/stores/register - register-store-endpoint"""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -361,7 +366,10 @@ class TestRegisterStoreEndpoint:
 
         assert response.status_code == 400
         assert response.data["message"] == "Store not created"
-        assert "This field may not be null." in response.data["errors"]["account_errors"]["username"][0]
+        assert (
+            "This field may not be null."
+            in response.data["errors"]["account_errors"]["username"][0]
+        )
 
     def test_missing_store_field(self, anonymous_client):
         data = self.get_valid_data()
@@ -374,4 +382,7 @@ class TestRegisterStoreEndpoint:
 
         assert response.status_code == 400
         assert response.data["message"] == "Store not created"
-        assert "This field may not be null." in response.data["errors"]["store_errors"]["store_name"][0]
+        assert (
+            "This field may not be null."
+            in response.data["errors"]["store_errors"]["store_name"][0]
+        )

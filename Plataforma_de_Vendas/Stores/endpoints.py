@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from .models import Store
 from .serializers import StoreSerializer
 
+
 # Helper function for register store endpoint
 def parse_store_registration_data(request_data, request_files):
     account_data = {
@@ -68,6 +69,7 @@ def get_store_endpoint(request, store_id):
             {"message": f"Store not found with the id {store_id}"},
             status=status.HTTP_404_NOT_FOUND,
         )
+
 
 @swagger_auto_schema(
     method="get",

@@ -1,4 +1,5 @@
 import pytest
+from core.helpers import convert_prices_dict
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from Products.models import (
@@ -11,7 +12,7 @@ from Products.models import (
     ProductTopSubcategory,
 )
 from Stores.models import Store
-from core.helpers import convert_prices_dict
+
 
 @pytest.mark.django_db
 class TestGetProductsByStoreEndpoint:
