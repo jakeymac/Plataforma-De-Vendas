@@ -14,8 +14,8 @@ class CustomUser(AbstractUser, UniqueIDModel):
         default=True, null=True, blank=True
     )  # For sellers to receive notifcations of their stock levels.
 
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, blank=False, null=False)
+    last_name = models.CharField(max_length=50, blank=False, null=False)
     email = models.EmailField(
         unique=True, error_messages={"unique": "A user with that email already exists."}
     )
