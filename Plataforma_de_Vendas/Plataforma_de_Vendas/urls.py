@@ -15,12 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+import sys
+
 from Accounts import endpoints as account_endpoints
 from Accounts import views as account_views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -30,17 +34,11 @@ from Products import views as product_views
 from rest_framework import permissions
 from Stores import endpoints as store_endpoints
 from Stores import views as store_views
-from core import views as core_views
 
-from django.http import Http404
-from django.core.exceptions import PermissionDenied
+handler404 = "core.views.custom_404_view"
+handler403 = "core.views.custom_403_view"
+handler500 = "core.views.custom_500_view"
 
-import sys
-
-
-handler404 = 'core.views.custom_404_view'
-handler403 = 'core.views.custom_403_view'
-handler500 = 'core.views.custom_500_view'
 
 # Custom admin check
 def is_admin(user):

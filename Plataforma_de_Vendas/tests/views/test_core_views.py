@@ -1,8 +1,6 @@
-import pytest
-from core.views import custom_404_view, custom_403_view, custom_500_view
-from django.http import Http404
+from core.views import custom_403_view, custom_404_view, custom_500_view
 from django.core.exceptions import PermissionDenied
-
+from django.http import Http404
 
 
 class TestCoreViews:
@@ -38,7 +36,9 @@ class TestCoreViews:
 
         response = anonymous_client.get("/nonexistent-url/")
         assert response.status_code == 404
-        assert "Sorry, the page you’re looking for doesn’t exist.".encode("utf-8") in response.content
+        assert (
+            "Sorry, the page you’re looking for doesn’t exist.".encode("utf-8") in response.content
+        )
 
     def test_custom_403_route(self, anonymous_client):
         response = anonymous_client.get("/test-403/")
@@ -46,7 +46,7 @@ class TestCoreViews:
         assert b"Testing 403" in response.content
 
     def test_custom_500_route(self, anonymous_client, settings):
-        settings.DEBUG = False  
+        settings.DEBUG = False
         anonymous_client.raise_request_exception = False  # <-- prevent exception from bubbling up
         response = anonymous_client.get("/test-500/")
         assert response.status_code == 500

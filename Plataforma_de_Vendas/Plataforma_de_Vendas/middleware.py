@@ -3,10 +3,9 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import logout
-from django.http import JsonResponse
-from django.utils.timezone import now
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.utils.timezone import now
 
 logger = logging.getLogger(__name__)
 

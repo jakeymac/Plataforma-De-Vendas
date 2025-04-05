@@ -1,13 +1,13 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
-from django.http import Http404
 from django.core.exceptions import PermissionDenied
-
+from django.http import Http404
+from django.shortcuts import render
 
 from .models import (
     Product,
     ProductSubcategory,
 )
+
 
 @login_required
 def add_product_view(request):
@@ -18,7 +18,6 @@ def add_product_view(request):
         return render(request, "products/add_new_product.html")
     else:
         raise PermissionDenied("You do not have permission to add products")
-
 
 
 @login_required
@@ -34,7 +33,6 @@ def edit_product_view(request, product_id):
                 and not request.user.groups.filter(name="Admins").exists()
             ):
                 raise PermissionDenied("You do not have permission to edit this product")
-                
 
             images = product.productimage_set.all().order_by("order")
             properties = product.properties
@@ -68,6 +66,6 @@ def view_product(request, product_id):
             "products/view_product.html",
             {"product": product, "images": images, "prices": prices},
         )
-        
+
     except Product.DoesNotExist:
         raise Http404("The product you are looking for does not exist.")
