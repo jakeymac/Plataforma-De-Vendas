@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
+
 
 from .models import (
     Product,
     ProductSubcategory,
 )
-
 
 @login_required
 def add_product_view(request):
@@ -15,8 +17,8 @@ def add_product_view(request):
     ):
         return render(request, "products/add_new_product.html")
     else:
-        # TODO add a forbidden page to let users know what's happening
-        return redirect("home")
+        raise PermissionDenied("You do not have permission to add products")
+
 
 
 @login_required
@@ -31,8 +33,8 @@ def edit_product_view(request, product_id):
                 product.store != request.user.store
                 and not request.user.groups.filter(name="Admins").exists()
             ):
-                # TODO add a forbidden page to let users know what's happening
-                return redirect("home")
+                raise PermissionDenied("You do not have permission to edit this product")
+                
 
             images = product.productimage_set.all().order_by("order")
             properties = product.properties
@@ -50,14 +52,10 @@ def edit_product_view(request, product_id):
                     "prices": prices,
                 },
             )
-
         except Product.DoesNotExist:
-            # TODO add a 404 page to let users know what's
-            # happening - that the product was not found
-            return redirect("home")
+            raise Http404("The product you are looking for does not exist.")
     else:
-        # TODO add a forbidden page to let users know what's happening
-        return redirect("home")
+        raise PermissionDenied("You do not have permission to edit products")
 
 
 def view_product(request, product_id):
@@ -70,7 +68,6 @@ def view_product(request, product_id):
             "products/view_product.html",
             {"product": product, "images": images, "prices": prices},
         )
+        
     except Product.DoesNotExist:
-        # TODO add a 404 page to let users know what's
-        # happening - that the product was not found
-        return redirect("home")
+        raise Http404("The product you are looking for does not exist.")

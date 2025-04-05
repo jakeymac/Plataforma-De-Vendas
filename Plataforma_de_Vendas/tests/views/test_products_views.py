@@ -27,8 +27,7 @@ class TestAddProductView:
         """Ensure a logged in customer cannot access the add product view."""
         customer_user, client = logged_in_customer
         response = client.get(reverse("add_new_product"))
-        assert response.status_code == 302
-        assert "/home" in response.url
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -59,8 +58,7 @@ class TestEditProductView:
         customer_user, client = logged_in_customer
         product, _ = product_fixture
         response = client.get(reverse("edit_product", args=[product.id]))
-        assert response.status_code == 302
-        assert "/home" in response.url
+        assert response.status_code == 403
 
     def test_edit_product_view_seller_not_own_product(
         self, logged_in_seller, product_fixture, store_fixture
@@ -80,16 +78,14 @@ class TestEditProductView:
         seller_user.save()
 
         response = client.get(reverse("edit_product", args=[product.id]))
-        assert response.status_code == 302
-        assert "/home" in response.url
+        assert response.status_code == 403
 
     def test_edit_product_view_nonexistent_product(self, logged_in_seller):
         """Ensure a logged in seller cannot access the edit
         product view of a nonexistent product."""
         seller_user, client = logged_in_seller
         response = client.get(reverse("edit_product", args=[9999]))
-        assert response.status_code == 302
-        assert "/home" in response.url
+        assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -115,5 +111,4 @@ class TestViewProductView:
         view product view of a nonexistent product."""
         customer_user, client = logged_in_customer
         response = client.get(reverse("view_product", args=[9999]))
-        assert response.status_code == 302
-        assert "/home" in response.url
+        assert response.status_code == 404

@@ -1,0 +1,16 @@
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container text-center mt-5 pt-5">
+    <h1 class="display-1 fw-bold text-danger">403</h1>
+    <p class="lead text-muted mb-4"> 
+        {% if message %}
+            {{ message }}
+        {% else %}
+            Sorry! You don't have permission to perform that action.
+        {% endif %}
+    </p>
+    <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Back to Home</a>
+</div>
+{% endblock %}

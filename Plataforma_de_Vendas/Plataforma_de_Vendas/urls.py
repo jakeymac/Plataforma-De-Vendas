@@ -30,7 +30,17 @@ from Products import views as product_views
 from rest_framework import permissions
 from Stores import endpoints as store_endpoints
 from Stores import views as store_views
+from core import views as core_views
 
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
+
+import sys
+
+
+handler404 = 'core.views.custom_404_view'
+handler403 = 'core.views.custom_403_view'
+handler500 = 'core.views.custom_500_view'
 
 # Custom admin check
 def is_admin(user):
@@ -348,5 +358,18 @@ urlpatterns = [
     ),
 ]
 
+# URL patterns for testing purposes only
+test_url_patterns = [
+    path("test-403/", lambda r: (_ for _ in ()).throw(PermissionDenied("Testing 403"))),
+    path("test-404/", lambda r: (_ for _ in ()).throw(Http404("Testing 404"))),
+    path("test-500/", lambda r: (_ for _ in ()).throw(Exception("Testing 500"))),
+]
+
+if "test" in sys.argv[0]:
+    urlpatterns += test_url_patterns
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if not settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
