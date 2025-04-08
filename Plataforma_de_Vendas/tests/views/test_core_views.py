@@ -18,13 +18,16 @@ class TestCoreViews:
 
     def test_custom_403_view(self, anonymous_client):
         request = anonymous_client.get("/").wsgi_request
-        response = custom_403_view(request, PermissionDenied("You do not have permission to edit this product."))
+        response = custom_403_view(
+            request, PermissionDenied("You do not have permission to edit this product.")
+        )
 
         assert response.status_code == 403
         assert b"You do not have permission to edit this product." in response.content
 
     def test_custom_403_view_not_permission_denied(self, anonymous_client):
         request = anonymous_client.get("/").wsgi_request
+
         class NotPermissionDenied(Exception):
             pass
 

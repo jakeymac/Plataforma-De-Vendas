@@ -2,15 +2,14 @@
 from datetime import datetime
 
 from Accounts.serializers import CustomUserSerializer
-from django.db import transaction
 from django.contrib.auth.models import Group
+from django.db import transaction
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
 
 from .models import Store
 from .serializers import StoreSerializer

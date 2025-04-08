@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
-from django.http import Http404
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
+from django.shortcuts import redirect, render
 from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
 from Stores.models import Store
+
 
 # Create your views here.
 def home(request):
@@ -27,8 +28,10 @@ def home(request):
     }
     return render(request, "Stores/home.html", context)
 
+
 def register_store_page(request):
     return render(request, "Stores/register_store.html")
+
 
 @login_required
 def view_my_store(request):
@@ -41,6 +44,7 @@ def view_my_store(request):
     else:
         raise PermissionDenied("You'll need to register as a seller first.")
 
+
 def view_store(request, store_url):
     try:
         store = Store.objects.get(store_url=store_url)
@@ -48,7 +52,8 @@ def view_store(request, store_url):
     except Store.DoesNotExist:
         raise Http404("The store you are looking for does not exist.")
 
-# TODO implement this view  
+
+# TODO implement this view
 # @login_required
 # def store_admin_portal(request):
 #     pass

@@ -79,6 +79,7 @@ class TestViewStoreView:
         assert response.status_code == 404
         assert b"The store you are looking for does not exist." in response.content
 
+
 class TestRegisterStorePageView:
     """Test the register store page view"""
 
