@@ -85,6 +85,11 @@ urlpatterns = [
         name="view_product",
     ),
     path(
+        "view_store/<str:store_url>/",
+        store_views.view_store,
+        name="view_store",
+    ),
+    path(
         "swagger/",
         user_passes_test(is_admin)(schema_view.with_ui("swagger", cache_timeout=0)),
         name="schema-swagger-ui",

@@ -314,7 +314,7 @@ class TestRegisterStoreEndpoint:
     """Test class for the register_store_endpoint - api/stores/register - register-store-endpoint"""
 
     @pytest.fixture(autouse=True)
-    def setup(self):
+    def setup(self, seller_group):
         self.url = reverse("register-store-endpoint")
 
     def get_valid_data(self):

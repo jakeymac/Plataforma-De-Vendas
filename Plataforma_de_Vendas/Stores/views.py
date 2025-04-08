@@ -1,7 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
-
+from Stores.models import Store
 
 # Create your views here.
 def home(request):
@@ -25,22 +27,28 @@ def home(request):
     }
     return render(request, "Stores/home.html", context)
 
+def register_store_page(request):
+    return render(request, "Stores/register_store.html")
 
 @login_required
 def view_my_store(request):
     if request.user.groups.filter(name="Sellers").exists():
         if request.user.store:
             store = request.user.store
-            return render(request, "Stores/view_store.html", {"store": store})
+            return redirect("view_store", store_url=store.store_url)
         else:
-            # TODO add a 404 page to let users know what's
-            # happening - that their store was not found
-            return redirect("home")
+            raise Http404("There was an error finding your store.")
     else:
-        # TODO add a 404 page to let users know that they
-        # need to register
-        return redirect("home")
+        raise PermissionDenied("You'll need to register as a seller first.")
 
+def view_store(request, store_url):
+    try:
+        store = Store.objects.get(store_url=store_url)
+        return render(request, "Stores/view_store.html", {"store": store})
+    except Store.DoesNotExist:
+        raise Http404("The store you are looking for does not exist.")
 
-def register_store_page(request):
-    return render(request, "Stores/register_store.html")
+# TODO implement this view  
+# @login_required
+# def store_admin_portal(request):
+#     pass

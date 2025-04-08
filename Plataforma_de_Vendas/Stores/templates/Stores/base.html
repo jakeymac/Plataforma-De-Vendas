@@ -102,6 +102,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="/admin_portal"><i class="bi bi-person-fill-gear"></i> Admin Portal</a>
                             </li>
+
+                        {% elif user|in_group:"Sellers" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/my_store"><i class="bi bi-person-fill-gear"></i> My Store</a>
+                            </li>    
                         {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="/account"><i class="bi bi-person-circle profile-icon"></i> Profile</a>
@@ -115,6 +120,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-primary btn-sm btn-signup" href="{% url 'register_account' %}"> Sign up</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm btn-signup" href="{% url 'register_store' %}"> Sign up to sell</a>
                         </li>
                     {% endif %}
                 </ul>
