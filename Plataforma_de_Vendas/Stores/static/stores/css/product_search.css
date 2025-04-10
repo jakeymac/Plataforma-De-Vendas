@@ -3,7 +3,7 @@
 }
 .outer-container {
     border: 1px solid black;
-    border-radius: 20px;
+    border-radius: var(--gui-border-radius);
 }
 
 #text-search-container {

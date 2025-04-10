@@ -7,7 +7,7 @@
     padding-bottom: 15px;
     width: 70%;
     background-color: #f8f9fa;
-    border-radius: 8px;
+    border-radius: var(--gui-border-radius);
     border: 1px solid black;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease-in-out;
