@@ -74,6 +74,7 @@ urlpatterns = [
     path("account/", account_views.view_account, name="view_account"),
     path("my_store/", store_views.view_my_store, name="view_my_store"),
     path("add_new_product/", product_views.add_product_view, name="add_new_product"),
+    path("product_search/", store_views.product_search_page, name="product_search"),
     path(
         "edit_product/<str:product_id>/",
         product_views.edit_product_view,

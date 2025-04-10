@@ -1,0 +1,20 @@
+#main-product-search-container {
+    height: 800px;
+}
+.outer-container {
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+#text-search-container {
+    height: 10%;
+    display: flex;
+}
+
+#sort-controls-container {
+    height: 10%;
+}
+
+#main-container {
+    height: 80%;
+}

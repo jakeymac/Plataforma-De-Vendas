@@ -1,0 +1,48 @@
+{% extends "Stores/base.html" %}
+
+{% load static %}
+
+{% block styles %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'stores/css/product_search.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container" id="main-product-search-container">
+    <div class="row mb-3 outer-container" id="text-search-container">
+        <div class="col-12 py-3">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-12 col-md-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <select class="form-select w-auto" id="sort-select" name="sort">
+                                    <option value="price-asc">Price (Low to High)</option>
+                                    <option value="price-desc">Price (High to Low)</option>
+                                    <option value="newest">Newest</option>
+                                </select>
+                                <button type="submit" class="btn btn-secondary" id="sort-products-button">Sort</button>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-8">
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control" id="product-text-search" name="query" placeholder="Search for products and brands">
+                                <button type="submit" class="btn btn-primary" id="search-button">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="main-container">
+        <div class="col-12 col-md-3 outer-container" id="filters-container">
+        </div>
+        <div class="col-12 col-md-9 outer-container" id="products-container">
+        </div>
+    </div>
+</div>
+    
+{% endblock %}
