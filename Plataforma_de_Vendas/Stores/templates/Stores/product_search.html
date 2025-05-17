@@ -1,9 +1,15 @@
 {% extends "Stores/base.html" %}
-
 {% load static %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+    <script src="{% static 'stores/js/product_search.js' %}"></script>
+{% endblock %}
 
 {% block styles %}
     {{ block.super }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'stores/css/product_search.css' %}">
 {% endblock %}
 
@@ -13,22 +19,22 @@
         <div class="col-12 py-3">
             <div class="row justify-content-center">
                 <div class="col-md-10 col-lg-8">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-12 col-md-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <div class="d-flex align-items-center gap-2">
-                                <select class="form-select w-auto" id="sort-select" name="sort">
+                                <select class="form-select w-auto" id="sort-products">
                                     <option value="price-asc">Price (Low to High)</option>
                                     <option value="price-desc">Price (High to Low)</option>
                                     <option value="newest">Newest</option>
                                 </select>
-                                <button type="submit" class="btn btn-secondary" id="sort-products-button">Sort</button>
+                                <button type="submit" class="btn btn-secondary update-button" id="sort-products-button">Sort</button>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-8">
                             <div class="d-flex gap-2">
-                                <input type="text" class="form-control" id="product-text-search" name="query" placeholder="Search for products and brands">
-                                <button type="submit" class="btn btn-primary" id="search-button">Search</button>
+                                <input type="text" class="form-control" id="product-text-search" placeholder="Search for products and brands">
+                                <button type="submit" class="btn btn-primary update-button" id="search-button">Search</button>
                             </div>
                         </div>
                     </div>
@@ -38,9 +44,30 @@
     </div>
 
     <div class="row" id="main-container">
-        <div class="col-12 col-md-3 outer-container" id="filters-container">
+        <div class="outer-container" id="filters-container">
+            <h4 class="text-center mt-2">Filter</h4>
+            <div class="container" id="inner-filters-container">
+                <select class="selectpicker form-control" multiple data-live-search="true" title="Choose categories" id='filter-categories' name="filter-categories">
+                    <option>Test Seller 4</option>
+                    <option>Test Seller 5</option>
+                    <option>Test Seller 6</option>
+                </select>
+                <select class="selectpicker form-control" multiple data-live-search="true" title="Choose Sellers" id='filter-sellers' name="filter-sellers">
+                    <option>Test Seller 1</option>
+                    <option>Test Seller 2</option>
+                    <option>Test Seller 3</option>
+                </select>
+                <div class="d-flex justify-content-between gap-2" id="filter-buttons-container">
+                    <button type="button" class="btn btn-secondary filter-button update-button" id="clear-filter-button">Clear Filters</button>
+                    <button type="button" class="btn btn-primary filter-button update-button" id="apply-filter-button">Apply Filters</button>
+                </div>
+            </div>
         </div>
-        <div class="col-12 col-md-9 outer-container" id="products-container">
+        <div class=" outer-container" id="products-container">
+            <h3 class="text-center mt-2">Search Results</h3>
+            <div class="container" id="inner-products-container">
+
+            </div>
         </div>
     </div>
 </div>

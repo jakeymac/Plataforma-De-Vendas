@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from Stores.models import Store
 
 from .models import (
@@ -79,44 +80,6 @@ def get_products_endpoint(request, product_id=None):
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response({"products": serializer.data}, status=status.HTTP_200_OK)
-
-
-@swagger_auto_schema(
-    method="get",
-    manual_parameters=[
-        openapi.Parameter(
-            name="q",
-            in_=openapi.IN_QUERY,
-            type=openapi.TYPE_STRING,
-            description="Search query",
-        )
-    ],
-    responses={200: "OK"},
-    description="Search for products by name or description",
-)
-@api_view(["GET"])
-def search_for_product_endpoint(request, store_id=None):
-    search_terms = request.GET.get("q", "").split(" ")
-    query = Q()
-    for term in search_terms:
-        query |= Q(product_name__icontains=term) | Q(product_description__icontains=term)
-
-    if store_id is not None:
-        try:
-            store = Store.objects.get(id=store_id)
-            products = Product.objects.filter(query, store=store)
-            serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except Store.DoesNotExist:
-            return Response(
-                {"message": f"Store not found with the id {store_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-    products = Product.objects.filter(query)
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
@@ -1000,8 +963,7 @@ def autosave_product_endpoint(request):
     )
 
 
-# This endpoint finalizes the save of a product, deleting the initial state
-# of the product, and deleting the images of the product in storage
+
 @swagger_auto_schema(
     method="post",
     responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
@@ -1010,6 +972,10 @@ def autosave_product_endpoint(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def final_save_product_endpoint(request):
+    """ 
+    This endpoint finalizes the save of a product, deleting the initial state
+    of the product, and deleting the images of the product in storage
+    """
     if (
         request.user.groups.filter(name="Admins").exists()
         or request.user.groups.filter(name="Sellers").exists()
@@ -1068,3 +1034,50 @@ def final_save_product_endpoint(request):
         {"message": "You do not have permission to save products"},
         status=status.HTTP_403_FORBIDDEN,
     )
+
+@swagger_auto_schema(
+    method="get",
+    responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
+    description="Product search results",
+)
+@api_view(["GET"])
+def product_search_endpoint(request):
+    """
+    Endpoint used in the product search page. 
+    This endpoint supports filtering, sorting, and pagination
+    """
+    search = request.GET.get("search", "")
+    sort = request.GET.get("sort", "-created_at")
+    page = request.GET.get("page", 1)
+
+    queryset = Product.objects.all()
+    
+    if search:
+        queryset = queryset.filter(
+            Q(product_name__icontainer=search) |
+            Q(product_description__icontains=search) |
+            Q(subcategory__subcategory_name__icontains=search)
+        )
+
+    if sort:
+        queryset = queryset.order_by(sort)
+
+    paginator = PageNumberPagination()
+    # TODO we could make this part of the query - leave this as default for now
+    paginator.page_size = 12 
+    paginated_qs = paginator.paginate_queryset(queryset, request)
+
+    total_product_count = queryset.count()
+    total_page_count = paginator.page.paginator.num_pages
+
+    serializer = ProductSerializer(paginated_qs)
+
+    return JsonResponse({
+        "product_count": total_product_count,
+        "page_count": total_page_count,
+        "next_page": paginator.get_next_link(),
+        "previous_page": paginator.get_previous_link(),
+        "products": serializer.data,
+    }, status=status.HTTP_200_OK)
+
+

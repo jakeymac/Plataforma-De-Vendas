@@ -280,7 +280,6 @@ def check_email_availability_endpoint(request):
         return Response({"is_available": False}, status=status.HTTP_200_OK)
     return Response({"is_available": True}, status=status.HTTP_200_OK)
 
-
 # TODO update this endpoint to use s3 bucket and upload file
 @swagger_auto_schema(
     method="put",
@@ -294,6 +293,7 @@ def check_email_availability_endpoint(request):
         },
     ),
 )
+
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_profile_picture_endpoint(request):

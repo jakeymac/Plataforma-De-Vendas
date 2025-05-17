@@ -17,4 +17,22 @@
 
 #main-container {
     height: 80%;
+    display: flex;
+    gap: 2.5%;
+}
+
+#filters-container {
+    width: 20%;
+}
+
+.filter-button {
+    font-size: 12px;
+}
+
+#products-container {
+    width: 77.5%;
+}
+
+#inner-products-container {
+    border: 1px solid black;
 }
