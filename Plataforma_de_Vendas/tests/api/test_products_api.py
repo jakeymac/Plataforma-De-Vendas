@@ -102,7 +102,6 @@ class TestGetProductsEndpoint:
         assert response.data["products"][0]["prices"] == product.prices
 
 
-
 @pytest.mark.django_db
 class TestRemoveProductEndpoint:
     """Test remove_product_endpoint - api/products/remove/product_id - remove-product-endpoint"""

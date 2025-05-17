@@ -1,4 +1,6 @@
 # API endpoints for products
+import json
+
 from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse
@@ -7,9 +9,9 @@ from drf_yasg.utils import swagger_auto_schema
 from Orders.models import Order
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 from Stores.models import Store
 
 from .models import (
@@ -963,7 +965,6 @@ def autosave_product_endpoint(request):
     )
 
 
-
 @swagger_auto_schema(
     method="post",
     responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
@@ -972,7 +973,7 @@ def autosave_product_endpoint(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def final_save_product_endpoint(request):
-    """ 
+    """
     This endpoint finalizes the save of a product, deleting the initial state
     of the product, and deleting the images of the product in storage
     """
@@ -1035,6 +1036,7 @@ def final_save_product_endpoint(request):
         status=status.HTTP_403_FORBIDDEN,
     )
 
+
 @swagger_auto_schema(
     method="get",
     responses={200: openapi.Response("Success", schema=openapi.Schema(type=openapi.TYPE_OBJECT))},
@@ -1043,41 +1045,89 @@ def final_save_product_endpoint(request):
 @api_view(["GET"])
 def product_search_endpoint(request):
     """
-    Endpoint used in the product search page. 
+    Endpoint used in the product search page.
     This endpoint supports filtering, sorting, and pagination
     """
     search = request.GET.get("search", "")
     sort = request.GET.get("sort", "-created_at")
-    page = request.GET.get("page", 1)
+    filters = request.GET.get("filters", "{}")
+    try:
+        filters = json.loads(filters)
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"message": "Invalid filters format"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     queryset = Product.objects.all()
-    
+
     if search:
         queryset = queryset.filter(
-            Q(product_name__icontainer=search) |
-            Q(product_description__icontains=search) |
-            Q(subcategory__subcategory_name__icontains=search)
+            Q(product_name__icontainer=search)
+            | Q(product_description__icontains=search)
+            | Q(subcategory__subcategory_name__icontains=search)
         )
 
     if sort:
-        queryset = queryset.order_by(sort)
+        sort_map = {
+            "price-asc": "prices__amount",
+            "price-desc": "-prices__amount",
+            "name-asc": "product_name",
+            "name-desc": "-product_name",
+            "newest": "-created_at",
+            "oldest": "created_at",
+        }
+        if sort in sort_map:
+            sort_parameter = sort_map[sort]
+        else:
+            return JsonResponse(
+                {"message": f"Invalid sort parameter: {sort}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = queryset.order_by(sort_parameter)
+
+    if filters:
+        filter_map = {
+            "categories": "subcategory__category__id",
+            "subcategories": "subcategory__id",
+            "stores": "store__id",
+            "category": "subcategory__category__id",
+            "subcategory": "subcategory__id",
+            "store": "store__id",
+        }
+        for filter in filters:
+            if filter in filter_map:
+                filter_parameter = filter_map[filter]
+                filter_value = filters[filter]
+                if filter_value:
+                    if isinstance(filter_value, list):
+                        queryset = queryset.filter(**{f"{filter_parameter}__in": filter_value})
+                    else:
+                        queryset = queryset.filter(**{filter_parameter: filter_value})
+            else:
+                return JsonResponse(
+                    {"message": f"Invalid filter parameter: {filter}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
     paginator = PageNumberPagination()
     # TODO we could make this part of the query - leave this as default for now
-    paginator.page_size = 12 
+    paginator.page_size = 12
     paginated_qs = paginator.paginate_queryset(queryset, request)
 
     total_product_count = queryset.count()
     total_page_count = paginator.page.paginator.num_pages
 
-    serializer = ProductSerializer(paginated_qs)
+    serializer = ProductSerializer(paginated_qs, many=True)
 
-    return JsonResponse({
-        "product_count": total_product_count,
-        "page_count": total_page_count,
-        "next_page": paginator.get_next_link(),
-        "previous_page": paginator.get_previous_link(),
-        "products": serializer.data,
-    }, status=status.HTTP_200_OK)
-
-
+    return JsonResponse(
+        {
+            "product_count": total_product_count,
+            "page_count": total_page_count,
+            "next_page": paginator.get_next_link(),
+            "previous_page": paginator.get_previous_link(),
+            "products": serializer.data,
+        },
+        status=status.HTTP_200_OK,
+    )

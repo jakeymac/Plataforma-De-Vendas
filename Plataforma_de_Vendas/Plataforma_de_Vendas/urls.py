@@ -260,9 +260,10 @@ urlpatterns = [
         product_endpoints.remove_product_image_endpoint,
         name="remove-product-image-endpoint",
     ),
-    path("api/products/search/", 
-         product_endpoints.product_search_endpoint, 
-         name="search-products-endpoint"
+    path(
+        "api/products/search/",
+        product_endpoints.product_search_endpoint,
+        name="search-products-endpoint",
     ),
     path(
         "api/products/<str:product_id>/",

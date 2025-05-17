@@ -52,8 +52,17 @@ def view_store(request, store_url):
     except Store.DoesNotExist:
         raise Http404("The store you are looking for does not exist.")
 
+
 def product_search_page(request):
-    return render(request, "Stores/product_search.html")
+    categories = ProductCategory.objects.all()
+    subcategories = ProductSubcategory.objects.all()
+    stores = Store.objects.all()
+    context = {
+        "categories": categories,
+        "subcategories": subcategories,
+        "stores": stores,
+    }
+    return render(request, "Stores/product_search.html", context)
 
 
 # TODO implement this view

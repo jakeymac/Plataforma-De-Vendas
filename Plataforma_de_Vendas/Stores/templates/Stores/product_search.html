@@ -47,15 +47,20 @@
         <div class="outer-container" id="filters-container">
             <h4 class="text-center mt-2">Filter</h4>
             <div class="container" id="inner-filters-container">
-                <select class="selectpicker form-control" multiple data-live-search="true" title="Choose categories" id='filter-categories' name="filter-categories">
-                    <option>Test Seller 4</option>
-                    <option>Test Seller 5</option>
-                    <option>Test Seller 6</option>
+                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" title="Choose categories" id='filter-categories' name="filter-categories">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.category_name }}</option>
+                    {% endfor %}
                 </select>
-                <select class="selectpicker form-control" multiple data-live-search="true" title="Choose Sellers" id='filter-sellers' name="filter-sellers">
-                    <option>Test Seller 1</option>
-                    <option>Test Seller 2</option>
-                    <option>Test Seller 3</option>
+                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" title="Choose subcategories" id="filter-subcategories" name="filter-subcategories">
+                    {% for subcategory in subcategories %}
+                        <option value="{{ subcategory.id }}">{{ subcategory.subcategory_name }}</option>
+                    {% endfor %}
+                </select>
+                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" title="Choose Sellers" id='filter-stores' name="filter-stores">
+                    {% for seller in sellers %}
+                        <option value="{{ seller.id }}">{{ seller.seller_name }}</option>
+                    {% endfor %}
                 </select>
                 <div class="d-flex justify-content-between gap-2" id="filter-buttons-container">
                     <button type="button" class="btn btn-secondary filter-button update-button" id="clear-filter-button">Clear Filters</button>
@@ -67,6 +72,22 @@
             <h3 class="text-center mt-2">Search Results</h3>
             <div class="container" id="inner-products-container">
 
+            </div>
+            <div class="container" id="pagination-container">
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled" id="previous-page-button">
+                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        </li>
+                        <!-- TODO add this functionality -->
+                        <!-- <li class="page-item active" id="current-page">
+                            <a class="page-link" href="#">1</a>
+                        </li> -->
+                        <li class="page-item" id="next-page-button">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>

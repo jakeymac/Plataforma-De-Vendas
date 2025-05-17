@@ -36,3 +36,12 @@
 #inner-products-container {
     border: 1px solid black;
 }
+
+#products-container {
+    position: relative;
+}
+
+#pagination-container {
+    position: absolute;
+    bottom: 0;
+}
