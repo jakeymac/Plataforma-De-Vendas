@@ -51,15 +51,16 @@ function updateURL(params) {
     history.pushState({}, '', `${window.location.pathname}?${newParams}`);
 }
 
-function getCurrentPageFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = parseInt(urlParams.get('page'), 10);
-    if (isNaN(page)) {
-        return page;
-    } else {
-        return 1;
-    }
-}
+// TODO will use this in pagination
+// function getCurrentPageFromURL() {
+//     const urlParams = new URLSearchParams(window.location.search);
+//     const page = parseInt(urlParams.get('page'), 10);
+//     if (isNaN(page)) {
+//         return page;
+//     } else {
+//         return 1;
+//     }
+// }
 
 function performSearch(page = 1) {
     let params = buildQueryParams(page);
@@ -83,12 +84,12 @@ function performSearch(page = 1) {
         });
 }
 
-$(document).ready(function() {
+$(document).ready(() => {
     console.log('Document ready. Trying to init selectpicker.');
     $('.selectpicker').selectpicker();
     console.log('Selectpicker initialized.');
 
-    $('.update-button').click(function() {
+    $('.update-button').click(() => {
         console.log('Update button clicked.');
         performSearch();
     });

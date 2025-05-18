@@ -1235,7 +1235,7 @@ class TestRollbackProductChangesEndpoint:
     def test_unauthorized_to_change_product(self, seller_fixture):
         seller_user, seller_client = seller_fixture
 
-        store = Store.objects.create(store_name="Test Store")
+        store = Store.objects.create(store_name="New Test Store")
 
         product = Product.objects.create(
             product_name="Rollback Product Name",
