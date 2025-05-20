@@ -1124,6 +1124,17 @@ def product_search_endpoint(request):
     total_page_count = paginator.page.paginator.num_pages
 
     serializer = ProductSerializer(paginated_qs, many=True)
+    products_data = serializer.data
+    for product_dict, product_instance in zip(products_data, paginated_qs):
+        product_dict["product_images"] = [
+            {
+                "id": image.id,
+                "image": image.image.url,
+                "order": image.order,
+                "s3_key": image.s3_key,
+            }
+            for image in product_instance.productimage_set.all()
+        ]
 
     return Response(
         {
@@ -1131,7 +1142,7 @@ def product_search_endpoint(request):
             "page_count": total_page_count,
             "next_page": paginator.get_next_link(),
             "previous_page": paginator.get_previous_link(),
-            "products": serializer.data,
+            "products": products_data,
         },
         status=status.HTTP_200_OK,
     )
