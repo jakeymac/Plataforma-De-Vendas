@@ -133,4 +133,7 @@ EMAIL_HOST_PASSWORD = "pwzg oyhu dcyr nkgl"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
+# RECIPIENT LIST FOR SCRIPT CLEANUP
+IMAGE_CLEANUP_SCRIPT_EMAIL_LIST = ["jmjohnson1578@gmail.com"]
+
 AWS_STORAGE_BUCKET_NAME = "plataforma-de-vendas"
