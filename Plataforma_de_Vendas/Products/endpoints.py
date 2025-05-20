@@ -1054,7 +1054,7 @@ def product_search_endpoint(request):
     try:
         filters = json.loads(filters)
     except json.JSONDecodeError:
-        return JsonResponse(
+        return Response(
             {"message": "Invalid filters format"},
             status=status.HTTP_400_BAD_REQUEST,
         )
@@ -1063,11 +1063,11 @@ def product_search_endpoint(request):
 
     if search:
         queryset = queryset.filter(
-            Q(product_name__icontainer=search)
+            Q(product_name__icontains=search)
             | Q(product_description__icontains=search)
             | Q(subcategory__subcategory_name__icontains=search)
         )
-
+    
     if sort:
         sort_map = {
             "price-asc": "prices__amount",
@@ -1080,13 +1080,14 @@ def product_search_endpoint(request):
         if sort in sort_map:
             sort_parameter = sort_map[sort]
         else:
-            return JsonResponse(
+            return Response(
                 {"message": f"Invalid sort parameter: {sort}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         queryset = queryset.order_by(sort_parameter)
 
+    invalid_filters = []
     if filters:
         filter_map = {
             "categories": "subcategory__category__id",
@@ -1106,8 +1107,11 @@ def product_search_endpoint(request):
                     else:
                         queryset = queryset.filter(**{filter_parameter: filter_value})
             else:
-                return JsonResponse(
-                    {"message": f"Invalid filter parameter: {filter}"},
+                invalid_filters.append(filter)
+                
+        if invalid_filters:                
+            return Response(
+                    {"message": f"Invalid filter parameter(s): {', '.join(invalid_filters)}"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -1121,7 +1125,7 @@ def product_search_endpoint(request):
 
     serializer = ProductSerializer(paginated_qs, many=True)
 
-    return JsonResponse(
+    return Response(
         {
             "product_count": total_product_count,
             "page_count": total_page_count,

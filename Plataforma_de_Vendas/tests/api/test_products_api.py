@@ -2,6 +2,7 @@ import pytest
 from core.helpers import convert_prices_dict
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+import json
 from Products.models import (
     InitialProductImage,
     InitialProductState,
@@ -1721,3 +1722,162 @@ class TestFinalSaveProductEndpoint:
 
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to save products"
+
+@pytest.mark.django_db
+class TestProductSearchEndpoint:
+    """Test the product_search_endpoint -
+    api/products/product_id/ - search-products-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("search-products-endpoint")
+
+    def test_invalid_filter_format(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+
+        data = {
+            "search": "",
+            "sort": "price-asc",
+            "filters": ["nonexistent_filter"]
+        }
+
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 400
+        print
+        assert response.data["message"] == "Invalid filters format"
+
+    def test_invalid_sort(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+
+        data = {
+            "search": "",
+            "sort": "invalid_sort",
+            "filters": {}
+        }
+
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 400
+        assert response.data["message"] == "Invalid sort parameter: invalid_sort"
+
+    def test_invalid_filter(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+
+        data = {
+            "search": "",
+            "sort": "price-asc",
+            "filters": json.dumps({"nonexistent_filter": ["value"], "another_filter": ["value"]})
+        }
+
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 400
+        assert response.data["message"] == "Invalid filter parameter(s): nonexistent_filter, another_filter"
+
+    def test_search_product_name(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        data = {
+            "search": product.product_name,
+            "sort": "price-asc",
+            "filters": {}
+        }
+
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 200
+        assert len(response.data["products"]) == 1
+        assert response.data["products"][0]["product_name"] == product.product_name
+
+    def test_nonexistent_product(self, customer_fixture):
+        customer_user, customer_client = customer_fixture
+
+        data = {
+            "search": "Nonexistent Product",
+            "sort": "price-asc",
+            "filters": {}
+        }
+
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 200
+        assert len(response.data["products"]) == 0
+
+    def test_valid_filter(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        new_category = ProductCategory.objects.create(category_name="New Category")
+        new_subcategory = ProductSubcategory.objects.create(
+            category=new_category,
+            subcategory_name="New Subcategory",
+            subcategory_description="New Subcategory Description",
+        )
+
+        new_product = Product.objects.create(
+            product_name="Filtered Product",
+            product_description="Filtered Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+            subcategory=new_subcategory,
+        )
+
+        data = {
+            "search": "",
+            "sort": "price-asc",
+            "filters": json.dumps({"category": [product.subcategory.category.id]})
+        }
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 200
+        assert len(response.data["products"]) == 1
+        assert response.data["products"][0]["product_name"] == product.product_name
+
+    def test_valid_filter_non_list(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+
+        data = {
+            "search": "",
+            "sort": "price-asc",
+            "filters": json.dumps({"category": product.subcategory.category.id})
+        }
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 200
+        assert len(response.data["products"]) == 1
+        assert response.data["products"][0]["product_name"] == product.product_name
+
+
+    def test_valid_filter_no_product(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+
+        new_category = ProductCategory.objects.create(category_name="New Category")
+
+        data = {
+            "search": "",
+            "sort": "price-asc",
+            "filters": json.dumps({"category": [new_category.id]})
+        }
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 200
+        assert len(response.data["products"]) == 0
+
+    def test_valid_sort(self, customer_fixture, product_fixture):
+        customer_user, customer_client = customer_fixture
+        product, _ = product_fixture
+
+        new_product = Product.objects.create(
+            product_name="Sorted Product",
+            product_description="Sorted Product Description",
+            properties={"color": "red", "size": "small"},
+            prices={5: 10.0, 10: 5.0},
+        )
+
+        data = {
+            "search": "",
+            "sort": "name-asc",
+            "filters": {}
+        }
+
+        response = customer_client.get(self.url, data, format="json")
+        assert response.status_code == 200
+        assert len(response.data["products"]) == 2
+        assert response.data["products"][0]["product_name"] == new_product.product_name
+        assert response.data["products"][1]["product_name"] == product.product_name
