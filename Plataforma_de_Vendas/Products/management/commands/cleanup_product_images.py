@@ -66,28 +66,30 @@ class Command(BaseCommand):
             # Send email summary
             subject = "3 Product Image Cleanup Completed"
             message = (
-                f"Cleanup completed at {timezone.now()}.\n"
-                f"Bucket: {bucket_name}\n"
-                f"Deleted {len(orphaned_images)} orphaned image(s).\n\n"
-                + "\n".join(orphaned_images[:50]) 
-            ) if orphaned_images else (
-                f"Cleanup completed at {timezone.now()}.\nNo orphaned images were found."
+                (
+                    f"Cleanup completed at {timezone.now()}.\n"
+                    f"Bucket: {bucket_name}\n"
+                    f"Deleted {len(orphaned_images)} orphaned image(s).\n\n"
+                    + "\n".join(orphaned_images[:50])
+                )
+                if orphaned_images
+                else (f"Cleanup completed at {timezone.now()}.\nNo orphaned images were found.")
             )
 
             send_mail(
                 subject,
                 message,
                 settings.DEFAULT_FROM_EMAIL,
-                settings.IMAGE_CLEANUP_SCRIPT_EMAIL_LIST ,
+                settings.IMAGE_CLEANUP_SCRIPT_EMAIL_LIST,
             )
 
         except Exception as e:
-                error_message = f"Cleanup failed at {timezone.now()}.\n\n{str(e)}"
-                send_mail(
-                    "S3 Product Image Cleanup FAILED",
-                    error_message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    settings.IMAGE_CLEANUP_SCRIPT_EMAIL_LIST,
-                )
-                self.stderr.write(self.style.ERROR("An error occurred during cleanup."))
-                raise  # Ensure the exception still bubbles up
+            error_message = f"Cleanup failed at {timezone.now()}.\n\n{str(e)}"
+            send_mail(
+                "S3 Product Image Cleanup FAILED",
+                error_message,
+                settings.DEFAULT_FROM_EMAIL,
+                settings.IMAGE_CLEANUP_SCRIPT_EMAIL_LIST,
+            )
+            self.stderr.write(self.style.ERROR("An error occurred during cleanup."))
+            raise  # Ensure the exception still bubbles up
