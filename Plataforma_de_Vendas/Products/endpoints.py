@@ -1067,7 +1067,7 @@ def product_search_endpoint(request):
             | Q(product_description__icontains=search)
             | Q(subcategory__subcategory_name__icontains=search)
         )
-    
+
     if sort:
         sort_map = {
             "price-asc": "prices__amount",
@@ -1108,12 +1108,12 @@ def product_search_endpoint(request):
                         queryset = queryset.filter(**{filter_parameter: filter_value})
             else:
                 invalid_filters.append(filter)
-                
-        if invalid_filters:                
+
+        if invalid_filters:
             return Response(
-                    {"message": f"Invalid filter parameter(s): {', '.join(invalid_filters)}"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                {"message": f"Invalid filter parameter(s): {', '.join(invalid_filters)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     paginator = PageNumberPagination()
     # TODO we could make this part of the query - leave this as default for now

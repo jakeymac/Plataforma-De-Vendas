@@ -94,6 +94,7 @@ class TestRegisterStorePageView:
         assert response.status_code == 200
         assert "Stores/register_store.html" in [t.name for t in response.templates]
 
+
 class TestProductSearchPageView:
     """Test the product search page view"""
 
@@ -101,12 +102,18 @@ class TestProductSearchPageView:
     def setup(self):
         self.url = reverse("product_search")
 
-    def test_product_search_page_view(self, anonymous_client, category_fixture, subcategory_fixture, store_fixture):
+    def test_product_search_page_view(
+        self, anonymous_client, category_fixture, subcategory_fixture, store_fixture
+    ):
         """Test the product search page view"""
         response = anonymous_client.get(self.url)
 
         assert response.status_code == 200
         assert "Stores/product_search.html" in [t.name for t in response.templates]
-        assert category_fixture.category_name in [c.category_name for c in response.context["categories"]]
-        assert subcategory_fixture.subcategory_name in [s.subcategory_name for s in response.context["subcategories"]]
+        assert category_fixture.category_name in [
+            c.category_name for c in response.context["categories"]
+        ]
+        assert subcategory_fixture.subcategory_name in [
+            s.subcategory_name for s in response.context["subcategories"]
+        ]
         assert store_fixture.store_name in [s.store_name for s in response.context["stores"]]
