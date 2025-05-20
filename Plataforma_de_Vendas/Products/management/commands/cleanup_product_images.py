@@ -64,7 +64,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Product Images Cleanup complete"))
 
             # Send email summary
-            subject = "3 Product Image Cleanup Completed"
+            subject = "S3 Product Image Cleanup Completed"
             message = (
                 (
                     f"Cleanup completed at {timezone.now()}.\n"
