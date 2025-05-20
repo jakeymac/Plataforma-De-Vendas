@@ -132,3 +132,5 @@ EMAIL_HOST_USER = "	plataformadevendassistema@gmail.com"
 EMAIL_HOST_PASSWORD = "pwzg oyhu dcyr nkgl"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+AWS_STORAGE_BUCKET_NAME = "plataforma-de-vendas"
