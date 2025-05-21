@@ -1,7 +1,3 @@
-// Variables to use throughout the script
-let nextPageURL = null;
-let previousPageURL = null;
-
 function getFilterValues() {
     // Get the values of the filter elements with any user input
     let filterValues = {};
@@ -83,11 +79,11 @@ function performSearch(page = 1) {
         })
         .then(data => {
             console.log('Data received: ', data);
-            $("#inner-products-container").empty();
+            $('#inner-products-container').empty();
             if (data.products.length > 0) {
                 data.products.forEach(product => {
                     let productHTML = productCardHTML(product);
-                    $("#inner-products-container").append(productHTML);
+                    $('#inner-products-container').append(productHTML);
                 });
                 if (data.previous_page) {
                     $('#previous-page-button').removeClass('disabled');
@@ -110,19 +106,17 @@ function performSearch(page = 1) {
 
 function productCardHTML(product) {
     // TODO add a generic product image with "onerror" if the image can't be loaded
-    return `
-    <div class="col">
-        <div class="col product-card h-100 shadow-sm">
-            <img class="product-card-img" src="${product.product_images[0].image}" alt="${product.product_name}" loading="lazy"> 
-            <div class="product-card-body d-flex flex-column">
-            <div class="product-title-wrapper">
-                <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
-            </div>
-                 <a href="/view_product/${product.id}/" class="btn btn-outline-secondary">View Product</a>
-            </div>
-        </div>
-    </div>
-    `;
+    return `<div class="col">
+                <div class="col product-card h-100 shadow-sm">
+                    <img class="product-card-img" src="${product.product_images[0].image}" alt="${product.product_name}" loading="lazy"> 
+                    <div class="product-card-body d-flex flex-column">
+                    <div class="product-title-wrapper">
+                        <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
+                    </div>
+                        <a href="/view_product/${product.id}/" class="btn btn-outline-secondary">View Product</a>
+                    </div>
+                </div>
+            </div>`;
 }
 
 $(document).ready(() => {
@@ -146,14 +140,14 @@ $(document).ready(() => {
     $('#next-page-button').click(function() {
         let currentPage = getCurrentPageFromURL();
         performSearch(currentPage + 1);
-    })
+    });
     $('#previous-page-button').click(function() {
         let currentPage = getCurrentPageFromURL();
         if (currentPage > 1) {
             performSearch(currentPage - 1);
         }
-    })
-    console.log("Performing initial search.");
-    performSearch(1);
+    });
+    console.log('Performing initial search.');
+    performSearch(1); // TODO make sure this works when loading the page with search parameters provided
 });
 
