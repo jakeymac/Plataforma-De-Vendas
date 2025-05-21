@@ -99,7 +99,7 @@ function performSearch(page = 1) {
                 }
 
             } else {
-                $("#inner-products-container").append('<p>No products found.</p>');
+                $('#inner-products-container').append('<p>No products found.</p>');
             }
         });
 }
@@ -130,18 +130,18 @@ $(document).ready(() => {
             $(this).find('option').prop('selected', false);
             $(this).selectpicker('val', []);
         });
-    })
+    });
 
     $('.update-button').click(() => {
         console.log('Update button clicked.');
         performSearch();
     });
     
-    $('#next-page-button').click(function() {
+    $('#next-page-button').click(() => {
         let currentPage = getCurrentPageFromURL();
         performSearch(currentPage + 1);
     });
-    $('#previous-page-button').click(function() {
+    $('#previous-page-button').click(() => {
         let currentPage = getCurrentPageFromURL();
         if (currentPage > 1) {
             performSearch(currentPage - 1);
