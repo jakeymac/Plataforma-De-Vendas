@@ -23,8 +23,9 @@
                         <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <div class="d-flex align-items-center gap-2">
                                 <select class="form-select w-auto" id="sort-products">
-                                    <option value="price-asc">Price (Low to High)</option>
-                                    <option value="price-desc">Price (High to Low)</option>
+                                    <option value="" selected>Sort by</option>
+                                    <option value="name-asc">Name(A-Z)</option>
+                                    <option value="name-desc">Name(Z-A)</option>
                                     <option value="newest">Newest</option>
                                 </select>
                                 <button type="submit" class="btn btn-secondary update-button" id="sort-products-button">Sort</button>
@@ -47,17 +48,17 @@
         <div class="outer-container" id="filters-container">
             <h4 class="text-center mt-2">Filter</h4>
             <div class="container" id="inner-filters-container">
-                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" title="Choose categories" id='filter-categories' name="filter-categories">
+                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" data-style="btn-outline-secondary" title="Choose categories" id='filter-categories' name="filter-categories">
                     {% for category in categories %}
                         <option value="{{ category.id }}">{{ category.category_name }}</option>
                     {% endfor %}
                 </select>
-                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" title="Choose subcategories" id="filter-subcategories" name="filter-subcategories">
+                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" data-style="btn-outline-secondary" title="Choose subcategories" id="filter-subcategories" name="filter-subcategories">
                     {% for subcategory in subcategories %}
                         <option value="{{ subcategory.id }}">{{ subcategory.subcategory_name }}</option>
                     {% endfor %}
                 </select>
-                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" title="Choose Sellers" id='filter-stores' name="filter-stores">
+                <select class="selectpicker form-control filter-selector" multiple data-live-search="true" data-style="btn-outline-secondary" title="Choose Sellers" id='filter-stores' name="filter-stores">
                     {% for seller in sellers %}
                         <option value="{{ seller.id }}">{{ seller.seller_name }}</option>
                     {% endfor %}

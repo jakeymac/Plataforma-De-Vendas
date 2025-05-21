@@ -1066,6 +1066,7 @@ def product_search_endpoint(request):
             | Q(subcategory__subcategory_name__icontains=search)
         )
 
+    # TODO need to decide on a default sort order
     if sort:
         sort_map = {
             "price-asc": "prices__amount",

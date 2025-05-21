@@ -1,3 +1,7 @@
+// Variables to use throughout the script
+let nextPageURL = null;
+let previousPageURL = null;
+
 function getFilterValues() {
     // Get the values of the filter elements with any user input
     let filterValues = {};
@@ -51,16 +55,15 @@ function updateURL(params) {
     history.pushState({}, '', `${window.location.pathname}?${newParams}`);
 }
 
-// TODO will use this in pagin
-// function getCurrentPageFromURL() {
-//     const urlParams = new URLSearchParams(window.location.search);
-//     const page = parseInt(urlParams.get('page'), 10);
-//     if (isNaN(page)) {
-//         return page;
-//     } else {
-//         return 1;
-//     }
-// }
+function getCurrentPageFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = parseInt(urlParams.get('page'), 10);
+    if (isNaN(page)) {
+        return 1;
+    } else {
+        return page;
+    }
+}
 
 function performSearch(page = 1) {
     let params = buildQueryParams(page);
@@ -86,6 +89,19 @@ function performSearch(page = 1) {
                     let productHTML = productCardHTML(product);
                     $("#inner-products-container").append(productHTML);
                 });
+                if (data.previous_page) {
+                    $('#previous-page-button').removeClass('disabled');
+                } else {
+                    $('#previous-page-button').addClass('disabled');
+                }
+
+                if (data.next_page) {
+                    $('#next-page-button').removeClass('disabled');
+                }
+                else {
+                    $('#next-page-button').addClass('disabled');
+                }
+
             } else {
                 $("#inner-products-container").append('<p>No products found.</p>');
             }
@@ -127,17 +143,16 @@ $(document).ready(() => {
         performSearch();
     });
     
-    // TODO implement these buttons - with disabling/enabling buttons
-    // $('#next-page-button').click(function() {
-    //     let currentPage = getCurrentPageFromURL();
-    //     performSearch(currentPage + 1);
-    // })
-    // $('#previous-page-button').click(function() {
-    //     let currentPage = getCurrentPageFromURL();
-    //     if (currentPage > 1) {
-    //         performSearch(currentPage - 1);
-    //     }
-    // })
+    $('#next-page-button').click(function() {
+        let currentPage = getCurrentPageFromURL();
+        performSearch(currentPage + 1);
+    })
+    $('#previous-page-button').click(function() {
+        let currentPage = getCurrentPageFromURL();
+        if (currentPage > 1) {
+            performSearch(currentPage - 1);
+        }
+    })
     console.log("Performing initial search.");
     performSearch(1);
 });
