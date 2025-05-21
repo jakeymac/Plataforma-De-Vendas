@@ -41,21 +41,42 @@ class TestViewMyStoreView:
 
         response = seller_client.get(self.url)
 
-        assert response.status_code == 200
-        assert "Stores/view_store.html" in [t.name for t in response.templates]
-        assert store == response.context["store"]
+        assert response.status_code == 302
+        assert response.url == f"/view_store/{store.store_url}/"
 
     def test_seller_with_no_store(self, logged_in_seller):
         """Test the access to the view my store view when the seller has no store"""
         _, seller_client = logged_in_seller
-        response = seller_client.get(self.url, follow=True)  # follow to get to template
-        assert "Stores/home.html" in [t.name for t in response.templates]
+        response = seller_client.get(self.url)
+        assert response.status_code == 404
+        assert b"There was an error finding your store." in response.content
 
     def test_non_seller_access(self, logged_in_customer):
         """Test the access to the view my store view when the user is not a seller"""
         _, customer_client = logged_in_customer
         response = customer_client.get(self.url, follow=True)  # follow to get to template
-        assert "Stores/home.html" in [t.name for t in response.templates]
+        assert response.status_code == 403
+        assert "need to register as a seller first.".encode("utf-8") in response.content
+
+
+class TestViewStoreView:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.view_name = "view_store"
+
+    def test_valid_access(self, anonymous_client, store_fixture):
+        """Test the view store view"""
+        url = reverse(self.view_name, args=[store_fixture.store_url])
+        response = anonymous_client.get(url)
+
+        assert response.status_code == 200
+        assert "Stores/view_store.html" in [t.name for t in response.templates]
+
+    def test_invalid_store_url(self, anonymous_client):
+        url = reverse(self.view_name, args=["invalid_store_url"])
+        response = anonymous_client.get(url)
+        assert response.status_code == 404
+        assert b"The store you are looking for does not exist." in response.content
 
 
 class TestRegisterStorePageView:
@@ -71,3 +92,27 @@ class TestRegisterStorePageView:
 
         assert response.status_code == 200
         assert "Stores/register_store.html" in [t.name for t in response.templates]
+
+
+class TestProductSearchPageView:
+    """Test the product search page view"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("product_search")
+
+    def test_product_search_page_view(
+        self, anonymous_client, category_fixture, subcategory_fixture, store_fixture
+    ):
+        """Test the product search page view"""
+        response = anonymous_client.get(self.url)
+
+        assert response.status_code == 200
+        assert "Stores/product_search.html" in [t.name for t in response.templates]
+        assert category_fixture.category_name in [
+            c.category_name for c in response.context["categories"]
+        ]
+        assert subcategory_fixture.subcategory_name in [
+            s.subcategory_name for s in response.context["subcategories"]
+        ]
+        assert store_fixture.store_name in [s.store_name for s in response.context["stores"]]

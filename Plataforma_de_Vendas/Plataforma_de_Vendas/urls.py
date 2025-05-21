@@ -48,9 +48,9 @@ def is_admin(user):
 # Swagger schema view
 schema_view = get_schema_view(
     openapi.Info(
-        title="NAME HERE API Documentation",
+        title="Plataforma de Vendas API Documentation",
         default_version="v1",
-        description="""This API provides seamless access to the NAME HERE system's
+        description="""This API provides seamless access to the Plataforma de Vendas system's
          functionalities for managing products, inventory, orders, and user accounts
          of both store owners and customers.""",
         contact=openapi.Contact(email="jmjohnson1578@gmail.com"),
@@ -74,6 +74,7 @@ urlpatterns = [
     path("account/", account_views.view_account, name="view_account"),
     path("my_store/", store_views.view_my_store, name="view_my_store"),
     path("add_new_product/", product_views.add_product_view, name="add_new_product"),
+    path("product_search/", store_views.product_search_page, name="product_search"),
     path(
         "edit_product/<str:product_id>/",
         product_views.edit_product_view,
@@ -83,6 +84,11 @@ urlpatterns = [
         "view_product/<str:product_id>/",
         product_views.view_product,
         name="view_product",
+    ),
+    path(
+        "view_store/<str:store_url>/",
+        store_views.view_store,
+        name="view_store",
     ),
     path(
         "swagger/",
@@ -210,11 +216,6 @@ urlpatterns = [
         name="add-product-endpoint",
     ),
     path(
-        "api/products/search/",
-        product_endpoints.search_for_product_endpoint,
-        name="search-product-endpoint",
-    ),
-    path(
         "api/products/create_initial_product_state/",
         product_endpoints.create_initial_product_state_endpoint,
         name="create-initial-product-state-endpoint",
@@ -239,12 +240,6 @@ urlpatterns = [
         product_endpoints.get_products_by_store_endpoint,
         name="products-by-store-endpoint",
     ),
-    # This may get replaced by a proper search endpoint with multiple filters
-    path(
-        "api/products/search/<str:store_id>/",
-        product_endpoints.search_for_product_endpoint,
-        name="search-product-by-store-endpoint",
-    ),
     path(
         "api/products/images/<str:product_id>/",
         product_endpoints.product_images_endpoint,
@@ -264,6 +259,11 @@ urlpatterns = [
         "api/products/remove_image/<str:image_id>/",
         product_endpoints.remove_product_image_endpoint,
         name="remove-product-image-endpoint",
+    ),
+    path(
+        "api/products/search/",
+        product_endpoints.product_search_endpoint,
+        name="search-products-endpoint",
     ),
     path(
         "api/products/<str:product_id>/",

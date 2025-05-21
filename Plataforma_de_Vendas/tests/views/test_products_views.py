@@ -101,8 +101,6 @@ class TestViewProductView:
         assert "products/view_product.html" in [t.name for t in response.templates]
         assert product.id == response.context["product"].id
         images = ProductImage.objects.filter(product=product).order_by("order")
-        print(images)
-        print(response.context["images"])
         assert list(images) == list(response.context["images"])
         assert product.prices == convert_prices_dict(response.context["prices"])
 

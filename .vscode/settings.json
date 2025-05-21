@@ -3,5 +3,6 @@
         "Plataforma_de_Vendas"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "bitoAI.codeCompletion.enableAutoCompletion": false
 }

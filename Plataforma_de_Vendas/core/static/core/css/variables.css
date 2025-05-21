@@ -1,0 +1,5 @@
+/* Variables to use for consistent styling throughout the project */
+
+:root {
+    --gui-border-radius: 20px;
+}
