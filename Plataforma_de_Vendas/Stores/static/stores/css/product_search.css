@@ -9,8 +9,10 @@
 #text-search-container {
     height: 10%;
     display: flex;
+    align-items: center;
     margin-top: 20px;
 }
+
 
 #sort-controls-container {
     height: 10%;

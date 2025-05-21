@@ -80,7 +80,6 @@ function performSearch(page = 1) {
         })
         .then(data => {
             console.log('Data received: ', data);
-            // Update the product list with the new data
             $("#inner-products-container").empty();
             if (data.products.length > 0) {
                 data.products.forEach(product => {
@@ -114,6 +113,14 @@ $(document).ready(() => {
     console.log('Document ready. Trying to init selectpicker.');
     $('.selectpicker').selectpicker();
     console.log('Selectpicker initialized.');
+
+    $('#clear-filter-button').click(() => {
+        let filterSelectors = $('select.filter-selector');
+        filterSelectors.each(function() {
+            $(this).find('option').prop('selected', false);
+            $(this).selectpicker('val', []);
+        });
+    })
 
     $('.update-button').click(() => {
         console.log('Update button clicked.');
