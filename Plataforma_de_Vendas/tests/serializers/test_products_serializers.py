@@ -111,8 +111,6 @@ class TestProductSerializer:
 
         serializer = ProductSerializer(instance=product, data=data)
         assert not serializer.is_valid()
-        print("Testing...")
-        print(serializer.errors)
         assert serializer.errors == {"product_name": ["Product with this name already exists"]}
 
 

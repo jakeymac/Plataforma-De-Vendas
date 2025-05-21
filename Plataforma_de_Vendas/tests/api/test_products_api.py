@@ -1741,7 +1741,6 @@ class TestProductSearchEndpoint:
 
         response = customer_client.get(self.url, data, format="json")
         assert response.status_code == 400
-        print
         assert response.data["message"] == "Invalid filters format"
 
     def test_invalid_sort(self, customer_fixture, product_fixture):

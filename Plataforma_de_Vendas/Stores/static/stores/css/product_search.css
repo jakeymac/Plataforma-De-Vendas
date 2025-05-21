@@ -1,5 +1,5 @@
 #main-product-search-container {
-    height: 1000px;
+    height: 1200px;
 }
 .outer-container {
     border: 1px solid black;
@@ -49,16 +49,15 @@
     border-radius: var(--gui-border-radius);
     
     padding: 0.5rem;
-    /* height: 200px !important; */
+    height: 250px !important;
 }
 
 .product-card-img {
-    height: 60%;
+    height: 50%;
     width: 100%;
     object-fit: contain;
     padding: 0.5rem;
     box-sizing: border-box;
-    /* margin-bottom: 40px; */
     flex: 1 1 auto;
 }
 

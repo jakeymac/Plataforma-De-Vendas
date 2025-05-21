@@ -103,7 +103,7 @@ function productCardHTML(product) {
             <div class="product-title-wrapper">
                 <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
             </div>
-                 <a href="/view_product/${product.id}/" class="btn btn-primary">View Product</a>
+                 <a href="/view_product/${product.id}/" class="btn btn-outline-secondary">View Product</a>
             </div>
         </div>
     </div>

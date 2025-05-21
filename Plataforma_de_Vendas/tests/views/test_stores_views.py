@@ -49,7 +49,6 @@ class TestViewMyStoreView:
         _, seller_client = logged_in_seller
         response = seller_client.get(self.url)
         assert response.status_code == 404
-        print(response.templates)
         assert b"There was an error finding your store." in response.content
 
     def test_non_seller_access(self, logged_in_customer):

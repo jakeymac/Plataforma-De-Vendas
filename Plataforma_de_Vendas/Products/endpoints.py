@@ -935,11 +935,9 @@ def autosave_product_endpoint(request):
             for image_id in data.get("image_ids"):
                 try:
                     product_image = ProductImage.objects.get(id=image_id)
-                    print(f"Updating image {product_image.id} to order {order}...")
                     product_image.order = order
                     product_image.save()
                     product_image.refresh_from_db()
-                    print(f"Saved image {product_image.id} with order " f"{product_image.order}...")
                     order += 1
                 except ProductImage.DoesNotExist:
                     ids_not_found.append(image_id)
