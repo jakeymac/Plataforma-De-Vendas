@@ -65,19 +65,25 @@ class Command(BaseCommand):
 
             # Send email summary
             subject = "S3 Product Image Cleanup Completed"
-            message = (
-                (
-                    f"Cleanup completed at {timezone.now()}.\n"
-                    f"Found images in the S3 bucket: {"\n".join(s3_images)}\n"
-                    f"Found images in the database: {"\n".join(db_images)}\n"
-                    f"Found initial images in the database: {"\n".join(initial_db_images)}\n"
-                    f"Deleted {len(orphaned_images)} orphaned image(s).\n\n"
-                    + "\n".join(orphaned_images[:50])
-                )
-                if orphaned_images
-                else (f"Cleanup completed at {timezone.now()}.\nNo orphaned images were found.")
-            )
 
+            s3_images_str = "\n".join(s3_images)
+            db_images_str = "\n".join(db_images)
+            initial_db_images_str = "\n".join(initial_db_images)
+            orphaned_images_str = "\n".join(orphaned_images[:50])
+
+            if orphaned_images:
+                message = (
+                    f"Cleanup completed at {timezone.now()}.\n"
+                    f"Found images in the S3 bucket:\n{s3_images_str}\n"
+                    f"Found images in the database:\n{db_images_str}\n"
+                    f"Found initial images in the database:\n{initial_db_images_str}\n"
+                    f"Deleted {len(orphaned_images)} orphaned image(s).\n\n"
+                    f"{orphaned_images_str}"
+                )
+            else:
+                message = (
+                    f"Cleanup completed at {timezone.now()}.\n" "No orphaned images were found."
+                )
             send_mail(
                 subject,
                 message,
