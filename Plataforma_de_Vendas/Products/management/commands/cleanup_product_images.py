@@ -68,7 +68,9 @@ class Command(BaseCommand):
             message = (
                 (
                     f"Cleanup completed at {timezone.now()}.\n"
-                    f"Bucket: {bucket_name}\n"
+                    f"Found images in the S3 bucket: {"\n".join(s3_images)}\n"
+                    f"Found images in the database: {"\n".join(db_images)}\n"
+                    f"Found initial images in the database: {"\n".join(initial_db_images)}\n"
                     f"Deleted {len(orphaned_images)} orphaned image(s).\n\n"
                     + "\n".join(orphaned_images[:50])
                 )
