@@ -35,20 +35,54 @@ function buildQueryParams(page = 1) {
     console.log('Sort value: ', sortValue);
     console.log('Filter values: ', filterValues);
     
-
-    let params = {
-        search: searchValue,
-        sort: sortValue,
-        page: page,
-        filters: JSON.stringify(filterValues),
-    };
-
+    let params = {};
+    if (searchValue) {
+        params.search = searchValue;
+    }
+    if (sortValue) {
+        params.sort = sortValue;
+    }
+    if (page != 1) {
+        params.page = page;
+    }
+    // Only include filters with non-empty arrays
+    let filtered = {};
+    for (let key in filterValues) {
+        if (Array.isArray(filterValues[key]) && filterValues[key].length > 0) {
+            filtered[key] = filterValues[key];
+        }
+    }
+    if (Object.keys(filtered).length > 0) {
+        params.filters = JSON.stringify(filtered);
+    }
     return params;
 }
 
 function updateURL(params) {
-    const newParams = new URLSearchParams(params);
-    history.pushState({}, '', `${window.location.pathname}?${newParams}`);
+    const urlParams = new URLSearchParams();
+
+    if (params.search && params.search.trim() !== '') {
+        urlParams.set('search', params.search.trim());
+    }
+    if (params.sort && params.sort.trim() !== '') {
+        urlParams.set('sort', params.sort.trim());
+    }
+    if (params.page && params.page !== 1) {
+        urlParams.set('page', params.page);
+    }
+
+    try {
+        const filters = JSON.parse(params.filters || '{}');
+        if (Object.keys(filters).length > 0) {
+            urlParams.set('filters', JSON.stringify(filters));
+        }
+    } catch (e) {
+        console.warn('Invalid filters JSON:', e);
+    }
+
+    const queryString = urlParams.toString();
+    const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+    history.pushState({}, '', newUrl);
 }
 
 function getCurrentPageFromURL() {
@@ -113,7 +147,6 @@ function productCardHTML(product) {
     }
     return `<div class="col">
                 <div class="col product-card h-100 shadow-sm">
-            
                     <img class="product-card-img" 
                      src="${imageUrl}" 
                      alt="${product.product_name}" 
@@ -160,4 +193,3 @@ $(document).ready(() => {
     console.log('Performing initial search.');
     performSearch(1); // TODO make sure this works when loading the page with search parameters provided
 });
-
