@@ -105,10 +105,20 @@ function performSearch(page = 1) {
 }
 
 function productCardHTML(product) {
-    // TODO add a generic product image with "onerror" if the image can't be loaded
+    let imageUrl;
+    if (product.product_images.length > 0) {
+        imageUrl = product.product_images[0].image;
+    } else {
+        imageUrl = `${STATIC_URL}stores/images/missing_image_placeholder.png`;
+    }
     return `<div class="col">
                 <div class="col product-card h-100 shadow-sm">
-                    <img class="product-card-img" src="${product.product_images[0].image}" alt="${product.product_name}" loading="lazy"> 
+            
+                    <img class="product-card-img" 
+                     src="${imageUrl}" 
+                     alt="${product.product_name}" 
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='${STATIC_URL}stores/images/missing_image_placeholder.png';"> 
                     <div class="product-card-body d-flex flex-column">
                     <div class="product-title-wrapper">
                         <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
