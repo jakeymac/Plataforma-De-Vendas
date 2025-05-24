@@ -15,4 +15,4 @@ cd "$PROJECT_BASE_DIR" || {
   exit 1
 }
 
-python manage.py cleanup_product_images --verbosity 2 >> "$PROJECT_BASE_DIR/Products/management/logs/product_image_cleanup.log" 2>&1
+PYTHONUNBUFFERED=1 python manage.py cleanup_product_images --verbosity 2 >> "$PROJECT_BASE_DIR/Products/management/logs/product_image_cleanup.log" 2>&1
