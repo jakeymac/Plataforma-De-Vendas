@@ -12,7 +12,7 @@ class Command(BaseCommand):
     help = "Cleanup orphaned images in the S3 bucket"
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("Beginning Product Images Cleanup...")
+        self.stdout.write("\nBeginning Product Images Cleanup...")
         self.stdout.write(f"Current date/time: {timezone.now()}")
 
         try:
@@ -27,10 +27,20 @@ class Command(BaseCommand):
                 for obj in bucket.objects.filter(Prefix="product_images/")
                 if obj.key != "product_images/"
             ]
+            self.stdout.write(f"Found {len(s3_images)} images in the S3 bucket")
+            self.stdout.write("Images in S3 bucket:")
+            for image in s3_images:
+                self.stdout.write(f"- {image}")
+            self.stdout.write("\n")
 
             # Get all image paths in the database
             self.stdout.write("Retreiving all image paths in the database...")
             db_images = list(ProductImage.objects.values_list("s3_key", flat=True))
+            self.stdout.write(f"Found {len(db_images)} images in the database")
+            self.stdout.write("Images in database:")
+            for image in db_images:
+                self.stdout.write(f"- {image}")
+            self.stdout.write("\n")
 
             # Get all initial image paths in the database that are less than 24 hours
             # old - TODO could possibly remove this with the cleanup initial product
@@ -40,6 +50,11 @@ class Command(BaseCommand):
                 created_at__gte=timezone.now() - timedelta(days=1)
             )
             initial_db_images = list(initial_db_images.values_list("s3_key", flat=True))
+            self.stdout.write(f"Found {len(initial_db_images)} initial images in the database")
+            self.stdout.write("Initial images in database:")
+            for image in initial_db_images:
+                self.stdout.write(f"- {image}")
+            self.stdout.write("\n")
 
             # Find orphaned images - this includes images that still exist as files in the
             # S3 bucket but are not in the database, meaning the user has deleted this
@@ -53,6 +68,9 @@ class Command(BaseCommand):
 
             # Delete orphaned images
             if orphaned_images:
+                self.stdout.write(
+                    f"Found {len(orphaned_images)} orphaned image(s) in the S3 bucket"
+                )
                 self.stdout.write("Deleting orphaned images...")
                 for image in orphaned_images:
                     bucket.Object(image).delete()
