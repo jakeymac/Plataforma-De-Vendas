@@ -1047,7 +1047,7 @@ def product_search_endpoint(request):
     This endpoint supports filtering, sorting, and pagination
     """
     search = request.GET.get("search", "")
-    sort = request.GET.get("sort", "-created_at")
+    sort = request.GET.get("sort", "newest")
     filters = request.GET.get("filters", "{}")
     try:
         filters = json.loads(filters)
