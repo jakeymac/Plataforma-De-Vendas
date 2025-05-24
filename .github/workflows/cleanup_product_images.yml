@@ -1,0 +1,23 @@
+name: Nightly Product Image Cleanup
+
+on:
+  schedule:
+    - cron: '0 6 * * *' 
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run cleanup on EC2
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo " Starting nightly cleanup: $(date)"
+            cd /home/ec2-user/project_files/Plataforma-De-Vendas/Plataforma_de_Vendas/Products/management/commands
+            bash run_cleanup_product_images.sh
+            echo "Cleanup complete: $(date)"
