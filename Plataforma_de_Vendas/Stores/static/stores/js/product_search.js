@@ -99,43 +99,43 @@ function performSearch(page = 1) {
     let params = buildQueryParams(page);
     updateURL(params);
     let query = new URLSearchParams(params);
-        fetch(`/api/products/search/?${query}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Data received: ', data);
-            $('#inner-products-container').empty();
-            if (data.products.length > 0) {
-                data.products.forEach(product => {
-                    let productHTML = productCardHTML(product);
-                    $('#inner-products-container').append(productHTML);
-                });
-                if (data.previous_page) {
-                    $('#previous-page-button').removeClass('disabled');
-                } else {
-                    $('#previous-page-button').addClass('disabled');
-                }
-
-                if (data.next_page) {
-                    $('#next-page-button').removeClass('disabled');
-                }
-                else {
-                    $('#next-page-button').addClass('disabled');
-                }
-
+    fetch(`/api/products/search/?${query}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data received: ', data);
+        $('#inner-products-container').empty();
+        if (data.products.length > 0) {
+            data.products.forEach(product => {
+                let productHTML = productCardHTML(product);
+                $('#inner-products-container').append(productHTML);
+            });
+            if (data.previous_page) {
+                $('#previous-page-button').removeClass('disabled');
             } else {
-                $('#inner-products-container').append('<p>No products found.</p>');
+                $('#previous-page-button').addClass('disabled');
             }
-        });
+
+            if (data.next_page) {
+                $('#next-page-button').removeClass('disabled');
+            }
+            else {
+                $('#next-page-button').addClass('disabled');
+            }
+
+        } else {
+            $('#inner-products-container').append('<p>No products found.</p>');
+        }
+    });
 }
 
 function productCardHTML(product) {
