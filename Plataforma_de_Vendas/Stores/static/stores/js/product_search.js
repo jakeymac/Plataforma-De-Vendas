@@ -1,14 +1,18 @@
+// Variables to manage the Choices dropdown objects
+var categoryFilterChoices;
+var subcategoryFilterChoices;
+
+function clearFilters() {
+    categoryFilterChoices.removeActiveItems();
+    subcategoryFilterChoices.removeActiveItems();
+}
+
 function getFilterValues() {
     // Get the values of the filter elements with any user input
     let filterValues = {};
-    let filterSelectors = $('select.filter-selector');
-    filterSelectors.each(function() {
-        let filterName = $(this).attr('name').split('filter-')[1];
-        let value = $(this).val();
-        if (value) { // Check if the value is not empty
-            filterValues[filterName] = value;
-        }
-    });
+
+    filterValues['categories'] = categoryFilterChoices.getValue(true);
+    filterValues['subcategories'] = subcategoryFilterChoices.getValue(true);
 
     return filterValues;
 }
@@ -168,11 +172,7 @@ $(document).ready(() => {
     console.log('Selectpicker initialized.');
 
     $('#clear-filter-button').click(() => {
-        let filterSelectors = $('select.filter-selector');
-        filterSelectors.each(function() {
-            $(this).find('option').prop('selected', false);
-            $(this).selectpicker('val', []);
-        });
+        clearFilters();
     });
 
     $('.update-button').click(() => {
@@ -190,6 +190,22 @@ $(document).ready(() => {
             performSearch(currentPage - 1);
         }
     });
+    categoryFilterChoices = new Choices('#filter-categories', {
+        removeItemButton: true,
+        itemSelectText: '',
+        searchEnabled: true,
+        placeholder: true,
+        placeholderValue: 'Choose a category...',
+    });
+    subcategoryFilterChoices = new Choices('#filter-subcategories', {
+        removeItemButton: true,
+        itemSelectText: '',
+        searchEnabled: true,
+        placeholder: true,
+        placeholderValue: 'Choose a subcategory...',
+    });
+
     console.log('Performing initial search.');
     performSearch(1); // TODO make sure this works when loading the page with search parameters provided
+    
 });

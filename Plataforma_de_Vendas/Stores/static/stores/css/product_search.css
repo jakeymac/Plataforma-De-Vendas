@@ -34,6 +34,10 @@
     gap: 1rem;
 }
 
+.choices {
+    margin-bottom: 0px !important;
+}
+
 .filter-button {
     font-size: 12px;
 }
