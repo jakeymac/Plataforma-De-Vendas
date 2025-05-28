@@ -11,8 +11,15 @@ function getFilterValues() {
     // Get the values of the filter elements with any user input
     let filterValues = {};
 
-    filterValues['categories'] = categoryFilterChoices.getValue(true);
-    filterValues['subcategories'] = subcategoryFilterChoices.getValue(true);
+    let categoriesValues = categoryFilterChoices.getValue(true);
+    let subcategoriesValues = subcategoryFilterChoices.getValue(true);
+
+    if (categoriesValues.length > 0) {
+        filterValues['categories'] = categoriesValues;
+    }
+    if (subcategoriesValues.length > 0) {
+        filterValues['subcategories'] = subcategoriesValues;
+    }
 
     return filterValues;
 }
@@ -29,37 +36,45 @@ function getSortValue() {
     return sortValue;
 }
 
-function buildQueryParams(page = 1) {
+function buildQueryParams(overrides = {}, page = 1) {
     // Build the query parameters for the AJAX request
-    let searchValue = getSearchValue();
-    let sortValue = getSortValue();
-    let filterValues = getFilterValues();
 
-    console.log('Search value: ', searchValue);
-    console.log('Sort value: ', sortValue);
-    console.log('Filter values: ', filterValues);
+    var currentUrlParams = new URLSearchParams(window.location.search);
+    var newParams = {};
+
+    if (currentUrlParams.has('search')) {
+        newParams.search = currentUrlParams.get('search');
+    }
+
+    if (currentUrlParams.has('sort')) {
+        newParams.sort = currentUrlParams.get('sort');
+    }
+
+    if (currentUrlParams.has('filters')) {
+        newParams.filters = currentUrlParams.get('filters');
+    }
+
+    if (currentUrlParams.has('page')) {
+        newParams.page = parseInt(currentUrlParams.get('page'), 10);
+    }
+
+    if ('search' in overrides) {
+        newParams.search = overrides.search;
+    }
+
+    if ('sort' in overrides) {
+        newParams.sort = overrides.sort;
+    }
+
+    if ('filters' in overrides) {
+        newParams.filters = JSON.stringify(overrides.filters);
+    }
+
+    if ('page' in overrides) {
+        newParams.page = overrides.page;
+    }
     
-    let params = {};
-    if (searchValue) {
-        params.search = searchValue;
-    }
-    if (sortValue) {
-        params.sort = sortValue;
-    }
-    if (page != 1) {
-        params.page = page;
-    }
-    // Only include filters with non-empty arrays
-    let filtered = {};
-    for (let key in filterValues) {
-        if (Array.isArray(filterValues[key]) && filterValues[key].length > 0) {
-            filtered[key] = filterValues[key];
-        }
-    }
-    if (Object.keys(filtered).length > 0) {
-        params.filters = JSON.stringify(filtered);
-    }
-    return params;
+    return newParams;
 }
 
 function updateURL(params) {
@@ -99,8 +114,8 @@ function getCurrentPageFromURL() {
     }
 }
 
-function performSearch(page = 1) {
-    let params = buildQueryParams(page);
+function performSearch(overrides = {}, page = 1) {
+    let params = buildQueryParams(overrides, page);
     updateURL(params);
     let query = new URLSearchParams(params);
     fetch(`/api/products/search/?${query}`, {
@@ -173,21 +188,36 @@ $(document).ready(() => {
 
     $('#clear-filter-button').click(() => {
         clearFilters();
+        performSearch(overrides={filters: {}})
     });
 
-    $('.update-button').click(() => {
-        console.log('Update button clicked.');
-        performSearch();
+    $("#search-button").click(() => {
+        console.log('Search button clicked.');
+        let searchValue = getSearchValue();
+        performSearch(overrides={search: searchValue});
+    });
+
+    $("#sort-products-button").click(() =>{
+        console.log('Sort button clicked.');
+        let sortValue = getSortValue();
+        performSearch(overrides={sort: sortValue});
+    });
+    
+    $("#apply-filter-button").click(() => {
+        console.log('Apply filter button clicked.');
+        let filterValues = getFilterValues();
+        performSearch(overrides={filters: filterValues});
     });
     
     $('#next-page-button').click(() => {
         let currentPage = getCurrentPageFromURL();
-        performSearch(currentPage + 1);
+        performSearch({}, currentPage + 1);
     });
+
     $('#previous-page-button').click(() => {
         let currentPage = getCurrentPageFromURL();
         if (currentPage > 1) {
-            performSearch(currentPage - 1);
+            performSearch({}, currentPage - 1);
         }
     });
     categoryFilterChoices = new Choices('#filter-categories', {
@@ -206,6 +236,6 @@ $(document).ready(() => {
     });
 
     console.log('Performing initial search.');
-    performSearch(1); // TODO make sure this works when loading the page with search parameters provided
+    performSearch({}, page=1); // TODO make sure this works when loading the page with search parameters provided
     
 });
