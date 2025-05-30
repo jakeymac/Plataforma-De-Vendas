@@ -164,8 +164,11 @@ function productCardHTML(product) {
     } else {
         imageUrl = `${STATIC_URL}stores/images/missing_image_placeholder.png`;
     }
+
+    let pricesData = encodeURIComponent(JSON.stringify(product.prices || []));
+
     return `<div class="col">
-                <div class="col product-card h-100 shadow-sm">
+                <div class="col product-card h-100 shadow-sm" data-pricing="${pricesData}">
                     <img class="product-card-img" 
                      src="${imageUrl}" 
                      alt="${product.product_name}" 
@@ -176,9 +179,60 @@ function productCardHTML(product) {
                         <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
                     </div>
                         <a href="/view_product/${product.id}/" class="btn btn-outline-secondary">View Product</a>
+                        <button class="btn btn-sm btn-primary mt-2 price-button" data-product-id="${product.id}">View Pricing</button>
                     </div>
                 </div>
             </div>`;
+}
+
+function showPriceModal(productId, buttonElement) {
+    // Remove any existing modals
+    $('.custom-price-modal').remove();
+
+    let productCard = $(buttonElement).closest('.product-card');
+    let pricesData = JSON.parse(decodeURIComponent(productCard.data('pricing')) || '[]');
+    
+    let pricingTableHTML = '';
+    if (pricesData.length > 0) {
+        pricingTableHTML = `<table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Units</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        pricesData.forEach(priceObject => {
+            pricingTableHTML += `<tr>
+                                    <td>${priceObject.units}</td>
+                                    <td>${priceObject.price}</td>
+                                </tr>`;
+        });
+        pricingTableHTML += `</tbody>
+        </table>`;
+    } else {
+        pricingTableHTML = `<p>No pricing information available for this product.</p>`;
+    }
+
+    // Create modal element
+    const modal = $(`
+        <div class="custom-price-modal shadow-sm p-3">
+            <strong>Pricing info for product ${productId}</strong>
+            ${pricingTableHTML}
+            <button class="btn btn-sm btn-outline-secondary close-price-modal">Close</button>
+        </div>
+    `);
+
+    // Position the modal near the button
+    $('body').append(modal);
+    const offset = $(buttonElement).offset();
+    const modalWidth = 300;
+    modal.css({
+         position: 'absolute',
+        top: offset.top,
+        left: offset.left - modalWidth - 10, // shift left of the button
+        zIndex: 1050
+    });
 }
 
 $(document).ready(() => {
@@ -191,19 +245,19 @@ $(document).ready(() => {
         performSearch(overrides={filters: {}})
     });
 
-    $("#search-button").click(() => {
+    $('#search-button').click(() => {
         console.log('Search button clicked.');
         let searchValue = getSearchValue();
         performSearch(overrides={search: searchValue});
     });
 
-    $("#sort-products-button").click(() =>{
+    $('#sort-products-button').click(() =>{
         console.log('Sort button clicked.');
         let sortValue = getSortValue();
         performSearch(overrides={sort: sortValue});
     });
     
-    $("#apply-filter-button").click(() => {
+    $('#apply-filter-button').click(() => {
         console.log('Apply filter button clicked.');
         let filterValues = getFilterValues();
         performSearch(overrides={filters: filterValues});
@@ -233,6 +287,28 @@ $(document).ready(() => {
         searchEnabled: true,
         placeholder: true,
         placeholderValue: 'Choose a subcategory...',
+    });
+
+    $(document).on('click', '.price-button', function () {
+        let productId = $(this).data('product-id');
+        showPriceModal(productId, this);
+    });
+
+    $(document).on('click', '.close-price-modal', function () {
+        $(this).closest('.custom-price-modal').remove();
+    });
+
+    $(document).on('click', function(event) {
+        let target = $(event.target);
+        let modal = $('.custom-price-modal');
+        
+        if (target.closest('a').length > 0) {
+            return; // Ignore clicks on links before leaving the page to avoid flickers
+        }
+
+        if (modal.length > 0 && !modal.is(target) && modal.has(target).length === 0 && !target.hasClass('price-button')) {
+            modal.remove();
+        }
     });
 
     console.log('Performing initial search.');

@@ -85,9 +85,16 @@
     align-items: flex-end;
 }
 
+.custom-price-modal {
+    border-radius: var(--gui-border-radius);
+    background-color: white;
+    border: 1px solid black;
+}
+
 #pagination-container {
     margin-top: auto;
     padding-bottom: 1rem;
     position: absolute;
     bottom: 0;
 }
+
