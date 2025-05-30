@@ -228,7 +228,7 @@ function showPriceModal(productId, buttonElement) {
     const offset = $(buttonElement).offset();
     const modalWidth = 300;
     modal.css({
-         position: 'absolute',
+        position: 'absolute',
         top: offset.top,
         left: offset.left - modalWidth - 10, // shift left of the button
         zIndex: 1050
@@ -242,7 +242,7 @@ $(document).ready(() => {
 
     $('#clear-filter-button').click(() => {
         clearFilters();
-        performSearch(overrides={filters: {}})
+        performSearch(overrides={filters: {}});
     });
 
     $('#search-button').click(() => {
@@ -298,7 +298,7 @@ $(document).ready(() => {
         $(this).closest('.custom-price-modal').remove();
     });
 
-    $(document).on('click', function(event) {
+    $(document).on('click', (event) => {
         let target = $(event.target);
         let modal = $('.custom-price-modal');
         
