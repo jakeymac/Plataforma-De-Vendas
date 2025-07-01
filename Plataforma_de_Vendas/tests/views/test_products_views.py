@@ -102,7 +102,9 @@ class TestViewProductView:
         assert product.id == response.context["product"].id
         images = ProductImage.objects.filter(product=product).order_by("order")
         assert list(images) == list(response.context["images"])
-        assert product.prices == convert_prices_dict(response.context["prices"])
+        assert convert_prices_dict(product.prices) == convert_prices_dict(
+            response.context["prices"]
+        )
 
     def test_view_product_view_nonexistent_product(self, logged_in_customer):
         """Ensure a logged in customer cannot access the

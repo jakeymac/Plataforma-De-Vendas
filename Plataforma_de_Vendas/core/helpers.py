@@ -15,5 +15,8 @@ def generate_unique_id():
 
 
 def convert_prices_dict(prices):
-    """Convert a product's prices dictionary to the correct format."""
-    return {int(key): float(value) for key, value in prices.items()}
+    """Convert prices dict to a list of dicts with 'price' and 'units' keys."""
+    return [
+        {"price": float(value), "units": int(key)}
+        for key, value in sorted(prices.items(), key=lambda item: int(item[0]))
+    ]
