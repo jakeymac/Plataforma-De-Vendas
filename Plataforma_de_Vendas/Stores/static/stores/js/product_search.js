@@ -56,6 +56,8 @@ function buildQueryParams(overrides = {}, page = 1) {
 
     if (currentUrlParams.has('page')) {
         newParams.page = parseInt(currentUrlParams.get('page'), 10);
+    } else {
+        newParams.page = page; // Default to the provided page if not in URL
     }
 
     if ('search' in overrides) {
