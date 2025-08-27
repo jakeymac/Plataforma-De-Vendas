@@ -155,6 +155,7 @@ function getCurrentPageFromURL() {
 function performSearch(overrides = {}, page = 1) {
     let params = buildQueryParams(overrides, page);
     updateURL(params);
+    $("#current-page").text(params.page);
     let query = new URLSearchParams(params);
     fetch(`/api/products/search/?${query}`, {
         method: 'GET',
@@ -172,6 +173,7 @@ function performSearch(overrides = {}, page = 1) {
         console.log('Data received: ', data);
         $('#inner-products-container').empty();
         if (data.products.length > 0) {
+            $("#pagination-container").show();
             data.products.forEach(product => {
                 let productHTML = productCardHTML(product);
                 $('#inner-products-container').append(productHTML);
@@ -190,6 +192,7 @@ function performSearch(overrides = {}, page = 1) {
             }
 
         } else {
+            $("#pagination-container").hide();
             $('#inner-products-container').append(`
                 <div id="no-products-container">
                     <p class="text-muted">No products found.</p>
