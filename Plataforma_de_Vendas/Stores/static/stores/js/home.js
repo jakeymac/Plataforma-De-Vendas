@@ -31,6 +31,13 @@ function load_data() {
 }
 
 function load_listeners() {
+    $("#search-button").click(() => {
+        let searchText = $("#search-input-box").val();
+        if (searchText) {
+            window.location.href = `/product_search?search=${encodeURIComponent(searchText)}`;
+        }
+    });
+
     $('.categories-list-item').hover(function() {
         // Hide all categories' sub-category containers, then show the one being hovered over
         $('.sub-categories-container').hide();
