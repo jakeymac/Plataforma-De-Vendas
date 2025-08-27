@@ -13,7 +13,7 @@ function parseConditionsFromURL() {
         search: urlParams.get('search') || '',
         sort: urlParams.get('sort') || '',
         filters: {}
-    }
+    };
 
     if (urlParams.has('page')) {
         conditions.page = parseInt(urlParams.get('page'), 10) || 1;
@@ -37,9 +37,9 @@ function parseConditionsFromURL() {
 }
 
 function applyConditions(conditions) {
-    $("#product-text-search").val(conditions.search);
+    $('#product-text-search').val(conditions.search);
     if (conditions.sort) {
-        $("#sort-products").val(conditions.sort);
+        $('#sort-products').val(conditions.sort);
     }
     if (conditions.filters.categories && Array.isArray(conditions.filters.categories)) {
         categoryFilterChoices.setChoiceByValue(conditions.filters.categories);
@@ -155,7 +155,7 @@ function getCurrentPageFromURL() {
 function performSearch(overrides = {}, page = 1) {
     let params = buildQueryParams(overrides, page);
     updateURL(params);
-    $("#current-page").text(params.page);
+    $('#current-page').text(params.page);
     let query = new URLSearchParams(params);
     fetch(`/api/products/search/?${query}`, {
         method: 'GET',
@@ -173,7 +173,7 @@ function performSearch(overrides = {}, page = 1) {
         console.log('Data received: ', data);
         $('#inner-products-container').empty();
         if (data.products.length > 0) {
-            $("#pagination-container").show();
+            $('#pagination-container').show();
             data.products.forEach(product => {
                 let productHTML = productCardHTML(product);
                 $('#inner-products-container').append(productHTML);
@@ -192,7 +192,7 @@ function performSearch(overrides = {}, page = 1) {
             }
 
         } else {
-            $("#pagination-container").hide();
+            $('#pagination-container').hide();
             $('#inner-products-container').append(`
                 <div id="no-products-container">
                     <p class="text-muted">No products found.</p>
