@@ -7,6 +7,49 @@ function clearFilters() {
     subcategoryFilterChoices.removeActiveItems();
 }
 
+function parseConditionsFromURL() {
+    let urlParams = new URLSearchParams(window.location.search);
+    let conditions = {
+        search: urlParams.get('search') || '',
+        sort: urlParams.get('sort') || '',
+        filters: {}
+    }
+
+    if (urlParams.has('page')) {
+        conditions.page = parseInt(urlParams.get('page'), 10) || 1;
+    } else {
+        conditions.page = 1;
+    }
+
+    let filtersParam = urlParams.get('filters');
+    if (filtersParam) {
+        try {
+            let parsedFilters = JSON.parse(filtersParam);
+            if (parsedFilters && typeof parsedFilters === 'object') {
+                conditions.filters = parsedFilters;
+            }
+        } catch (e) {
+            console.warn('Invalid filters JSON:', e);
+        }
+    }
+
+    return conditions;
+}
+
+function applyConditions(conditions) {
+    $("#product-text-search").val(conditions.search);
+    if (conditions.sort) {
+        $("#sort-products").val(conditions.sort);
+    }
+    if (conditions.filters.categories && Array.isArray(conditions.filters.categories)) {
+        categoryFilterChoices.setChoiceByValue(conditions.filters.categories);
+    }
+
+    if (conditions.filters.subcategories && Array.isArray(conditions.filters.subcategories)) {
+        subcategoryFilterChoices.setChoiceByValue(conditions.filters.subcategories);
+    }
+}
+
 function getFilterValues() {
     // Get the values of the filter elements with any user input
     let filterValues = {};
@@ -39,25 +82,18 @@ function getSortValue() {
 function buildQueryParams(overrides = {}, page = nul) {
     // Build the query parameters for the AJAX request
 
-    var currentUrlParams = new URLSearchParams(window.location.search);
-    var newParams = {};
+    var newParams = {
+        search: getSearchValue(),
+        sort: getSortValue(),
+        filters: JSON.stringify(getFilterValues()),
+    };
 
-    if (currentUrlParams.has('search')) {
-        newParams.search = currentUrlParams.get('search');
-    }
-
-    if (currentUrlParams.has('sort')) {
-        newParams.sort = currentUrlParams.get('sort');
-    }
-
-    if (currentUrlParams.has('filters')) {
-        newParams.filters = currentUrlParams.get('filters');
-    }
-
-    if (page === null) {
-        newParams.page = parseInt(currentUrlParams.get('page'), 10);
+    if (page !== null && page !== undefined) {
+        newParams.page = page;
+    } else if (currentUrlParams.has('page')) {
+        newParams.page = parseInt(currentUrlParams.get('page'), 10) || 1;
     } else {
-        newParams.page = page; // Default to the provided page if not in URL
+        newParams.page = 1;
     }
 
     if ('search' in overrides) {
@@ -240,9 +276,26 @@ function showPriceModal(productName, buttonElement) {
 }
 
 $(document).ready(() => {
-    console.log('Document ready. Trying to init selectpicker.');
     $('.selectpicker').selectpicker();
-    console.log('Selectpicker initialized.');
+
+    categoryFilterChoices = new Choices('#filter-categories', {
+        removeItemButton: true,
+        itemSelectText: '',
+        searchEnabled: true,
+        placeholder: true,
+        placeholderValue: 'Choose a category...',
+    });
+
+    subcategoryFilterChoices = new Choices('#filter-subcategories', {
+        removeItemButton: true,
+        itemSelectText: '',
+        searchEnabled: true,
+        placeholder: true,
+        placeholderValue: 'Choose a subcategory...',
+    });
+
+    let initialConditions = parseConditionsFromURL();
+    applyConditions(initialConditions);
 
     $('#clear-filter-button').click(() => {
         clearFilters();
@@ -278,20 +331,6 @@ $(document).ready(() => {
             performSearch({}, currentPage - 1);
         }
     });
-    categoryFilterChoices = new Choices('#filter-categories', {
-        removeItemButton: true,
-        itemSelectText: '',
-        searchEnabled: true,
-        placeholder: true,
-        placeholderValue: 'Choose a category...',
-    });
-    subcategoryFilterChoices = new Choices('#filter-subcategories', {
-        removeItemButton: true,
-        itemSelectText: '',
-        searchEnabled: true,
-        placeholder: true,
-        placeholderValue: 'Choose a subcategory...',
-    });
 
     $(document).on('click', '.price-button', function () {
         let productName = $(this).data('product-name');
@@ -316,6 +355,6 @@ $(document).ready(() => {
     });
 
     console.log('Performing initial search.');
-    performSearch({}, page=1); // TODO make sure this works when loading the page with search parameters provided
-    
+    performSearch(initialConditions, initialConditions.page); // TODO make sure this works when loading the page with search parameters provided
+
 });
