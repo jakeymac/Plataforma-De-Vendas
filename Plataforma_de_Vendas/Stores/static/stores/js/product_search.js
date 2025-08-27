@@ -36,7 +36,7 @@ function getSortValue() {
     return sortValue;
 }
 
-function buildQueryParams(overrides = {}, page = 1) {
+function buildQueryParams(overrides = {}, page = nul) {
     // Build the query parameters for the AJAX request
 
     var currentUrlParams = new URLSearchParams(window.location.search);
@@ -54,7 +54,7 @@ function buildQueryParams(overrides = {}, page = 1) {
         newParams.filters = currentUrlParams.get('filters');
     }
 
-    if (currentUrlParams.has('page')) {
+    if (page === null) {
         newParams.page = parseInt(currentUrlParams.get('page'), 10);
     } else {
         newParams.page = page; // Default to the provided page if not in URL
@@ -176,12 +176,14 @@ function productCardHTML(product) {
                      alt="${product.product_name}" 
                      loading="lazy"
                      onerror="this.onerror=null;this.src='${STATIC_URL}stores/images/missing_image_placeholder.png';"> 
-                    <div class="product-card-body d-flex flex-column">
-                    <div class="product-title-wrapper">
-                        <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
-                    </div>
-                        <a href="/view_product/${product.id}/" class="btn btn-outline-secondary">View Product</a>
-                        <button class="btn btn-sm btn-primary mt-2 price-button" data-product-id="${product.id}">View Pricing</button>
+                        <div class="product-card-body d-flex flex-column">
+                        <div class="product-title-wrapper">
+                            <h6 class="product-card-title" title="${product.product_name}">${product.product_name}</h6>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2 mt-2">
+                            <a href="/view_product/${product.id}/" class="btn btn-compact btn-outline-secondary" role="button">View Product</a>
+                            <button class="btn btn-compact btn-primary price-button" data-product-id="${product.id}">View Pricing</button>
+                        </div>
                     </div>
                 </div>
             </div>`;

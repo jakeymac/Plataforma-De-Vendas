@@ -77,13 +77,22 @@
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
 }
 
 .product-title-wrapper {
     height: 3.5rem; 
     display: flex;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: center;
 }
+
+.btn-compact {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.45rem;
+}
+
 
 .custom-price-modal {
     border-radius: var(--gui-border-radius);
