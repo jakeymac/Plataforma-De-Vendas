@@ -95,6 +95,8 @@
 
 
 .custom-price-modal {
+    min-width: 250px;
+    max-width: 300px;
     border-radius: var(--gui-border-radius);
     background-color: white;
     border: 1px solid black;

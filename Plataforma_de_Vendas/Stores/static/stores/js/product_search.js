@@ -182,14 +182,14 @@ function productCardHTML(product) {
                         </div>
                         <div class="d-flex justify-content-center gap-2 mt-2">
                             <a href="/view_product/${product.id}/" class="btn btn-compact btn-outline-secondary" role="button">View Product</a>
-                            <button class="btn btn-compact btn-primary price-button" data-product-id="${product.id}">View Pricing</button>
+                            <button class="btn btn-compact btn-primary price-button" data-product-name="${product.product_name}">View Pricing</button>
                         </div>
                     </div>
                 </div>
             </div>`;
 }
 
-function showPriceModal(productId, buttonElement) {
+function showPriceModal(productName, buttonElement) {
     // Remove any existing modals
     $('.custom-price-modal').remove();
 
@@ -221,7 +221,7 @@ function showPriceModal(productId, buttonElement) {
     // Create modal element
     const modal = $(`
         <div class="custom-price-modal shadow-sm p-3">
-            <strong>Pricing info for product ${productId}</strong>
+            <strong>Pricing info for ${productName}</strong>
             ${pricingTableHTML}
             <button class="btn btn-sm btn-outline-secondary close-price-modal">Close</button>
         </div>
@@ -294,8 +294,8 @@ $(document).ready(() => {
     });
 
     $(document).on('click', '.price-button', function () {
-        let productId = $(this).data('product-id');
-        showPriceModal(productId, this);
+        let productName = $(this).data('product-name');
+        showPriceModal(productName, this);
     });
 
     $(document).on('click', '.close-price-modal', function () {
