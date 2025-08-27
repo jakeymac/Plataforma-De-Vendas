@@ -190,7 +190,11 @@ function performSearch(overrides = {}, page = 1) {
             }
 
         } else {
-            $('#inner-products-container').append('<p>No products found.</p>');
+            $('#inner-products-container').append(`
+                <div id="no-products-container">
+                    <p class="text-muted">No products found.</p>
+                </div>
+            `);        
         }
     });
 }
