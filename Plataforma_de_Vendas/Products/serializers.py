@@ -11,7 +11,6 @@ from .models import (
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    prices = serializers.JSONField()
 
     class Meta:
         model = Product
@@ -19,22 +18,90 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if "prices" in data and isinstance(data["prices"], dict):
-            data["prices"] = {int(key): float(value) for key, value in data["prices"].items()}
+        prices = instance.prices or {}
+        data["prices"] = [
+            {"price": float(value), "units": int(key)}
+            for key, value in sorted(prices.items(), key=lambda item: int(item[0]))
+        ]
+
         return data
 
+    def to_internal_value(self, data):
+        raw = data.copy()
+        prices_list = raw.pop("prices", [])
+        validated_data = super().to_internal_value(raw)
+        validated_data["prices"] = self.validate_prices(prices_list)
+
+        return validated_data
+
     def validate_prices(self, prices):
-        if not isinstance(prices, dict):
+        if not isinstance(prices, list):
             raise serializers.ValidationError(
-                "Prices must be a dictionary with integer keys and float values."
+                {"prices": "Prices must be a list of objects with price and units keys"}
             )
 
-        try:
-            return {int(key): float(value) for key, value in prices.items()}
-        except (ValueError, TypeError):
+        seen_units = set()
+        duplicate_units = set()
+        seen_prices = set()
+        duplicate_prices = set()
+        result = []
+
+        for item in prices:
+            if not isinstance(item, dict):
+                raise serializers.ValidationError(
+                    {"prices": "Each price must be an object with 'price' and 'units' keys"}
+                )
+
+            if "price" not in item or "units" not in item:
+                raise serializers.ValidationError(
+                    {"prices": "Each price object must contain 'price' and 'units' keys"}
+                )
+
+            try:
+                price = float(item["price"])
+            except (ValueError, TypeError):
+                raise serializers.ValidationError({"prices": "Price must be a valid float"})
+
+            try:
+                units = int(item["units"])
+            except (ValueError, TypeError):
+                raise serializers.ValidationError({"prices": "Units must be a valid integer"})
+            if units in seen_units:
+                duplicate_units.add(units)
+            else:
+                seen_units.add(units)
+
+            if price in seen_prices:
+                duplicate_prices.add(price)
+            else:
+                seen_prices.add(price)
+
+            result.append({"units": units, "price": price})
+
+        if duplicate_units and duplicate_prices:
             raise serializers.ValidationError(
-                "Invalid format. Must be a dictionary with integer keys and float values."
+                {
+                    "prices": (
+                        f"Duplicate units found: {', '.join(map(str, duplicate_units))} and "
+                        f"duplicate prices found: {', '.join(map(str, duplicate_prices))}"
+                    )
+                }
             )
+        elif duplicate_units:
+            raise serializers.ValidationError(
+                {"prices": f"Duplicate units found: {', '.join(map(str, duplicate_units))}"}
+            )
+        elif duplicate_prices:
+            raise serializers.ValidationError(
+                {"prices": f"Duplicate prices found: {', '.join(map(str, duplicate_prices))}"}
+            )
+
+        if not result:
+            raise serializers.ValidationError({"prices": "Prices list cannot be empty"})
+
+        return {
+            int(item["units"]): item["price"] for item in sorted(result, key=lambda x: x["units"])
+        }
 
 
 class ProductImageSerializer(serializers.ModelSerializer):

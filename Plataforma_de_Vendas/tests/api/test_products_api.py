@@ -38,7 +38,7 @@ class TestGetProductsByStoreEndpoint:
         assert response.data[0]["product_name"] == product.product_name
         assert response.data[0]["product_description"] == product.product_description
         assert response.data[0]["properties"] == product.properties
-        assert response.data[0]["prices"] == product.prices
+        assert response.data[0]["prices"] == convert_prices_dict(product.prices)
 
     def test_nonexistent_store(self, customer_fixture):
         customer_user, customer_client = customer_fixture
@@ -74,7 +74,7 @@ class TestGetProductsEndpoint:
         assert response.data["product_name"] == product.product_name
         assert response.data["product_description"] == product.product_description
         assert response.data["properties"] == product.properties
-        assert response.data["prices"] == product.prices
+        assert response.data["prices"] == convert_prices_dict(product.prices)
 
     def test_nonexistent_product(self, customer_fixture):
         customer_user, customer_client = customer_fixture
@@ -101,7 +101,7 @@ class TestGetProductsEndpoint:
         assert response.data["products"][0]["product_name"] == product.product_name
         assert response.data["products"][0]["product_description"] == product.product_description
         assert response.data["products"][0]["properties"] == product.properties
-        assert response.data["products"][0]["prices"] == product.prices
+        assert response.data["products"][0]["prices"] == convert_prices_dict(product.prices)
 
 
 @pytest.mark.django_db
@@ -1076,7 +1076,7 @@ class TestAddProductEndpoint:
             "product_name": "Test Product Name",
             "product_description": "Test Product Description",
             "properties": {"color": "red", "size": "small"},
-            "prices": {5: 10.0, 10: 5.0},
+            "prices": [{"price": 10.0, "units": 5}, {"price": 5.0, "units": 10}],
             "subcategory": subcategory.id,
         }
 
@@ -1088,7 +1088,7 @@ class TestAddProductEndpoint:
         product = Product.objects.get(product_name="Test Product Name")
         assert product.product_description == "Test Product Description"
         assert product.properties == {"color": "red", "size": "small"}
-        assert convert_prices_dict(product.prices) == {5: 10.0, 10: 5.0}
+        assert product.prices == {"5": 10.0, "10": 5.0}
         assert product.subcategory_id == subcategory.id
 
     def test_already_existing_product_name(
@@ -1102,7 +1102,7 @@ class TestAddProductEndpoint:
             "product_name": product.product_name,
             "product_description": "Test Product Description",
             "properties": {"color": "red", "size": "small"},
-            "prices": {5: 10.0, 10: 5.0},
+            "prices": [{"price": 10.0, "units": 5}, {"price": 5.0, "units": 10}],
             "subcategory": subcategory.id,
         }
 
@@ -1119,7 +1119,7 @@ class TestAddProductEndpoint:
             "product_name": "Test Product Name",
             "product_description": "Test Product Description",
             "properties": {"color": "red", "size": "small"},
-            "prices": {5: 10.0, 10: 5.0},
+            "prices": [{"price": 10.0, "units": 5}, {"price": 5.0, "units": 10}],
             "subcategory": subcategory.id,
         }
 
@@ -1192,7 +1192,7 @@ class TestRollbackProductChangesEndpoint:
         assert product.product_name == initial_values["product_name"]
         assert product.product_description == initial_values["product_description"]
         assert product.properties == initial_values["properties"]
-        assert convert_prices_dict(product.prices) == initial_values["prices"]
+        assert convert_prices_dict(product.prices) == convert_prices_dict(initial_values["prices"])
 
         assert not ProductImage.objects.filter(id=product_image.id).exists()
         assert not InitialProductImage.objects.filter(id=initial_product_image.id).exists()
@@ -1329,7 +1329,7 @@ class TestCreateInitialProductStateEndpoint:
         assert initial_state.product_name == new_product.product_name
         assert initial_state.product_description == new_product.product_description
         assert initial_state.properties == new_product.properties
-        assert convert_prices_dict(initial_state.prices) == new_product.prices
+        assert convert_prices_dict(initial_state.prices) == convert_prices_dict(new_product.prices)
         assert initial_state.original_created_at == new_product.created_at
 
         assert initial_image.image == new_product_image.image
@@ -1418,7 +1418,7 @@ class TestAutosaveProductEndpoint:
             "product_name": "Autosave Product Name",
             "product_description": "Autosave Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": [product_image.id, product_image_2.id],
         }
 
@@ -1432,7 +1432,7 @@ class TestAutosaveProductEndpoint:
         assert new_product.product_name == "Autosave Product Name"
         assert new_product.product_description == "Autosave Product Description"
         assert new_product.properties == {"color": "blue", "size": "large"}
-        assert convert_prices_dict(new_product.prices) == {5: 20.0, 10: 10.0}
+        assert convert_prices_dict(new_product.prices) == convert_prices_dict({5: 20.0, 10: 10.0})
 
         assert ProductImage.objects.filter(product=new_product).count() == 2
 
@@ -1462,7 +1462,7 @@ class TestAutosaveProductEndpoint:
             "product_name": "Autosave Product Name",
             "product_description": "Autosave Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": [product_image.id],
         }
 
@@ -1492,7 +1492,7 @@ class TestAutosaveProductEndpoint:
             "product_name": product.product_name,
             "product_description": "Autosave Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": [product_image.id],
         }
 
@@ -1517,12 +1517,12 @@ class TestAutosaveProductEndpoint:
             "product_name": "Autosave Product Name",
             "product_description": "Autosave Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": ["0", "1"],
         }
 
         response = admin_client.post(self.url, data, format="json")
-
+        print(response)
         assert response.status_code == 404
         assert response.data["message"] == "Images not found with the ids ['0', '1']"
 
@@ -1534,7 +1534,7 @@ class TestAutosaveProductEndpoint:
             "product_name": "Autosave Product Name",
             "product_description": "Autosave Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": ["0"],
         }
 
@@ -1552,7 +1552,7 @@ class TestAutosaveProductEndpoint:
             "product_name": "Autosave Product Name",
             "product_description": "Autosave Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10.0, "units": 10}],
             "image_ids": ["0"],
         }
 
@@ -1582,7 +1582,7 @@ class TestFinalSaveProductEndpoint:
             "product_name": "Final Save Product Name",
             "product_description": "Final Save Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": [product_image.id],
         }
 
@@ -1596,7 +1596,7 @@ class TestFinalSaveProductEndpoint:
         assert product.product_name == "Final Save Product Name"
         assert product.product_description == "Final Save Product Description"
         assert product.properties == {"color": "blue", "size": "large"}
-        assert convert_prices_dict(product.prices) == {5: 20.0, 10: 10.0}
+        assert convert_prices_dict(product.prices) == convert_prices_dict({5: 20.0, 10: 10.0})
 
         assert ProductImage.objects.filter(product=product).count() == 1
 
@@ -1626,7 +1626,7 @@ class TestFinalSaveProductEndpoint:
             "product_name": "Final Save Product Name",
             "product_description": "Final Save Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": [product_image.id],
         }
 
@@ -1656,7 +1656,7 @@ class TestFinalSaveProductEndpoint:
             "product_name": product.product_name,
             "product_description": "Final Save Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": [product_image.id],
         }
 
@@ -1680,7 +1680,7 @@ class TestFinalSaveProductEndpoint:
             "product_name": "Final Save Product Name",
             "product_description": "Final Save Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": ["0", "1"],
         }
 
@@ -1697,7 +1697,7 @@ class TestFinalSaveProductEndpoint:
             "product_name": "Final Save Product Name",
             "product_description": "Final Save Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": ["0"],
         }
 
@@ -1715,7 +1715,7 @@ class TestFinalSaveProductEndpoint:
             "product_name": "Final Save Product Name",
             "product_description": "Final Save Product Description",
             "properties": {"color": "blue", "size": "large"},
-            "prices": {5: 20.0, 10: 10.0},
+            "prices": [{"price": 20.0, "units": 5}, {"price": 10, "units": 10}],
             "image_ids": ["0"],
         }
 

@@ -86,7 +86,7 @@ def product_fixture(db, store_fixture, subcategory_fixture, mock_image):
         product_name="Test Product Name",
         product_description="This is a test product description",
         properties={"test_property_1": "value1", "test_property_2": "value2"},
-        prices={12: 125.0, 20: 230.0},
+        prices={20: 230.0, 12: 125.0},
         subcategory=subcategory_fixture,
     )
 

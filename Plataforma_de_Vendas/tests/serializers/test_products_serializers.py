@@ -1,4 +1,5 @@
 import pytest
+from core.helpers import convert_prices_dict
 from Products.models import Product
 from Products.serializers import (
     ProductCategorySerializer,
@@ -21,10 +22,8 @@ class TestProductSerializer:
         serializer = ProductSerializer(instance=product)
         data = serializer.data
 
-        assert data["prices"] == {5: 10.0, 10: 20.5}
-        assert isinstance(data["prices"], dict)
-        assert all(isinstance(k, int) for k in data["prices"].keys())
-        assert all(isinstance(v, float) for v in data["prices"].values())
+        assert data["prices"] == convert_prices_dict({5: 10.0, 10: 20.5})
+        assert isinstance(data["prices"], list)
 
     def test_valid_price_data(self, product_fixture):
         """Test valid price data"""
@@ -34,7 +33,7 @@ class TestProductSerializer:
             "product_name": product.product_name,
             "product_description": product.product_description,
             "properties": {"color": "red"},
-            "prices": {1: 125},
+            "prices": [{"price": 125.0, "units": 1}],
         }
 
         serializer = ProductSerializer(instance=product, data=data)
@@ -49,46 +48,64 @@ class TestProductSerializer:
             "product_name": product.product_name,
             "product_description": product.product_description,
             "properties": {"color": "red"},
-            "prices": {"none": 125},  # string price key
         }
 
+        data["prices"] = "invalid_data"  # Not a list
         serializer = ProductSerializer(instance=product, data=data)
         assert not serializer.is_valid()
+        print(serializer.errors)
         assert (
-            "Invalid format. Must be a dictionary with integer keys and float values."
-            in serializer.errors["prices"][0]
+            "Prices must be a list of objects with price and units keys"
+            in serializer.errors["prices"]
         )
 
-        data["prices"] = {1: "none"}  # string price value
+        data["prices"] = [{"price": 125.0, "units": 1}, [1, 125.0]]
+
         serializer = ProductSerializer(instance=product, data=data)
         assert not serializer.is_valid()
         assert (
-            "Invalid format. Must be a dictionary with integer keys and float values."
-            in serializer.errors["prices"][0]
+            "Each price must be an object with 'price' and 'units' keys"
+            in serializer.errors["prices"]
         )
 
-        data["prices"] = {1: None}  # None price value
+        data["prices"] = [{"prices": 125.0, "units": 1}, {"price": 130, "unit": 2}]
         serializer = ProductSerializer(instance=product, data=data)
         assert not serializer.is_valid()
         assert (
-            "Invalid format. Must be a dictionary with integer keys and float values."
-            in serializer.errors["prices"][0]
+            "Each price object must contain 'price' and 'units' keys" in serializer.errors["prices"]
         )
 
-        data["prices"] = {None: 125}  # None price key
+        data["prices"] = [{"price": "hello", "units": 125}]  # None price value
         serializer = ProductSerializer(instance=product, data=data)
         assert not serializer.is_valid()
-        assert (
-            "Invalid format. Must be a dictionary with integer keys and float values."
-            in serializer.errors["prices"][0]
-        )
+        assert "Price must be a valid float" in serializer.errors["prices"]
 
-        data["prices"] = [1, 125]  # list instead of dict
+        data["prices"] = [{"price": 125, "units": "hello"}]  # None units value
+        serializer = ProductSerializer(instance=product, data=data)
+        assert not serializer.is_valid()
+        assert "Units must be a valid integer" in serializer.errors["prices"]
+
+        data["prices"] = [{"price": 125, "units": 1}, {"price": 130, "units": 1}]
+        serializer = ProductSerializer(instance=product, data=data)
+        assert not serializer.is_valid()
+        assert "Duplicate units found: 1" in serializer.errors["prices"]
+
+        data["prices"] = [{"price": 125, "units": 1}, {"price": 125, "units": 2}]
+        serializer = ProductSerializer(instance=product, data=data)
+        assert not serializer.is_valid()
+        assert "Duplicate prices found: 125" in serializer.errors["prices"]
+
+        data["prices"] = [
+            {"price": 125, "units": 1},
+            {"price": 130, "units": 1},
+            {"price": 150, "units": 2},
+            {"price": 150, "units": 4},
+        ]
         serializer = ProductSerializer(instance=product, data=data)
         assert not serializer.is_valid()
         assert (
-            "Prices must be a dictionary with integer keys and float values."
-            in serializer.errors["prices"][0]
+            "Duplicate units found: 1 and duplicate prices found: 150"
+            in serializer.errors["prices"]
         )
 
     def test_updating_existing_product_with_existing_name(self, product_fixture):
