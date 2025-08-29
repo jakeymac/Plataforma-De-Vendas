@@ -36,9 +36,9 @@ function addNewPriceRow() {
                 <div class="error-message-div price_error_field" id="price-${priceCounter}_error_field"></div>
             </div>
             <div class="col-4">
-                <label for="quantity-${priceCounter}" class="form-label">Quantity</label>
-                <input type="number" class="form-control product-info-input quantity-input" id="quantity-${priceCounter}" name="quantity-${priceCounter}">
-                <div class="error-message-div quantity_error_field" id="quantity-${priceCounter}_error_field"></div>
+                <label for="units-${priceCounter}" class="form-label">units</label>
+                <input type="number" class="form-control product-info-input units-input" id="units-${priceCounter}" name="units-${priceCounter}">
+                <div class="error-message-div quantity_error_field" id="units-${priceCounter}_error_field"></div>
             </div>
             <div class="col-4">
                 <button type="button" class="btn btn-danger remove-price-button">Remove</button>
@@ -216,8 +216,8 @@ function loadListeners() {
         let lastPriceRow = $('#product-prices .sortable-item:last');
         if (lastPriceRow.length > 0) {
             let price = lastPriceRow.find('.price-input').val().trim();
-            let quantity = lastPriceRow.find('.quantity-input').val().trim();
-            if (price || quantity) {
+            let units = lastPriceRow.find('.units-input').val().trim();
+            if (price || units) {
                 addNewPriceRow();
                 clearTimeout(autoSaveTimeout);
                 autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
@@ -413,7 +413,7 @@ function organizeFormData(data) {
     // Organize the form data into a dictionary, seperating properties into a sub-dictionary
     let organizedData = {};
     let properties = {};
-    let prices = {};
+    let prices = [];
     let imageIds = [];
     
     for (let entry of data.entries()) {
@@ -427,8 +427,8 @@ function organizeFormData(data) {
         } else if (key.includes('price')) {
             let priceNumber = key.split('-')[1];
             let price = value;
-            let quantity = data.get(`quantity-${priceNumber}`);
-            prices[price] = quantity;
+            let units = parseInt(data.get(`units-${priceNumber}`), 10);
+            prices.push({"price": price, "units": units});
         } else if (key === 'image_id') {
             imageIds.push(value);
         } else if (!key.includes('property-value')) {
@@ -516,16 +516,16 @@ async function autoSaveProductInfo() {
     $('.price-row').each(function() {
         let row = $(this);
         let price = row.find('.price-input').val().trim();
-        let quantity = row.find('.quantity-input').val().trim();
+        let units = row.find('.units-input').val().trim();
 
         if (!price) {
             readyToSubmit = false;
             row.find('.price-input').addClass('error-input');
         }
 
-        if (!quantity) {
+        if (!units) {
             readyToSubmit = false;
-            row.find('.quantity-input').addClass('error-input');
+            row.find('.units-input').addClass('error-input');
         }
     });
 

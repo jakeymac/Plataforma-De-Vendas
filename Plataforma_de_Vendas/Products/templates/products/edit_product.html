@@ -104,7 +104,7 @@
                     </div>    
                     <div id="prices-container">
                         <div id="product-prices">
-                            {% for price, quantity in prices.items %}
+                            {% for price, units in prices.items %}
                                 <div class="col-12 sortable-item row price-row" id="price-row-{{ forloop.counter }}">
                                     <div class="col-4">
                                         <label for="price-{{ forloop.counter }}" class="form-label">Price</label>
@@ -112,9 +112,9 @@
                                         <div class="error-message-div price_error_field" id="price-{{ forloop.counter }}_error_field"></div>
                                     </div>
                                     <div class="col-4">
-                                        <label for="quantity-{{ forloop.counter }}" class="form-label">Quantity</label>
-                                        <input type="number" class="form-control product-info-input quantity-input" id="quantity-{{ forloop.counter }}" name="quantity-{{ forloop.counter }}" value="{{ quantity }}">
-                                        <div class="error-message-div quantity_error_field" id="quantity-{{ forloop.counter }}_error_field"></div>
+                                        <label for="units-{{ forloop.counter }}" class="form-label">units</label>
+                                        <input type="number" class="form-control product-info-input units-input" id="units-{{ forloop.counter }}" name="units-{{ forloop.counter }}" value="{{ units }}">
+                                        <div class="error-message-div quantity_error_field" id="units-{{ forloop.counter }}_error_field"></div>
                                     </div>
                                     <div class="col-4">
                                         <button type="button" class="btn btn-danger remove-price-button">Remove</button>
