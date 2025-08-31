@@ -35,6 +35,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return validated_data
 
     def validate_prices(self, prices):
+
+        if prices in (None, '', [], 'null', 'undefined'):
+            return {}
+        
         if not isinstance(prices, list):
             raise serializers.ValidationError(
                 {"prices": "Prices must be a list of objects with price and units keys"}
@@ -95,9 +99,6 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"prices": f"Duplicate prices found: {', '.join(map(str, duplicate_prices))}"}
             )
-
-        if not result:
-            raise serializers.ValidationError({"prices": "Prices list cannot be empty"})
 
         return {
             int(item["units"]): item["price"] for item in sorted(result, key=lambda x: x["units"])
