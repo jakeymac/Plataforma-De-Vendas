@@ -29,18 +29,17 @@
     margin-left: auto;
     margin-right: auto;
     margin-top: 5px;
+    padding: 6px 10px;
+}
+
+#messages-container.alert.alert-success {
+    color: green;
+}
+#messages-container.alert.alert-danger {
+    color: red;
 }
 
 .error-input {
     border: 2px solid red;
     background-color: #ffe6e6;
 }
-
-.error-message {
-    background-color: red;
-}
-
-.success-message {
-    background-color: green;
-}
-

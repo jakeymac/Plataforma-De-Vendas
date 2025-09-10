@@ -7,6 +7,14 @@ const apiUrls = {
     'top-categories-form': ['/api/products/topsubcategories/update/', 'PUT']
 };
 
+const formSuccessMessages = {
+    'add-category-form': 'Category added successfully',
+    'add-subcategory-form': 'Subcategory added successfully',
+    'edit-category-form': 'Category updated successfully',
+    'edit-subcategory-form': 'Subcategory updated successfully',
+    'top-categories-form': 'Top categories updated successfully'
+}
+
 function update_product_selector(products) {
     $('#product-selector').empty();
     if (products.length === 0) {
@@ -32,6 +40,17 @@ function load_listeners() {
         // Remove error class and clear error message
         $(`#${selectId}`).removeClass('error-input');
         $(`#${selectId}_error_container`).text('');
+    });
+
+    $('.top-subcategory-selector').on('change', function () {
+        const selectId = $(this).attr('id');
+        $(`#${selectId}`).removeClass('error-input');
+
+        // Check if all the selectors have been fixed
+        if ($('.top-subcategory-selector.error-input').length == 0) {
+            $('#top-categories-message-container').removeClass('alert alert-danger');
+            $('#top-categories-message-container').text('');
+        }
     });
 
     $('.delete-button').click(function () {
@@ -111,27 +130,41 @@ function load_listeners() {
                         $(`#${field}`).addClass('error-input');
                     } else {
                         // This is for the top categories form
-                        $('#top-categories-message-container').text(errorData.error);
-                        $('#top-categories-message-container').addClass('error-message');
+                        if (errorData.duplicates) {
+                            for (var orderNum in errorData.duplicates) {
+                                $(`#top_subcategory_selector_${orderNum}`).addClass('error-input');
+                            }
+                        }
+                        $('#top-categories-message-container').text(errorData.message);
+                        $('#top-categories-message-container').addClass('alert alert-danger');
                     }
                 }            
             } else {
-                $(this).find('.message-container').text('Success');
-                $(this).find('.message-container').addClass('success-message');
+                // Show success message
+                let successMessage = formSuccessMessages[formId];
+                $(this).find('.message-container').text(successMessage);
+                $(this).find('.message-container').addClass('alert alert-success');
+
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
             }
         } catch (error) {
             $(this).find('.message-container').text('Error: ' + error.message);
-            $(this).find('.message-container').addClass('error-message');
+            $(this).find('.message-container').addClass('alert alert-danger');
         }
     });    
+
+    $('#product-selector').on('change', function () {
+        // Clear out any error messages below 
+        $("#product-message-container").removeClass('alert alert-danger');
+        $("#product-message-container").text('');
+    });
 
     $('#edit-product-button').on('click', () => {
         let productId = $('#product-selector').val();
         if (productId == '') {
-            $('#product-message-container').removeClass('error-message');
+            $('#product-message-container').removeClass('alert alert-danger');
             $('#product-message-container').text('Please select a product to edit');
         } else {
             // Check for product's existence to avoid errors
@@ -144,10 +177,10 @@ function load_listeners() {
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) {
-                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').addClass('alert alert-danger');
                         $('#product-message-container').text('Product not found');
                     } else {
-                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').addClass('alert alert-danger');
                         $('#product-message-container').text('An error occurred');
                     }
                 } else {
@@ -160,7 +193,7 @@ function load_listeners() {
     $('#view-product-button').on('click', () => {
         let productId = $('#product-selector').val();
         if (productId == '') {
-            $('#product-message-container').removeClass('error-message');
+            $('#product-message-container').removeClass('alert alert-danger');
             $('#product-message-container').text('Please select a product to view');
         } else {
             // Check for product's existence to avoid errors
@@ -173,10 +206,10 @@ function load_listeners() {
             .then(response => {
                 if (!response.ok) {
                     if (response.status === 404) {
-                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').addClass('alert alert-danger');
                         $('#product-message-container').text('Product not found');
                     } else {
-                        $('#product-message-container').addClass('error-message');
+                        $('#product-message-container').addClass('alert alert-danger');
                         $('#product-message-container').text('An error occurred');
                     }
                 } else {
@@ -200,6 +233,10 @@ function load_listeners() {
     });
 
     $('#product-search').on('input', function () {
+        // Clear out any error messages below 
+        $("#product-message-container").removeClass('alert alert-danger')
+        $("#product-message-container").text('');
+
         let searchTerm = $(this).val();
         let filteredProducts = products.filter(product => {
             return product.product_name.toLowerCase().includes(searchTerm) || (product.product_description && product.product_description.toLowerCase().includes(searchTerm));

@@ -629,19 +629,24 @@ def get_top_subcategories_endpoint(request):
 @permission_classes([IsAuthenticated])
 def update_top_subcategories_endpoint(request):
     if request.user.groups.filter(name="Admins").exists():
+        # TODO make this endpoint more robust requiring specific keys in the request data
+        # ie: subcategory_1, subcategory_2, ..., subcategory_6,
+        # or just ID's for each subcategory in order
         data = request.data
         seen = set()
-        duplicates = []
+        duplicates = {}
         # TODO could make this number a built-in setting to keep uniform across the project
         if len(request.data) != 6:
             return Response(
                 {"message": "There must be 6 top subcategories"}, status=status.HTTP_400_BAD_REQUEST
             )
         for subcategory in request.data:
+            order_num = subcategory.split("_")[-1]
             if data.get(subcategory) in seen:
-                duplicates.append(data.get(subcategory))
+                duplicates[order_num] = data.get(subcategory)
             else:
                 seen.add(data.get(subcategory))
+        
         if duplicates:
             return Response(
                 {"message": "Duplicate subcategories found", "duplicates": duplicates},
