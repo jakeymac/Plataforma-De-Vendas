@@ -646,7 +646,7 @@ def update_top_subcategories_endpoint(request):
                 duplicates[order_num] = data.get(subcategory)
             else:
                 seen.add(data.get(subcategory))
-        
+
         if duplicates:
             return Response(
                 {"message": "Duplicate subcategories found", "duplicates": duplicates},

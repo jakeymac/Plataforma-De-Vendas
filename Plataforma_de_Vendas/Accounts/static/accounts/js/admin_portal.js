@@ -13,7 +13,7 @@ const formSuccessMessages = {
     'edit-category-form': 'Category updated successfully',
     'edit-subcategory-form': 'Subcategory updated successfully',
     'top-categories-form': 'Top categories updated successfully'
-}
+};
 
 function update_product_selector(products) {
     $('#product-selector').empty();
@@ -155,10 +155,10 @@ function load_listeners() {
         }
     });    
 
-    $('#product-selector').on('change', function () {
+    $('#product-selector').on('change', () => {
         // Clear out any error messages below 
-        $("#product-message-container").removeClass('alert alert-danger');
-        $("#product-message-container").text('');
+        $('#product-message-container').removeClass('alert alert-danger');
+        $('#product-message-container').text('');
     });
 
     $('#edit-product-button').on('click', () => {
@@ -234,8 +234,8 @@ function load_listeners() {
 
     $('#product-search').on('input', function () {
         // Clear out any error messages below 
-        $("#product-message-container").removeClass('alert alert-danger')
-        $("#product-message-container").text('');
+        $('#product-message-container').removeClass('alert alert-danger');
+        $('#product-message-container').text('');
 
         let searchTerm = $(this).val();
         let filteredProducts = products.filter(product => {

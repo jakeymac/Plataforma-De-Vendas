@@ -31,8 +31,8 @@ function load_data() {
 }
 
 function load_listeners() {
-    $("#search-button").click(() => {
-        let searchText = $("#search-input-box").val();
+    $('#search-button').click(() => {
+        let searchText = $('#search-input-box').val();
         if (searchText) {
             window.location.href = `/product_search?search=${encodeURIComponent(searchText)}`;
         }

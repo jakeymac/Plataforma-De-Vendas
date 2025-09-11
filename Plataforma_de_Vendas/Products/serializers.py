@@ -36,9 +36,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def validate_prices(self, prices):
 
-        if prices in (None, '', [], 'null', 'undefined'):
+        if prices in (None, "", [], "null", "undefined"):
             return {}
-        
+
         if not isinstance(prices, list):
             raise serializers.ValidationError(
                 {"prices": "Prices must be a list of objects with price and units keys"}

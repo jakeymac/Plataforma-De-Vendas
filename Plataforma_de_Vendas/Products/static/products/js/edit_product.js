@@ -428,7 +428,7 @@ function organizeFormData(data) {
             let priceNumber = key.split('-')[1];
             let price = value;
             let units = parseInt(data.get(`units-${priceNumber}`), 10);
-            prices.push({"price": price, "units": units});
+            prices.push({'price': price, 'units': units});
         } else if (key === 'image_id') {
             imageIds.push(value);
         } else if (!key.includes('property-value')) {
