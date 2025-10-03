@@ -1435,7 +1435,7 @@ class TestAutosaveProductEndpoint:
         assert new_product.product_name == "Autosave Product Name"
         assert new_product.product_description == "Autosave Product Description"
         assert new_product.properties == {"color": "blue", "size": "large"}
-        assert convert_prices_dict(new_product.prices) == convert_prices_dict({5: 20.0, 10: 10.0})
+        assert convert_prices_dict(new_product.prices) == convert_prices_dict({20.0: 5, 10.0: 10})
 
         assert ProductImage.objects.filter(product=new_product).count() == 2
 
@@ -1599,7 +1599,7 @@ class TestFinalSaveProductEndpoint:
         assert product.product_name == "Final Save Product Name"
         assert product.product_description == "Final Save Product Description"
         assert product.properties == {"color": "blue", "size": "large"}
-        assert convert_prices_dict(product.prices) == convert_prices_dict({5: 20.0, 10: 10.0})
+        assert convert_prices_dict(product.prices) == convert_prices_dict({20.0: 5, 10.0: 10})
 
         assert ProductImage.objects.filter(product=product).count() == 1
 

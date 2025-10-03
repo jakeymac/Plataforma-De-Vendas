@@ -85,7 +85,8 @@ class TestEditProductView:
         product view of a nonexistent product."""
         seller_user, client = logged_in_seller
         response = client.get(reverse("edit_product", args=[9999]))
-        assert response.status_code == 404
+        assert response.status_code == 200
+        assert "products/product_not_found.html" in [t.name for t in response.templates]
 
 
 @pytest.mark.django_db
@@ -111,4 +112,5 @@ class TestViewProductView:
         view product view of a nonexistent product."""
         customer_user, client = logged_in_customer
         response = client.get(reverse("view_product", args=[9999]))
-        assert response.status_code == 404
+        assert response.status_code == 200
+        assert "products/product_not_found.html" in [t.name for t in response.templates]

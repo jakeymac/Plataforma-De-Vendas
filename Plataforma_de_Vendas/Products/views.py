@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
 from django.shortcuts import render
 
 from .models import (

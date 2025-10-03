@@ -38,7 +38,7 @@ class TestProductSerializer:
 
         serializer = ProductSerializer(instance=product, data=data)
         assert serializer.is_valid()
-        assert serializer.validated_data["prices"] == {1: 125.0}
+        assert serializer.validated_data["prices"] == {125.0: 1}
 
     def test_empty_price_data(self, product_fixture):
         """Test empty price data - often in cases of a new product"""
