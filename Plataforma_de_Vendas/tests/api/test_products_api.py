@@ -1033,15 +1033,18 @@ class TestUpdateTopSubcategoriesEndpoint:
         subcategory = subcategory_fixture
 
         data = self.create_subcategories(subcategory, 6)
-        data["New Subcategory 1"] = data["New Subcategory 2"]
+        top_subcategory_data = {
+            f"top_subcategory_{i + 1}": data[f"New Subcategory {i + 1}"] for i in range(6)
+        }
+        top_subcategory_data["top_subcategory_1"] = top_subcategory_data["top_subcategory_2"]
 
-        response = admin_client.put(self.url, data)
+        response = admin_client.put(self.url, top_subcategory_data)
 
         assert response.status_code == 400
         assert response.data["message"] == "Duplicate subcategories found"
 
-        assert data["New Subcategory 1"] in response.data["duplicates"]
-        assert data["New Subcategory 2"] in response.data["duplicates"]
+        assert top_subcategory_data["top_subcategory_1"] in response.data["duplicates"].values()
+        assert "2" in response.data["duplicates"].keys()
 
     def test_nonexistent_subcategory_ids(self, admin_fixture, subcategory_fixture):
         admin_user, admin_client = admin_fixture
@@ -1432,7 +1435,7 @@ class TestAutosaveProductEndpoint:
         assert new_product.product_name == "Autosave Product Name"
         assert new_product.product_description == "Autosave Product Description"
         assert new_product.properties == {"color": "blue", "size": "large"}
-        assert convert_prices_dict(new_product.prices) == convert_prices_dict({5: 20.0, 10: 10.0})
+        assert convert_prices_dict(new_product.prices) == convert_prices_dict({20.0: 5, 10.0: 10})
 
         assert ProductImage.objects.filter(product=new_product).count() == 2
 
@@ -1596,7 +1599,7 @@ class TestFinalSaveProductEndpoint:
         assert product.product_name == "Final Save Product Name"
         assert product.product_description == "Final Save Product Description"
         assert product.properties == {"color": "blue", "size": "large"}
-        assert convert_prices_dict(product.prices) == convert_prices_dict({5: 20.0, 10: 10.0})
+        assert convert_prices_dict(product.prices) == convert_prices_dict({20.0: 5, 10.0: 10})
 
         assert ProductImage.objects.filter(product=product).count() == 1
 

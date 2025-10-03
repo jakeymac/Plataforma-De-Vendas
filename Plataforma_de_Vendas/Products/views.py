@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
 from django.shortcuts import render
 
 from .models import (
@@ -51,7 +50,7 @@ def edit_product_view(request, product_id):
                 },
             )
         except Product.DoesNotExist:
-            raise Http404("The product you are looking for does not exist.")
+            return render(request, "products/product_not_found.html")
     else:
         raise PermissionDenied("You do not have permission to edit products")
 
@@ -68,4 +67,4 @@ def view_product(request, product_id):
         )
 
     except Product.DoesNotExist:
-        raise Http404("The product you are looking for does not exist.")
+        return render(request, "products/product_not_found.html")

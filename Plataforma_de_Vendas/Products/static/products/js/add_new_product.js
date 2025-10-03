@@ -16,13 +16,13 @@ function load_listeners() {
                 let errorData = await response.json();
                 if (errorData.message) {
                     $('#messages-container').text(errorData.message);
-                    $('#messages-container').addClass('error-message');
+                    $('#messages-container').addClass('alert alert-danger');
                     $('#product_name').addClass('error-input');
                 }
             } else {
                 let responseData = await response.json();
                 $(this).closest('form').find('#messages-container').text('Success');
-                $(this).closest('form').find('#messages-container').addClass('success-message');    
+                $(this).closest('form').find('#messages-container').addClass('alert alert-success');    
                 let productId = responseData.id;
                 setTimeout(() => {
                     window.location.href = `/edit_product/${productId}`;
@@ -30,14 +30,14 @@ function load_listeners() {
             }
         } catch(error) {
             $(this).closest('form').find('#messages-container').text('Error: ' + error.message);
-            $(this).closest('form').find('#messages-container').addClass('error-message');
+            $(this).closest('form').find('#messages-container').addClass('alert alert-danger');
         }
     });
 
     $('#product_name').on('input', () => {
         $('#product_name').removeClass('error-input');
         $('#messages-container').text('');
-        $('#messages-container').removeClass('error-message');
+        $('#messages-container').removeClass('alert alert-danger');
     });
 }
 $(document).ready(() => {

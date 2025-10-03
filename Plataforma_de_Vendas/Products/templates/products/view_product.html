@@ -53,10 +53,10 @@
                             <dd>{{ product.seller.store_name }}</dd>
                             <!-- Maybe make this horizontal line a little shorter than it is now -->
                             <hr>
-                            <!-- TODO add information for price/quantity -->
+                            <!-- TODO add information for price/units -->
                             <dt>Price(s)</dt>
-                                {% for price, quantity in prices.items %}
-                                    <dd>${{ price }} - {{ quantity }} units</dd>
+                                {% for price, units in prices.items %}
+                                    <dd>${{ price }} - {{ units }} units</dd>
                                 {% endfor %}
 
                             <dd>{{ product.price }}</dd>

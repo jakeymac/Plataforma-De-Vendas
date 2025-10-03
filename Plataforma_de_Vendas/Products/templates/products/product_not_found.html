@@ -1,0 +1,16 @@
+{% extends "Stores/base.html" %}
+{% load static %}
+
+{% block title %} Product Not Found {% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5 pt-5">
+    <h1 class="">Product Not Found</h1>
+    <p class="lead text-muted mb-4"> 
+        Sorry! The product you’re looking for does not exist.
+    </p>
+    <!-- TODO update this depending on whether or not it's from the edit 
+     product page or admin portal or to send back to product search page -->
+    <a href="{% url 'index' %}" class="btn btn-primary btn-lg">Back to Home</a>
+</div>
+{% endblock %}

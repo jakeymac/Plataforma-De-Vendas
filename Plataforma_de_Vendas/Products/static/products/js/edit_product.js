@@ -7,6 +7,7 @@ let uploadInProgress = false;
 let initialProductStateId;
 
 function addNewPropertyRow() {
+    propertyCounter++;
     $('#product-properties').append(`
         <div class="row sortable-item property-row" id="property-row-${propertyCounter}">
             <div class="col-5">
@@ -23,11 +24,11 @@ function addNewPropertyRow() {
                 <button type="button" class="btn btn-danger remove-property-button">Remove</button>
             </div>
         </div>`);
-    propertyCounter++;
     bindPropertyRemovalButtons();
 }
 
 function addNewPriceRow() {
+    priceCounter++;
     $('#product-prices').append(`
         <div class="col-12 sortable-item row price-row" id="price-row-${priceCounter}">
             <div class="col-4">
@@ -36,15 +37,14 @@ function addNewPriceRow() {
                 <div class="error-message-div price_error_field" id="price-${priceCounter}_error_field"></div>
             </div>
             <div class="col-4">
-                <label for="quantity-${priceCounter}" class="form-label">Quantity</label>
-                <input type="number" class="form-control product-info-input quantity-input" id="quantity-${priceCounter}" name="quantity-${priceCounter}">
-                <div class="error-message-div quantity_error_field" id="quantity-${priceCounter}_error_field"></div>
+                <label for="units-${priceCounter}" class="form-label">units</label>
+                <input type="number" class="form-control product-info-input units-input" id="units-${priceCounter}" name="units-${priceCounter}">
+                <div class="error-message-div quantity_error_field" id="units-${priceCounter}_error_field"></div>
             </div>
             <div class="col-4">
                 <button type="button" class="btn btn-danger remove-price-button">Remove</button>
             </div>
         </div>`);
-    priceCounter++;
     bindPriceRemovalButtons();
 }
 
@@ -216,8 +216,8 @@ function loadListeners() {
         let lastPriceRow = $('#product-prices .sortable-item:last');
         if (lastPriceRow.length > 0) {
             let price = lastPriceRow.find('.price-input').val().trim();
-            let quantity = lastPriceRow.find('.quantity-input').val().trim();
-            if (price || quantity) {
+            let units = lastPriceRow.find('.units-input').val().trim();
+            if (price || units) {
                 addNewPriceRow();
                 clearTimeout(autoSaveTimeout);
                 autoSaveTimeout = setTimeout(autoSaveProductInfo, 1500);
@@ -413,7 +413,7 @@ function organizeFormData(data) {
     // Organize the form data into a dictionary, seperating properties into a sub-dictionary
     let organizedData = {};
     let properties = {};
-    let prices = {};
+    let prices = [];
     let imageIds = [];
     
     for (let entry of data.entries()) {
@@ -427,11 +427,11 @@ function organizeFormData(data) {
         } else if (key.includes('price')) {
             let priceNumber = key.split('-')[1];
             let price = value;
-            let quantity = data.get(`quantity-${priceNumber}`);
-            prices[price] = quantity;
+            let units = parseInt(data.get(`units-${priceNumber}`), 10);
+            prices.push({'price': price, 'units': units});
         } else if (key === 'image_id') {
             imageIds.push(value);
-        } else if (!key.includes('property-value')) {
+        } else if (!key.includes('property-value') && !key.includes('units')) {
             organizedData[key] = value;
         } 
     }
@@ -516,16 +516,16 @@ async function autoSaveProductInfo() {
     $('.price-row').each(function() {
         let row = $(this);
         let price = row.find('.price-input').val().trim();
-        let quantity = row.find('.quantity-input').val().trim();
+        let units = row.find('.units-input').val().trim();
 
         if (!price) {
             readyToSubmit = false;
             row.find('.price-input').addClass('error-input');
         }
 
-        if (!quantity) {
+        if (!units) {
             readyToSubmit = false;
-            row.find('.quantity-input').addClass('error-input');
+            row.find('.units-input').addClass('error-input');
         }
     });
 
@@ -571,8 +571,8 @@ async function rollBackProduct() {
         // TODO - add redirection to whatever the previous page actually was
         window.location.href = `/admin_portal/`;
     } else {
-        $('#extra-message-div').removeClass('success-message-div');
-        $('#extra-message-div').addClass('error-message-div');
+        $('#extra-message-div').removeClass('alert alert-success');
+        $('#extra-message-div').addClass('alert alert-danger');
         $('#extra-message-div').text('Error canceling changes');
         
         setTimeout(() => {
@@ -594,8 +594,8 @@ async function removeProduct() {
 
     if (response.ok) {
         // TODO - add redirection to whatever the previous page actually was
-        $('#confirm-deletion-main-text').removeClass('error-message-div');
-        $('#confirm-deletion-main-text').addClass('deletion-success-message');
+        $('#confirm-deletion-main-text').removeClass('alert alert-danger');
+        $('#confirm-deletion-main-text').addClass('alert alert-success');
         $('#confirm-deletion-main-text').text('Product removed successfully');
         setTimeout(() => {
             $('#confirm-deletion-main-text').text('');
@@ -603,8 +603,8 @@ async function removeProduct() {
         }, 2000);
         
     } else {
-        $('#confirm-deletion-main-text').removeClass('deletion-success-message');
-        $('#confirm-deletion-main-text').addClass('error-message-div');
+        $('#confirm-deletion-main-text').removeClass('alert alert-success');
+        $('#confirm-deletion-main-text').addClass('alert alert-danger');
         $('#confirm-deletion-main-text').text('Error removing product');
         
         setTimeout(() => {
@@ -653,8 +653,8 @@ async function saveProductInfo() {
         if (response) {
             if (response.ok) {
                 $('#extra-message-div').text('Product saved successfully');
-                $('#extra-message-div').removeClass('error-message-div');
-                $('#extra-message-div').addClass('success-message-div');
+                $('#extra-message-div').removeClass('alert alert-danger');
+                $('#extra-message-div').addClass('alert alert-success');
                 setTimeout(() => {
                     // TODO - add redirection to view product page
                     window.location.href = `/admin_portal/`;
@@ -669,8 +669,8 @@ async function saveProductInfo() {
             }
         } else {
             $('#extra-message-div').text('Error saving product');
-            $('#extra-message-div').removeClass('success-message-div');
-            $('#extra-message-div').addClass('error-message-div');
+            $('#extra-message-div').removeClass('alert alert-success');
+            $('#extra-message-div').addClass('alert alert-danger');
             setTimeout(() => {
                 $('#extra-message-div').text('');
             }, 2000);
