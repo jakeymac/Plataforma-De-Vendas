@@ -571,8 +571,8 @@ async function rollBackProduct() {
         // TODO - add redirection to whatever the previous page actually was
         window.location.href = `/admin_portal/`;
     } else {
-        $('#extra-message-div').removeClass('success-message-div');
-        $('#extra-message-div').addClass('error-message-div');
+        $('#extra-message-div').removeClass('alert alert-success');
+        $('#extra-message-div').addClass('alert alert-danger');
         $('#extra-message-div').text('Error canceling changes');
         
         setTimeout(() => {
@@ -594,8 +594,8 @@ async function removeProduct() {
 
     if (response.ok) {
         // TODO - add redirection to whatever the previous page actually was
-        $('#confirm-deletion-main-text').removeClass('error-message-div');
-        $('#confirm-deletion-main-text').addClass('deletion-success-message');
+        $('#confirm-deletion-main-text').removeClass('alert alert-danger');
+        $('#confirm-deletion-main-text').addClass('alert alert-success');
         $('#confirm-deletion-main-text').text('Product removed successfully');
         setTimeout(() => {
             $('#confirm-deletion-main-text').text('');
@@ -603,8 +603,8 @@ async function removeProduct() {
         }, 2000);
         
     } else {
-        $('#confirm-deletion-main-text').removeClass('deletion-success-message');
-        $('#confirm-deletion-main-text').addClass('error-message-div');
+        $('#confirm-deletion-main-text').removeClass('alert alert-success');
+        $('#confirm-deletion-main-text').addClass('alert alert-danger');
         $('#confirm-deletion-main-text').text('Error removing product');
         
         setTimeout(() => {
@@ -653,8 +653,8 @@ async function saveProductInfo() {
         if (response) {
             if (response.ok) {
                 $('#extra-message-div').text('Product saved successfully');
-                $('#extra-message-div').removeClass('error-message-div');
-                $('#extra-message-div').addClass('success-message-div');
+                $('#extra-message-div').removeClass('alert alert-danger');
+                $('#extra-message-div').addClass('alert alert-success');
                 setTimeout(() => {
                     // TODO - add redirection to view product page
                     window.location.href = `/admin_portal/`;
@@ -669,8 +669,8 @@ async function saveProductInfo() {
             }
         } else {
             $('#extra-message-div').text('Error saving product');
-            $('#extra-message-div').removeClass('success-message-div');
-            $('#extra-message-div').addClass('error-message-div');
+            $('#extra-message-div').removeClass('alert alert-success');
+            $('#extra-message-div').addClass('alert alert-danger');
             setTimeout(() => {
                 $('#extra-message-div').text('');
             }, 2000);
