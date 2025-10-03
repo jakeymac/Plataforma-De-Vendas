@@ -7,6 +7,7 @@ let uploadInProgress = false;
 let initialProductStateId;
 
 function addNewPropertyRow() {
+    propertyCounter++;
     $('#product-properties').append(`
         <div class="row sortable-item property-row" id="property-row-${propertyCounter}">
             <div class="col-5">
@@ -23,11 +24,11 @@ function addNewPropertyRow() {
                 <button type="button" class="btn btn-danger remove-property-button">Remove</button>
             </div>
         </div>`);
-    propertyCounter++;
     bindPropertyRemovalButtons();
 }
 
 function addNewPriceRow() {
+    priceCounter++;
     $('#product-prices').append(`
         <div class="col-12 sortable-item row price-row" id="price-row-${priceCounter}">
             <div class="col-4">
@@ -44,7 +45,6 @@ function addNewPriceRow() {
                 <button type="button" class="btn btn-danger remove-price-button">Remove</button>
             </div>
         </div>`);
-    priceCounter++;
     bindPriceRemovalButtons();
 }
 
@@ -431,7 +431,7 @@ function organizeFormData(data) {
             prices.push({'price': price, 'units': units});
         } else if (key === 'image_id') {
             imageIds.push(value);
-        } else if (!key.includes('property-value')) {
+        } else if (!key.includes('property-value') && !key.includes('units')) {
             organizedData[key] = value;
         } 
     }
