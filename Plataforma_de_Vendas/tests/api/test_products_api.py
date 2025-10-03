@@ -1033,15 +1033,19 @@ class TestUpdateTopSubcategoriesEndpoint:
         subcategory = subcategory_fixture
 
         data = self.create_subcategories(subcategory, 6)
-        data["New Subcategory 1"] = data["New Subcategory 2"]
+        top_subcategory_data = {
+            f"top_subcategory_{i + 1}": data[f"New Subcategory {i + 1}"]
+            for i in range(6)
+        }
+        top_subcategory_data["top_subcategory_1"] = top_subcategory_data["top_subcategory_2"]
 
-        response = admin_client.put(self.url, data)
+        response = admin_client.put(self.url, top_subcategory_data)
 
         assert response.status_code == 400
         assert response.data["message"] == "Duplicate subcategories found"
 
-        assert data["New Subcategory 1"] in response.data["duplicates"]
-        assert data["New Subcategory 2"] in response.data["duplicates"]
+        assert top_subcategory_data["top_subcategory_1"] in response.data["duplicates"].values()
+        assert "2" in response.data["duplicates"].keys()
 
     def test_nonexistent_subcategory_ids(self, admin_fixture, subcategory_fixture):
         admin_user, admin_client = admin_fixture
