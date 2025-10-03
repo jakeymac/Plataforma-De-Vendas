@@ -1034,8 +1034,7 @@ class TestUpdateTopSubcategoriesEndpoint:
 
         data = self.create_subcategories(subcategory, 6)
         top_subcategory_data = {
-            f"top_subcategory_{i + 1}": data[f"New Subcategory {i + 1}"]
-            for i in range(6)
+            f"top_subcategory_{i + 1}": data[f"New Subcategory {i + 1}"] for i in range(6)
         }
         top_subcategory_data["top_subcategory_1"] = top_subcategory_data["top_subcategory_2"]
 
