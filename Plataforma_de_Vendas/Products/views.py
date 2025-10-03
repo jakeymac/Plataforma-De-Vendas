@@ -51,7 +51,7 @@ def edit_product_view(request, product_id):
                 },
             )
         except Product.DoesNotExist:
-            raise Http404("The product you are looking for does not exist.")
+            return render(request, "products/product_not_found.html")
     else:
         raise PermissionDenied("You do not have permission to edit products")
 
@@ -68,4 +68,4 @@ def view_product(request, product_id):
         )
 
     except Product.DoesNotExist:
-        raise Http404("The product you are looking for does not exist.")
+        return render(request, "products/product_not_found.html")
