@@ -101,7 +101,8 @@ class ProductSerializer(serializers.ModelSerializer):
             )
 
         return {
-            int(item["price"]): int(item["units"]) for item in sorted(result, key=lambda x: x["units"])
+            int(item["price"]): int(item["units"])
+            for item in sorted(result, key=lambda x: x["units"])
         }
 
 
