@@ -224,11 +224,9 @@ def search_orders_endpoint(request):
         if sort in sort_map:
             sort_parameter = sort_map[sort]
         else:
-            valid_options = ', '.join(sort_map.keys())
+            valid_options = ", ".join(sort_map.keys())
             return Response(
-                {
-                    "message": f"Invalid sort option '{sort}'. Valid options are: {valid_options}."
-                },
+                {"message": f"Invalid sort option '{sort}'. Valid options are: {valid_options}."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
