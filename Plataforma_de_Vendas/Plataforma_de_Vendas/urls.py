@@ -359,7 +359,7 @@ urlpatterns = [
         "api/orders/search/",
         order_endpoints.search_orders_endpoint,
         name="orders-search-endpoint",
-    )
+    ),
 ]
 
 # URL patterns for testing purposes only

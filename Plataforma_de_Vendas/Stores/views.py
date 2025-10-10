@@ -44,24 +44,31 @@ def view_my_store(request):
             raise Http404("There was an error finding your store.")
     else:
         raise PermissionDenied("You'll need to register as a seller first.")
-    
+
 
 def view_store(request, store_url):
     if request.user.is_authenticated and request.user.groups.filter(name="Sellers").exists():
         if request.user.store and request.user.store.store_url == store_url:
             orders = Order.objects.filter(store=request.user.store).order_by("-created_at")[:10]
-            return render(request, "Stores/store_dashboard.html", {"store": request.user.store, "recent_orders": orders})
+            return render(
+                request,
+                "Stores/store_dashboard.html",
+                {"store": request.user.store, "recent_orders": orders},
+            )
     try:
         store = Store.objects.get(store_url=store_url)
         return render(request, "Stores/view_store.html", {"store": store})
     except Store.DoesNotExist:
         raise Http404("The store you are looking for does not exist.")
-    
+
+
 @login_required
 def order_dashboard(request):
     if request.user.is_authenticated and request.user.groups.filter(name="Sellers").exists():
         if request.user.store:
-            return render(request, "Stores/store_orders_dashboard.html", {"store": request.user.store})
+            return render(
+                request, "Stores/store_orders_dashboard.html", {"store": request.user.store}
+            )
         else:
             raise Http404("You do not have a store associated with your account.")
     else:

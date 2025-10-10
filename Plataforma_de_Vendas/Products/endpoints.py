@@ -1066,9 +1066,9 @@ def product_search_endpoint(request):
 
     if search:
         queryset = queryset.filter(
-            Q(product_name__icontains=search) |
-            Q(product_description__icontains=search) |
-            Q(subcategory__subcategory_name__icontains=search)
+            Q(product_name__icontains=search)
+            | Q(product_description__icontains=search)
+            | Q(subcategory__subcategory_name__icontains=search)
         )
 
     # TODO need to decide on a default sort order

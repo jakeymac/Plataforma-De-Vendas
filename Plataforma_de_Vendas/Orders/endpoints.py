@@ -17,7 +17,6 @@ from .serializers import OrderSerializer
 from Stores.models import Store
 
 
-
 @swagger_auto_schema(
     method="GET",
     operation_description="Get all orders",
@@ -189,10 +188,11 @@ def update_order_endpoint(request):
         status=status.HTTP_401_UNAUTHORIZED,
     )
 
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def search_orders_endpoint(request):
-    
+
     search = request.GET.get("search", "")
     sort = request.GET.get("sort", "newest")
     filters = request.GET.get("filters", "{}")
@@ -204,16 +204,16 @@ def search_orders_endpoint(request):
             {"message": "Invalid filters format."},
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     queryset = Order.objects.all()
 
     if search:
         queryset = queryset.filter(
-            Q(user__username__icontains=search) |
-            Q(user__first_name__icontains=search) |
-            Q(user__last_name__icontains=search) |
-            Q(store__store_name__icontains=search) |
-            Q(tracking_code__icontains=search)
+            Q(user__username__icontains=search)
+            | Q(user__first_name__icontains=search)
+            | Q(user__last_name__icontains=search)
+            | Q(store__store_name__icontains=search)
+            | Q(tracking_code__icontains=search)
         )
 
     if sort:
@@ -226,11 +226,14 @@ def search_orders_endpoint(request):
         if sort in sort_map:
             sort_parameter = sort_map[sort]
         else:
-            return Response({
-                    "message": f"Invalid sort option '{sort}'. Valid options are: {', '.join(sort_map.keys())}."}, 
-                    status=status.HTTP_400_BAD_REQUEST
+            valid_options = ', '.join(sort_map.keys())
+            return Response(
+                {
+                    "message": f"Invalid sort option '{sort}'. Valid options are: {valid_options}."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         queryset = queryset.order_by(sort_parameter)
 
     invalid_filters = []
@@ -257,7 +260,7 @@ def search_orders_endpoint(request):
                 {"message": f"Invalid filter options: {', '.join(invalid_filters)}."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
     paginator = PageNumberPagination()
     paginator.page_size = 10
     paginated_qs = paginator.paginate_queryset(queryset, request)
@@ -277,5 +280,3 @@ def search_orders_endpoint(request):
         },
         status=status.HTTP_200_OK,
     )
-
-
