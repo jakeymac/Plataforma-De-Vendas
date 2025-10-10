@@ -9,6 +9,12 @@ class OrderSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
     store = serializers.PrimaryKeyRelatedField(queryset=Store.objects.all())
 
+    user_username = serializers.CharField(source="user.username", read_only=True)
+    user_first_name = serializers.CharField(source="user.first_name", read_only=True)
+    user_last_name = serializers.CharField(source="user.last_name", read_only=True)
+    user_email = serializers.CharField(source="user.email", read_only=True)
+    store_name = serializers.CharField(source="store.store_name", read_only=True)
+
     class Meta:
         model = Order
         fields = "__all__"

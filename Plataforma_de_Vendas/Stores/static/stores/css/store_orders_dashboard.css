@@ -1,0 +1,7 @@
+.card {
+    border-radius: var(--gui-border-radius);
+}
+
+#orders-dashboard-main-container {
+    margin-top: 20px;
+}
