@@ -148,7 +148,11 @@ def seller_fixture(db, store_fixture):
 def customer_fixture(db):
     customer_group, created = Group.objects.get_or_create(name="Customers")
     customer_user = CustomUser.objects.create_user(
-        username="pytest_customer", password="password123", email="customer_email_123@example.com"
+        username="pytest_customer",
+        password="password123",
+        email="customer_email_123@example.com",
+        first_name="Test",
+        last_name="Customer",
     )
     customer_user.groups.add(Group.objects.get(name="Customers"))
     customer_user.save()

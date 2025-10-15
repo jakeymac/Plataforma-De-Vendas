@@ -358,7 +358,7 @@ urlpatterns = [
     path(
         "api/orders/search/",
         order_endpoints.search_orders_endpoint,
-        name="orders-search-endpoint",
+        name="search-orders-endpoint",
     ),
 ]
 

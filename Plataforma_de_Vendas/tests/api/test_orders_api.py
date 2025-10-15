@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from Accounts.models import CustomUser
 from django.contrib.auth.models import Group
@@ -481,3 +483,209 @@ class TestUpdateOrderEndpoint:
 
         assert response.status_code == 404
         assert response.data == {"message": "Order not found with the id 999"}
+
+
+@pytest.mark.django_db
+class TestSearchOrdersEndpoint:
+    """Test the search_orders_endpoint - api/orders/search/ - search-orders-endpoint"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("search-orders-endpoint")
+
+    def test_invalid_filter_format(self, customer_fixture):
+        customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"filters": "invalid_json"})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Invalid filters format."}
+
+    def test_invalid_sort(self, customer_fixture):
+        customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"sort": "invalid_sort_option"})
+
+        assert response.status_code == 400
+        valid_options = ", ".join(["newest", "oldest", "highest_total", "lowest_total"])
+        assert response.data == {
+            "message": (
+                f"Invalid sort option 'invalid_sort_option'. "
+                f"Valid options are: {valid_options}."
+            )
+        }
+
+    def test_invalid_filter(self, customer_fixture):
+        customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"filters": '{"invalid_filter_key": "value"}'})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Invalid filter options: invalid_filter_key."}
+
+    def test_search_customer_first_name(self, customer_fixture, order_fixture):
+        customer_user, client = customer_fixture
+
+        new_customer = CustomUser.objects.create_user(
+            username="another_customer",
+            password="password123",
+            email="another_customer@example.com",
+            first_name="Another",
+            last_name="Customer",
+        )
+        new_customer.save()
+
+        new_order = Order.objects.create(
+            user=new_customer,
+            store=order_fixture.store,
+            total=150.0,
+        )
+        new_order.save()
+
+        response = client.get(self.url, {"search": "another"})
+
+        assert response.status_code == 200
+        assert len(response.data["orders"]) == 1
+        assert response.data["orders"][0]["id"] == new_order.id
+
+    def test_search_customer_last_name(self, customer_fixture, order_fixture):
+        customer_user, client = customer_fixture
+
+        new_customer = CustomUser.objects.create_user(
+            username="another_customer",
+            password="password123",
+            email="another_customer@example.com",
+            first_name="Another",
+            last_name="Customer",
+        )
+
+        new_customer.save()
+
+        another_new_customer = CustomUser.objects.create_user(
+            username="test_user",
+            password="password123",
+            email="test_user@example.com",
+            first_name="Another2",
+            last_name="Johnson",
+        )
+
+        another_new_customer.save()
+
+        new_order = Order.objects.create(
+            user=new_customer,
+            store=order_fixture.store,
+            total=150.0,
+        )
+
+        new_order.save()
+
+        another_new_order = Order.objects.create(
+            user=another_new_customer,
+            store=order_fixture.store,
+            total=200.0,
+        )
+
+        another_new_order.save()
+
+        response = client.get(self.url, {"search": "customer"})
+
+        assert response.status_code == 200
+        assert len(response.data["orders"]) == 2
+        assert order_fixture.id in [order["id"] for order in response.data["orders"]]
+        assert new_order.id in [order["id"] for order in response.data["orders"]]
+
+    def test_sort_newest(self, customer_fixture, order_fixture):
+        customer_user, client = customer_fixture
+
+        new_order = Order.objects.create(
+            user=customer_user,
+            store=order_fixture.store,
+            total=150.0,
+        )
+        new_order.save()
+
+        response = client.get(self.url, {"sort": "newest"})
+
+        assert response.status_code == 200
+        assert response.data["orders"][0]["id"] == new_order.id
+        assert response.data["orders"][1]["id"] == order_fixture.id
+
+    def test_sort_oldest(self, customer_fixture, order_fixture):
+        customer_user, client = customer_fixture
+
+        new_order = Order.objects.create(
+            user=customer_user,
+            store=order_fixture.store,
+            total=150.0,
+        )
+        new_order.save()
+
+        response = client.get(self.url, {"sort": "oldest"})
+
+        assert response.status_code == 200
+        assert response.data["orders"][0]["id"] == order_fixture.id
+        assert response.data["orders"][1]["id"] == new_order.id
+
+    def test_filter_by_status(self, customer_fixture, order_fixture):
+        customer_user, client = customer_fixture
+
+        new_order = Order.objects.create(
+            user=customer_user,
+            store=order_fixture.store,
+            total=150.0,
+            status="DONE",
+        )
+        new_order.save()
+
+        response = client.get(self.url, {"filters": '{"status": "DONE"}'})
+
+        assert response.status_code == 200
+        assert len(response.data["orders"]) == 1
+        assert response.data["orders"][0]["id"] == new_order.id
+        assert response.data["orders"][0]["status"] == "DONE"
+
+    def test_filter_by_min_total(self, customer_fixture, order_fixture):
+        customer_user, client = customer_fixture
+
+        new_order = Order.objects.create(
+            user=customer_user,
+            store=order_fixture.store,
+            total=150.0,
+        )
+        new_order.save()
+
+        response = client.get(self.url, {"filters": '{"min_total": 120}'})
+
+        assert response.status_code == 200
+        assert len(response.data["orders"]) == 1
+        assert response.data["orders"][0]["id"] == new_order.id
+        assert float(response.data["orders"][0]["total"]) >= 120
+
+    def test_filter_by_user(self, admin_fixture, customer_fixture, order_fixture):
+        admin_user, client = admin_fixture
+        customer_user, _ = customer_fixture
+
+        new_customer = CustomUser.objects.create_user(
+            username="another_customer",
+            password="password123",
+            email="another_customer@example.com",
+            first_name="Another",
+            last_name="Customer",
+        )
+
+        new_customer.save()
+
+        new_order = Order.objects.create(
+            user=new_customer,
+            store=order_fixture.store,
+            total=150.0,
+        )
+
+        new_order.save()
+
+        response = client.get(self.url, {"filters": json.dumps({"users": [customer_user.id]})})
+
+        assert response.status_code == 200
+        assert len(response.data["orders"]) == 1
+        assert order_fixture.id in [order["id"] for order in response.data["orders"]]
+        assert new_order.id not in [order["id"] for order in response.data["orders"]]

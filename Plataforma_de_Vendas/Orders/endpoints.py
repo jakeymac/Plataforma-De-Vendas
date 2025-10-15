@@ -190,7 +190,6 @@ def update_order_endpoint(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def search_orders_endpoint(request):
-
     search = request.GET.get("search", "")
     sort = request.GET.get("sort", "newest")
     filters = request.GET.get("filters", "{}")
@@ -210,6 +209,7 @@ def search_orders_endpoint(request):
             Q(user__username__icontains=search)
             | Q(user__first_name__icontains=search)
             | Q(user__last_name__icontains=search)
+            | Q(user__email__icontains=search)
             | Q(store__store_name__icontains=search)
             | Q(tracking_code__icontains=search)
         )
@@ -238,6 +238,9 @@ def search_orders_endpoint(request):
             "status": "status",
             "stores": "store__id",
             "users": "user__id",
+            "user": "user__id",
+            "min_total": "total__gte",
+            "max_total": "total__lte",
         }
         for filter in filters:
             if filter in filter_map:
