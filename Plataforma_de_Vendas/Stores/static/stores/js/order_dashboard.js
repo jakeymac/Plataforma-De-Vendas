@@ -6,14 +6,22 @@ function buildQueryParms() {
     let filterValue = $('#order-filter-selector').val();
     let sortValue = $('#order-sort-selector').val();
 
+    let filters = {
+        'store': storeId
+    }
+
     let params = new URLSearchParams();
     params.append('page', currentPage);
     if (searchQuery) {
         params.append('search', searchQuery);
     }
+
     if (filterValue) {
-        params.append('filters', JSON.stringify({'status': filterValue}));
+        filters['status'] = filterValue;
     }
+    // Always filter by store
+    params.append('filters', JSON.stringify(filters));
+
     if (sortValue) {
         params.append('sort', sortValue);
     }

@@ -10,6 +10,7 @@
 
 {% block scripts %}
     {{ block.super }}
+    <script > const storeId = "{{ store.id }}"; </script>
     <script src="{% static 'stores/js/order_dashboard.js' %}"></script>
 {% endblock %}
 
