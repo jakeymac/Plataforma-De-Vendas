@@ -237,6 +237,7 @@ def search_orders_endpoint(request):
         filter_map = {
             "status": "status",
             "stores": "store__id",
+            "store": "store__id",
             "users": "user__id",
             "user": "user__id",
             "min_total": "total__gte",

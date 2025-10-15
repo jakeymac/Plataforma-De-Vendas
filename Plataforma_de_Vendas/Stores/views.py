@@ -49,11 +49,10 @@ def view_my_store(request):
 def view_store(request, store_url):
     if request.user.is_authenticated and request.user.groups.filter(name="Sellers").exists():
         if request.user.store and request.user.store.store_url == store_url:
-            orders = Order.objects.filter(store=request.user.store).order_by("-created_at")[:10]
             return render(
                 request,
                 "Stores/store_dashboard.html",
-                {"store": request.user.store, "recent_orders": orders},
+                {"store": request.user.store},
             )
     try:
         store = Store.objects.get(store_url=store_url)
