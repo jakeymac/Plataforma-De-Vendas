@@ -72,11 +72,68 @@ class TestViewStoreView:
         assert response.status_code == 200
         assert "Stores/view_store.html" in [t.name for t in response.templates]
 
+    def test_seller_access_own_store(self, logged_in_seller, store_fixture):
+        """Test the view store view when the seller accesses their own store"""
+        seller_user, seller_client = logged_in_seller
+        seller_user.store = store_fixture
+        seller_user.save()
+
+        url = reverse(self.view_name, args=[store_fixture.store_url])
+        response = seller_client.get(url)
+
+        assert response.status_code == 200
+        assert "Stores/store_dashboard.html" in [t.name for t in response.templates]
+        assert response.context["store"] == store_fixture
+
+    def test_seller_access_other_store(self, logged_in_seller, store_fixture):
+        """Test the view store view when the seller accesses another store"""
+        _, seller_client = logged_in_seller
+        url = reverse(self.view_name, args=[store_fixture.store_url])
+        response = seller_client.get(url)
+
+        assert response.status_code == 200
+        assert "Stores/view_store.html" in [t.name for t in response.templates]
+        assert response.context["store"] == store_fixture
+
     def test_invalid_store_url(self, anonymous_client):
         url = reverse(self.view_name, args=["invalid_store_url"])
         response = anonymous_client.get(url)
         assert response.status_code == 404
         assert b"The store you are looking for does not exist." in response.content
+
+
+class TestOrderDashboardView:
+    """Test the order dashboard view"""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.url = reverse("order_dashboard")
+
+    def test_valid_access(self, logged_in_seller, store_fixture):
+        """Test valid access to the order dashboard view"""
+        seller_user, seller_client = logged_in_seller
+        seller_user.store = store_fixture
+        seller_user.save()
+
+        response = seller_client.get(self.url)
+
+        assert response.status_code == 200
+        assert "Stores/store_orders_dashboard.html" in [t.name for t in response.templates]
+        assert response.context["store"] == store_fixture
+
+    def test_seller_with_no_store(self, logged_in_seller):
+        """Test access to the order dashboard view when the seller has no store"""
+        _, seller_client = logged_in_seller
+        response = seller_client.get(self.url)
+        assert response.status_code == 404
+        assert b"You do not have a store associated with your account." in response.content
+
+    def test_non_seller_access(self, logged_in_customer):
+        """Test access to the order dashboard view when the user is not a seller"""
+        _, customer_client = logged_in_customer
+        response = customer_client.get(self.url, follow=True)
+        assert response.status_code == 403
+        assert "need to register as a seller first.".encode("utf-8") in response.content
 
 
 class TestRegisterStorePageView:
