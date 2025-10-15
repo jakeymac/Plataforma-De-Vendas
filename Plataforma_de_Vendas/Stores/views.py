@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import redirect, render
-from Orders.models import Order
 from Products.models import ProductCategory, ProductSubcategory, ProductTopSubcategory
 from Stores.models import Store
 
