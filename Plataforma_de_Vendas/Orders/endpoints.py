@@ -204,6 +204,121 @@ def search_orders_endpoint(request):
 
     queryset = Order.objects.all()
 
+    user = request.user
+
+    if user.groups.filter(name="Admins").exists():
+        requested_user_filter = filters.get("user") or filters.get("users")
+        requested_store_filter = filters.get("store") or filters.get("stores")
+
+        nonexistent_users = []
+        nonexistent_stores = []
+
+        if requested_user_filter:
+            if isinstance(requested_user_filter, list):
+                for user_id in requested_user_filter:
+                    if not CustomUser.objects.filter(id=user_id).exists():
+                        nonexistent_users.append(user_id)
+            else:
+                if not CustomUser.objects.filter(id=requested_user_filter).exists():
+                    nonexistent_users = [requested_user_filter]
+
+        if requested_store_filter:
+            if isinstance(requested_store_filter, list):
+                for store_id in requested_store_filter:
+                    if not Store.objects.filter(id=store_id).exists():
+                        nonexistent_stores.append(store_id)
+            else:
+                if not Store.objects.filter(id=requested_store_filter).exists():
+                    nonexistent_stores = [requested_store_filter]
+
+        if nonexistent_users or nonexistent_stores:
+            messages = []
+            if nonexistent_users:
+                if len(nonexistent_users) == 1:
+                    messages.append(f"User with id {nonexistent_users[0]} does not exist.")
+                else:
+                    messages.append(f"Users with ids {', '.join(map(str, nonexistent_users))} do not exist.")
+            if nonexistent_stores:
+                if len(nonexistent_stores) == 1:
+                    messages.append(f"Store with id {nonexistent_stores[0]} does not exist.")
+                else:
+                    messages.append(f"Stores with ids {', '.join(map(str, nonexistent_stores))} do not exist.")
+            if len(messages) == 1:
+                messages = messages[0]
+            return Response(
+                {"message": messages},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    elif user.groups.filter(name="Sellers").exists():
+        if not user.store:
+            return Response(
+                {"message": "You do not have a store associated with your account."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        requested_store_filter = filters.get("store") or filters.get("stores")
+
+        if not requested_store_filter:
+            return Response(
+                {"message": "Sellers must provide a 'store' or 'stores' filter."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        if isinstance(requested_store_filter, list):
+            unauthorized_stores = []
+            for store_id in requested_store_filter:
+                if store_id != user.store.id:
+                    unauthorized_stores.append(store_id)
+            if unauthorized_stores:
+                if len(unauthorized_stores) == 1:
+                    return Response(
+                        {"message": f"You are not authorized to view orders from store {unauthorized_stores[0]}."},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+                else:
+                    return Response(
+                        {"message": f"You are not authorized to view orders from stores: {', '.join(map(str, unauthorized_stores))}."},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+                
+        else:
+            if requested_store_filter and requested_store_filter != user.store.id:
+                return Response(
+                    {"message": f"You are not authorized to view orders from store {requested_store_filter}."},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+    elif user.groups.filter(name="Customers").exists():
+        requested_user_filter = filters.get("user") or filters.get("users")
+
+        if not requested_user_filter:
+            return Response(
+                {"message": "Customers must provide a 'user' or 'users' filter."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if isinstance(requested_user_filter, list):
+            unauthorized_users = []
+            for user_id in requested_user_filter:
+                if user_id != user.id:
+                    unauthorized_users.append(user_id)
+            if unauthorized_users:
+                if len(unauthorized_users) == 1:
+                    return Response(
+                        {"message": f"You are not authorized to view orders for user {unauthorized_users[0]}."},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+                else:
+                    return Response(
+                        {"message": f"You are not authorized to view orders for users: {', '.join(map(str, unauthorized_users))}."},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+        else:
+            if requested_user_filter and requested_user_filter != user.id:
+                return Response(
+                    {"message": f"You are not authorized to view orders for user {requested_user_filter}."},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
     if search:
         queryset = queryset.filter(
             Q(user__username__icontains=search)

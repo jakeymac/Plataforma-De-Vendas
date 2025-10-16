@@ -1,5 +1,4 @@
 import json
-
 import pytest
 from Accounts.models import CustomUser
 from django.contrib.auth.models import Group
@@ -501,8 +500,132 @@ class TestSearchOrdersEndpoint:
         assert response.status_code == 400
         assert response.data == {"message": "Invalid filters format."}
 
-    def test_invalid_sort(self, customer_fixture):
+    def test_admin_access_nonexistent_user(self, admin_fixture):
+        admin_user, client = admin_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"user": 999})})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "User with id 999 does not exist."}
+
+    def test_admin_access_nonexistent_user_list(self, admin_fixture):
+        admin_user, client = admin_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"users": [999, 1000]})})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Users with ids 999, 1000 do not exist."}
+
+    def test_admin_access_nonexistent_store(self, admin_fixture):
+        admin_user, client = admin_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"store": 999})})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Store with id 999 does not exist."}
+
+    def test_admin_access_nonexistent_store_list(self, admin_fixture):
+        admin_user, client = admin_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"stores": [999, 1000]})})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Stores with ids 999, 1000 do not exist."}
+
+    def test_admin_access_nonexistent_store_and_user(self, admin_fixture):
+        admin_user, client = admin_fixture
+
+        response = client.get(
+            self.url,
+            {"filters": json.dumps({"stores": [999], "users": [1000]})},
+        )
+
+        assert response.status_code == 400
+        assert response.data == {"message": ["User with id 1000 does not exist.", "Store with id 999 does not exist."]}
+
+    def test_seller_without_store(self, seller_fixture):
+        seller_user, client = seller_fixture
+
+        seller_user.store = None
+        seller_user.save()
+
+        response = client.get(self.url)
+
+        assert response.status_code == 400
+        assert response.data == {"message": "You do not have a store associated with your account."}
+
+    def test_seller_no_store_filter(self, seller_fixture):
+        seller_user, client = seller_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"status": "PENDING"})})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Sellers must provide a 'store' or 'stores' filter."}
+
+    def test_seller_unauthorized_single_store_in_list(self, seller_fixture):
+        seller_user, client = seller_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"store": [999]})})
+
+        assert response.status_code == 401
+        assert response.data == {"message": "You are not authorized to view orders from store 999."}
+
+    def test_seller_unauthorized_multiple_stores(self, seller_fixture):
+        seller_user, client = seller_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"stores": [999, 1000]})})
+
+        assert response.status_code == 401
+        assert response.data == {"message": "You are not authorized to view orders from stores: 999, 1000."}
+
+    def test_seller_unauthorized_store(self, seller_fixture):
+        seller_user, client = seller_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"store": 999})})
+
+        assert response.status_code == 401
+        assert response.data == {"message": "You are not authorized to view orders from store 999."}
+
+    def test_customer_no_user_filter(self, customer_fixture):
         customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"status": "PENDING"})})
+
+        assert response.status_code == 400
+        assert response.data == {"message": "Customers must provide a 'user' or 'users' filter."}
+
+    def test_customer_unauthorized_single_user_in_list(self, customer_fixture):
+        customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"user": [999]})})
+
+        assert response.status_code == 401
+        assert response.data == {"message": "You are not authorized to view orders for user 999."}
+
+    def test_customer_unauthorized_multiple_users(self, customer_fixture):
+        customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"users": [999, 1000]})})
+
+        assert response.status_code == 401
+        assert response.data == {"message": "You are not authorized to view orders for users: 999, 1000."}
+
+    def test_customer_unauthorized_user(self, customer_fixture):
+        customer_user, client = customer_fixture
+
+        response = client.get(self.url, {"filters": json.dumps({"user": 999})})
+
+        assert response.status_code == 401
+        assert response.data == {"message": "You are not authorized to view orders for user 999."}
+
+    def test_anonymous_access(self, anonymous_client):
+        response = anonymous_client.get(self.url)
+
+        assert response.status_code == 403
+
+    def test_invalid_sort(self, customer_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         response = client.get(self.url, {"sort": "invalid_sort_option"})
 
@@ -515,16 +638,18 @@ class TestSearchOrdersEndpoint:
             )
         }
 
-    def test_invalid_filter(self, customer_fixture):
-        customer_user, client = customer_fixture
+    def test_invalid_filter(self, customer_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
-        response = client.get(self.url, {"filters": '{"invalid_filter_key": "value"}'})
+        response = client.get(self.url, {"filters": json.dumps({"invalid_filter_key": "value",})})
 
         assert response.status_code == 400
         assert response.data == {"message": "Invalid filter options: invalid_filter_key."}
 
-    def test_search_customer_first_name(self, customer_fixture, order_fixture):
-        customer_user, client = customer_fixture
+    def test_search_customer_first_name(self, customer_fixture, order_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         new_customer = CustomUser.objects.create_user(
             username="another_customer",
@@ -548,8 +673,9 @@ class TestSearchOrdersEndpoint:
         assert len(response.data["orders"]) == 1
         assert response.data["orders"][0]["id"] == new_order.id
 
-    def test_search_customer_last_name(self, customer_fixture, order_fixture):
-        customer_user, client = customer_fixture
+    def test_search_customer_last_name(self, admin_fixture, customer_fixture, order_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         new_customer = CustomUser.objects.create_user(
             username="another_customer",
@@ -594,8 +720,9 @@ class TestSearchOrdersEndpoint:
         assert order_fixture.id in [order["id"] for order in response.data["orders"]]
         assert new_order.id in [order["id"] for order in response.data["orders"]]
 
-    def test_sort_newest(self, customer_fixture, order_fixture):
-        customer_user, client = customer_fixture
+    def test_sort_newest(self, customer_fixture, order_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         new_order = Order.objects.create(
             user=customer_user,
@@ -610,8 +737,9 @@ class TestSearchOrdersEndpoint:
         assert response.data["orders"][0]["id"] == new_order.id
         assert response.data["orders"][1]["id"] == order_fixture.id
 
-    def test_sort_oldest(self, customer_fixture, order_fixture):
-        customer_user, client = customer_fixture
+    def test_sort_oldest(self, customer_fixture, order_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         new_order = Order.objects.create(
             user=customer_user,
@@ -626,8 +754,9 @@ class TestSearchOrdersEndpoint:
         assert response.data["orders"][0]["id"] == order_fixture.id
         assert response.data["orders"][1]["id"] == new_order.id
 
-    def test_filter_by_status(self, customer_fixture, order_fixture):
-        customer_user, client = customer_fixture
+    def test_filter_by_status(self, customer_fixture, order_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         new_order = Order.objects.create(
             user=customer_user,
@@ -644,8 +773,9 @@ class TestSearchOrdersEndpoint:
         assert response.data["orders"][0]["id"] == new_order.id
         assert response.data["orders"][0]["status"] == "DONE"
 
-    def test_filter_by_min_total(self, customer_fixture, order_fixture):
-        customer_user, client = customer_fixture
+    def test_filter_by_min_total(self, customer_fixture, order_fixture, admin_fixture):
+        customer_user, _ = customer_fixture
+        admin_user, client = admin_fixture
 
         new_order = Order.objects.create(
             user=customer_user,
