@@ -47,12 +47,12 @@ function loadRecentOrders() {
 }
 
 function loadListeners() {
-    $("#refresh-orders-button").click(function() {
+    $('#refresh-orders-button').click(() => {
         loadRecentOrders();
     });
 }
 
-$(document).ready(function() {
+$(document).ready(() => {
     loadRecentOrders();
     loadListeners();
 

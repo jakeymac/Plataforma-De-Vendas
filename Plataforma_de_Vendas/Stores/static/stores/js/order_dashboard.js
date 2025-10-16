@@ -6,9 +6,7 @@ function buildQueryParms() {
     let filterValue = $('#order-filter-selector').val();
     let sortValue = $('#order-sort-selector').val();
 
-    let filters = {
-        'store': storeId
-    }
+    let filters = { 'store': storeId };
 
     let params = new URLSearchParams();
     params.append('page', currentPage);

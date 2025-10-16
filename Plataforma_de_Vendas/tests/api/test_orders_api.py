@@ -1,4 +1,5 @@
 import json
+
 import pytest
 from Accounts.models import CustomUser
 from django.contrib.auth.models import Group
@@ -541,7 +542,9 @@ class TestSearchOrdersEndpoint:
         )
 
         assert response.status_code == 400
-        assert response.data == {"message": ["User with id 1000 does not exist.", "Store with id 999 does not exist."]}
+        assert response.data == {
+            "message": ["User with id 1000 does not exist.", "Store with id 999 does not exist."]
+        }
 
     def test_seller_without_store(self, seller_fixture):
         seller_user, client = seller_fixture
@@ -576,7 +579,9 @@ class TestSearchOrdersEndpoint:
         response = client.get(self.url, {"filters": json.dumps({"stores": [999, 1000]})})
 
         assert response.status_code == 401
-        assert response.data == {"message": "You are not authorized to view orders from stores: 999, 1000."}
+        assert response.data == {
+            "message": "You are not authorized to view orders from stores: 999, 1000."
+        }
 
     def test_seller_unauthorized_store(self, seller_fixture):
         seller_user, client = seller_fixture
@@ -608,7 +613,9 @@ class TestSearchOrdersEndpoint:
         response = client.get(self.url, {"filters": json.dumps({"users": [999, 1000]})})
 
         assert response.status_code == 401
-        assert response.data == {"message": "You are not authorized to view orders for users: 999, 1000."}
+        assert response.data == {
+            "message": "You are not authorized to view orders for users: 999, 1000."
+        }
 
     def test_customer_unauthorized_user(self, customer_fixture):
         customer_user, client = customer_fixture
@@ -642,7 +649,16 @@ class TestSearchOrdersEndpoint:
         customer_user, _ = customer_fixture
         admin_user, client = admin_fixture
 
-        response = client.get(self.url, {"filters": json.dumps({"invalid_filter_key": "value",})})
+        response = client.get(
+            self.url,
+            {
+                "filters": json.dumps(
+                    {
+                        "invalid_filter_key": "value",
+                    }
+                )
+            },
+        )
 
         assert response.status_code == 400
         assert response.data == {"message": "Invalid filter options: invalid_filter_key."}

@@ -237,12 +237,16 @@ def search_orders_endpoint(request):
                 if len(nonexistent_users) == 1:
                     messages.append(f"User with id {nonexistent_users[0]} does not exist.")
                 else:
-                    messages.append(f"Users with ids {', '.join(map(str, nonexistent_users))} do not exist.")
+                    messages.append(
+                        f"Users with ids {', '.join(map(str, nonexistent_users))} do not exist."
+                    )
             if nonexistent_stores:
                 if len(nonexistent_stores) == 1:
                     messages.append(f"Store with id {nonexistent_stores[0]} does not exist.")
                 else:
-                    messages.append(f"Stores with ids {', '.join(map(str, nonexistent_stores))} do not exist.")
+                    messages.append(
+                        f"Stores with ids {', '.join(map(str, nonexistent_stores))} do not exist."
+                    )
             if len(messages) == 1:
                 messages = messages[0]
             return Response(
@@ -263,7 +267,7 @@ def search_orders_endpoint(request):
                 {"message": "Sellers must provide a 'store' or 'stores' filter."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         if isinstance(requested_store_filter, list):
             unauthorized_stores = []
             for store_id in requested_store_filter:
@@ -272,19 +276,34 @@ def search_orders_endpoint(request):
             if unauthorized_stores:
                 if len(unauthorized_stores) == 1:
                     return Response(
-                        {"message": f"You are not authorized to view orders from store {unauthorized_stores[0]}."},
+                        {
+                            "message": (
+                                f"You are not authorized to view orders from store "
+                                f"{unauthorized_stores[0]}."
+                            )
+                        },
                         status=status.HTTP_401_UNAUTHORIZED,
                     )
                 else:
                     return Response(
-                        {"message": f"You are not authorized to view orders from stores: {', '.join(map(str, unauthorized_stores))}."},
+                        {
+                            "message": (
+                                "You are not authorized to view orders from stores: "
+                                f"{', '.join(map(str, unauthorized_stores))}."
+                            )
+                        },
                         status=status.HTTP_401_UNAUTHORIZED,
                     )
-                
+
         else:
             if requested_store_filter and requested_store_filter != user.store.id:
                 return Response(
-                    {"message": f"You are not authorized to view orders from store {requested_store_filter}."},
+                    {
+                        "message": (
+                            f"You are not authorized to view orders from store "
+                            f"{requested_store_filter}."
+                        )
+                    },
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
     elif user.groups.filter(name="Customers").exists():
@@ -304,18 +323,33 @@ def search_orders_endpoint(request):
             if unauthorized_users:
                 if len(unauthorized_users) == 1:
                     return Response(
-                        {"message": f"You are not authorized to view orders for user {unauthorized_users[0]}."},
+                        {
+                            "message": (
+                                f"You are not authorized to view orders for user "
+                                f"{unauthorized_users[0]}."
+                            )
+                        },
                         status=status.HTTP_401_UNAUTHORIZED,
                     )
                 else:
                     return Response(
-                        {"message": f"You are not authorized to view orders for users: {', '.join(map(str, unauthorized_users))}."},
+                        {
+                            "message": (
+                                "You are not authorized to view orders for users: "
+                                f"{', '.join(map(str, unauthorized_users))}."
+                            )
+                        },
                         status=status.HTTP_401_UNAUTHORIZED,
                     )
         else:
             if requested_user_filter and requested_user_filter != user.id:
                 return Response(
-                    {"message": f"You are not authorized to view orders for user {requested_user_filter}."},
+                    {
+                        "message": (
+                            f"You are not authorized to view orders for user "
+                            f"{requested_user_filter}."
+                        )
+                    },
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
 
