@@ -1,0 +1,7 @@
+.card {
+    border-radius: var(--gui-border-radius);
+}
+
+.orders-table-container {
+    height: 540px;
+}
