@@ -1,0 +1,13 @@
+.cardCustom {
+    border-radius: var(--gui-border-radius);
+}
+
+.infoCardHeaderTitle {
+    margin: 0 auto;
+    text-align: center;
+    flex: 1;
+}
+
+.ordersTableContainer {
+    height: 540px;
+}

@@ -6,11 +6,12 @@
 {% block styles %}
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'stores/css/store_orders_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'core/react/assets/main.css' %}">
 {% endblock %}
 
 {% block scripts %}
     {{ block.super }}
-    <script type="module" src="{% static 'core/js/react/index.js' %}"></script>
+    <script type="module" src="{% static 'core/react/index.js' %}"></script>
 {% endblock %}
 
 {% block content %}

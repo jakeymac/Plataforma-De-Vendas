@@ -72,7 +72,7 @@ export default function OrdersDashboard({ storeId }) {
   }
 
   return (
-    <div className={clsx('card', styles.card)}>
+    <div className={clsx('card', styles.cardCustom)}>
       <div className="card-header">
         <div className="d-flex align-items-center justify-content-between mb-3">
           <div className="flex-grow-1 text-center">
@@ -125,6 +125,7 @@ export default function OrdersDashboard({ storeId }) {
             </select>
           </div>
         </div>
+      </div>
         <div className="card-body">
           <div className="position-relative">
             { loading && (
@@ -135,68 +136,67 @@ export default function OrdersDashboard({ storeId }) {
               </div>
             )}
             <div className={clsx('table-responsive', styles.ordersTableContainer)}>
-            <table className="table table-striped table-bordered mb-0">
-              <thead className="table-light">
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer Username</th>
-                  <th>Customer Name</th>
-                  <th>Date</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th className="text-center">
-                    <i className="bi bi-eye"></i>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                { orders.length === 0 ? (
+              <table className="table table-striped table-bordered mb-0">
+                <thead className="table-light">
                   <tr>
-                    <td colSpan="7" className="text-center">No orders found</td>
+                    <th>Order ID</th>
+                    <th>Customer Username</th>
+                    <th>Customer Name</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th className="text-center">
+                      <i className="bi bi-eye"></i>
+                    </th>
                   </tr>
-                ) : (
-                  orders.map((order) => (
-                    <tr key={order.id}>
-                      <td>{order.id}</td>
-                      <td>{order.user_username}</td>
-                      <td>{order.user_first_name} {order.user_last_name}</td>
-                      <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                      <td>${order.total}</td>
-                      <td>{order.status}</td>
-                      <td className="text-center">
-                        <a href={`/orders/${order.id}/`} className="btn btn-primary btn-sm">View</a>
-                      </td>
+                </thead>
+                <tbody>
+                  { orders.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="text-center">No orders found</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className="card-footer d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
-            <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
-              <span className="fw-semibold">Total: {total}</span>
+                  ) : (
+                    orders.map((order) => (
+                      <tr key={order.id}>
+                        <td>{order.id}</td>
+                        <td>{order.user_username}</td>
+                        <td>{order.user_first_name} {order.user_last_name}</td>
+                        <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                        <td>${order.total}</td>
+                        <td>{order.status}</td>
+                        <td className="text-center">
+                          <a href={`/orders/${order.id}/`} className="btn btn-primary btn-sm">View</a>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="d-flex justify-content-center align-items-center gap-2">
-              <button 
-                className="btn btn-outline-secondary btn-sm"
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
-              >
-                <i className="bi bi-chevron-left"></i> Prev
-              </button>
-              <span className="fw-semibold">Page {page}</span>
-              <button 
-                className="btn btn-outline-secondary btn-sm"
-                disabled={page >= pageCount}
-                onClick={() => setPage(page + 1)}
-              >
-                Next <i className="bi bi-chevron-right"></i>
-              </button>
-            </div>
-          </div>
           </div>
         </div>
-      </div>
+        <div className="card-footer d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
+          <div className="d-flex flex-wrap justify-content-center align-items-center gap-3">
+            <span className="fw-semibold">Total: {total}</span>
+          </div>
+          <div className="d-flex justify-content-center align-items-center gap-2">
+            <button 
+              className="btn btn-outline-secondary btn-sm"
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+            >
+              <i className="bi bi-chevron-left"></i> Prev
+            </button>
+            <span className="fw-semibold">Page {page}</span>
+            <button 
+              className="btn btn-outline-secondary btn-sm"
+              disabled={page >= pageCount}
+              onClick={() => setPage(page + 1)}
+            >
+              Next <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: resolve(__dirname, '../Plataforma_de_Vendas/core/static/core/js/react'),
+    outDir: resolve(__dirname, '../Plataforma_de_Vendas/core/static/core/react'),
     emptyOutDir: true,
     manifest: true,
     rollupOptions: {
