@@ -139,7 +139,7 @@ class ProductSubcategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductSubcategory
-        fields = ["category_id", "subcategory_name", "subcategory_description"]
+        fields = ["category_id", "id", "subcategory_name", "subcategory_description"]
 
     def validate(self, data):
         name = data.get("subcategory_name")
