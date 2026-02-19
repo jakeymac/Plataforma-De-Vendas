@@ -236,25 +236,24 @@ def add_product_image_endpoint(request):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def remove_product_image_endpoint(request, image_id):
-    if (
-        request.user.groups.filter(name="Admins").exists()
-        or request.user.groups.filter(name="Sellers").exists()
-    ):
-        try:
-            image = ProductImage.objects.get(id=image_id)
+    try:
+        image = ProductImage.objects.get(id=image_id)
+        if request.user.groups.filter(name="Admins").exists() or (
+            request.user.groups.filter(name="Sellers").exists()
+            and request.user.store == image.product.store
+        ):
             image.delete()
             return Response(
                 {"message": "Image removed successfully"}, status=status.HTTP_204_NO_CONTENT
             )
-        except ProductImage.DoesNotExist:
-            return Response(
-                {"message": f"Image not found with the id {image_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-    else:
         return Response(
             {"message": "You do not have permission to remove this image"},
             status=status.HTTP_403_FORBIDDEN,
+        )
+    except ProductImage.DoesNotExist:
+        return Response(
+            {"message": f"Image not found with the id {image_id}"},
+            status=status.HTTP_404_NOT_FOUND,
         )
 
 
@@ -281,6 +280,10 @@ def products_in_order_endpoint(request, order_id):
             products = ProductInOrder.objects.filter(order=order)
             serializer = ProductInOrderSerializer(products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "You are not authorized to view products in this order"},
+            status=status.HTTP_403_FORBIDDEN,
+        )
     except Order.DoesNotExist:
         return Response(
             {"message": f"Order not found with the id {order_id}"},
@@ -440,7 +443,7 @@ def add_subcategory_endpoint(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_category_endpoint(request):
-    if request.user.groups.filter(name="Admins"):
+    if request.user.groups.filter(name="Admins").exists():
         data = request.data
         serializer = ProductCategorySerializer(data=data)
         if serializer.is_valid():

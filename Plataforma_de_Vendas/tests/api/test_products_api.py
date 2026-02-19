@@ -336,6 +336,50 @@ class TestRemoveProductImageEndpoint:
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to remove this image"
 
+    def test_seller_cannot_delete_other_stores_image(self, product_fixture):
+        """Sellers can only delete images belonging to their own store's products."""
+        from Accounts.models import CustomUser
+        from django.contrib.auth.models import Group
+        from Stores.models import Store
+        from rest_framework.test import APIClient
+
+        other_store = Store.objects.create(
+            store_name="Other Store",
+            store_url="otherstore",
+        )
+        seller_group, _ = Group.objects.get_or_create(name="Sellers")
+        other_seller = CustomUser.objects.create_user(
+            username="other_seller", password="password123", email="other_seller@example.com"
+        )
+        other_seller.groups.add(seller_group)
+        other_seller.store = other_store
+        other_seller.save()
+
+        other_client = APIClient()
+        other_client.force_authenticate(user=other_seller)
+
+        product, _ = product_fixture
+        image = ProductImage.objects.filter(product=product)[0]
+
+        url = reverse(self.view_name, kwargs={"image_id": image.id})
+        response = other_client.delete(url)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to remove this image"
+
+    def test_seller_can_delete_own_stores_image(self, seller_fixture, product_fixture):
+        """Sellers can delete images belonging to their own store's products."""
+        seller_user, seller_client = seller_fixture
+        product, _ = product_fixture
+
+        image = ProductImage.objects.filter(product=product)[0]
+
+        url = reverse(self.view_name, kwargs={"image_id": image.id})
+        response = seller_client.delete(url)
+
+        assert response.status_code == 204
+        assert not ProductImage.objects.filter(id=image.id).exists()
+
     def test_nonexistent_image(self, admin_fixture):
         admin_user, admin_client = admin_fixture
 
@@ -377,6 +421,35 @@ class TestProductsInOrderEndpoint:
 
         assert response.status_code == 404
         assert response.data["message"] == "Order not found with the id 0"
+
+    def test_unauthorized_access(self, seller_fixture, order_fixture):
+        """A seller not associated with the order's store should get a 403 response."""
+        from Accounts.models import CustomUser
+        from django.contrib.auth.models import Group
+        from Stores.models import Store
+        from rest_framework.test import APIClient
+
+        other_store = Store.objects.create(
+            store_name="Other Store",
+            store_url="otherstore2",
+        )
+        seller_group, _ = Group.objects.get_or_create(name="Sellers")
+        other_seller = CustomUser.objects.create_user(
+            username="other_seller2", password="password123", email="other_seller2@example.com"
+        )
+        other_seller.groups.add(seller_group)
+        other_seller.store = other_store
+        other_seller.save()
+
+        other_client = APIClient()
+        other_client.force_authenticate(user=other_seller)
+
+        order = order_fixture
+        url = reverse(self.view_name, kwargs={"order_id": order.id})
+        response = other_client.get(url)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You are not authorized to view products in this order"
 
 
 @pytest.mark.django_db
@@ -666,6 +739,20 @@ class TestAddCategoryEndpoint:
         }
 
         response = customer_client.post(self.url, data)
+
+        assert response.status_code == 403
+        assert response.data["message"] == "You do not have permission to add a category"
+
+    def test_seller_unauthorized_access(self, seller_fixture):
+        """Sellers should not be able to add categories."""
+        seller_user, seller_client = seller_fixture
+
+        data = {
+            "category_name": "Test Category Name",
+            "category_description": "Test Category Description",
+        }
+
+        response = seller_client.post(self.url, data)
 
         assert response.status_code == 403
         assert response.data["message"] == "You do not have permission to add a category"
