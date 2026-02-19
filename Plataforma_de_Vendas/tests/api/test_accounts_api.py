@@ -325,6 +325,11 @@ class TestLoginEndpoint:
         response = customer_client.post(url, data, format="json")
         assert response.status_code == 400
 
+    def test_get_method_not_allowed(self, anonymous_client):
+        """GET method should not be allowed on the login endpoint."""
+        response = anonymous_client.get(self.url)
+        assert response.status_code == 405
+
 
 class TestLogoutEndpoint:
     """Tests the logout_endpoint - api/accounts/logout/ - logout-endpoint"""

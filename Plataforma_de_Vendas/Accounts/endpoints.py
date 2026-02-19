@@ -153,7 +153,7 @@ def get_current_user_info_endpoint(request):
         },
     ),
 )
-@api_view(["POST", "GET"])  # TODO remove GET method
+@api_view(["POST"])
 def login_endpoint(request):
     data = request.data
     username = data.get("username")
